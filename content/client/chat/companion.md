@@ -153,6 +153,43 @@ Enables clinicians and patients to share clinical documents (lab results, radiol
 | F-4-1 | Given clinical attachments under 25MB, then files upload securely with download cards. |
 | F-4-2 | Given a message reply, then a quote banner links back to the original message in thread. |
 
+### F-5: Scoped Composer Controls & In-Line Responsible Assignment
+#### 1. What it does
+Streamlines clinical conversation controls on the Companion channel by removing the topbar assignment button and moving Care Bot pause/resume controls and responsible team member assignment into the composer gear menu. Eliminates external message templates on Companion and renders a clean, concise popup directly above the gear box scoped strictly to the organization's team members.
+
+#### 2. What it includes
+| Item | Type | What it does | Notes |
+| :--- | :--- | :--- | :--- |
+| F-5.1: Topbar Assign Removal | UI Scoping | Removes the topbar `Unassigned` / `Bot Active` button on Companion conversations | Cleaner top header |
+| F-5.2: Care Bot Pause / Resume Action | Control | Toggles Care Bot active/paused status directly inside the composer gear menu | Shows Active/Paused badge |
+| F-5.3: Template Option Removal | Scoping | Hides the "Share Template Message" option on the Companion channel | Templates are SMS/WhatsApp only |
+| F-5.4: Concise Responsible Popup | UI Popover | Renders a small, clean popover directly above the gear box | Positioned right above gear icon |
+| F-5.5: Team Member-Only Selection | Data Scoping | Scopes assignable responsible persons strictly to organization team members | Excludes bots and non-org users |
+
+#### 3. Worked example
+| # | Situation | What the user does | Result |
+| :--- | :--- | :--- | :--- |
+| 1 | Staff inspects Companion chat header | Opens patient Companion conversation | **Topbar shows contact name and phone; the `Unassigned` button is absent** |
+| 2 | Staff wants to pause automated bot replies | Clicks gear icon in composer and taps "Pause Care Bot" | **Care Bot pauses; status pill updates to "Paused" and toast confirms "Care Bot paused"** |
+| 3 | Staff wants to assign doctor to thread | Clicks gear icon and selects "Assign Responsible" | **Clean, concise popup opens directly above the gear box listing organization team members** |
+| 4 | Staff selects "Dr. Akshita Sharma" | Clicks Dr. Akshita Sharma in member list | **Responsible updates to Dr. Akshita Sharma; bot pauses automatically; toast confirms assignment** |
+| 5 | Staff unassigns responsible | Clicks "Unassigned" option in popup | **Responsible is cleared; toast confirms "Conversation unassigned"** |
+
+#### 4. Jobs to be done
+| # | User | Job to be done |
+| :--- | :--- | :--- |
+| F-5-J1 | Care Coordinator | When taking over a patient conversation from the Care Bot, I want to pause the bot and assign a clinician from a concise popup above the composer, so that I can manage routing without leaving the chat stream. |
+| F-5-J2 | Practice Administrator | When assigning responsibles on Companion, I want member choices restricted strictly to our organization team members, so that patient threads cannot be routed to arbitrary external contacts. |
+
+#### 5. Acceptance criteria
+| # | Criteria |
+| :--- | :--- |
+| F-5-1 | Given a Companion conversation, when viewed, then the topbar assignment button is hidden. |
+| F-5-2 | Given the composer gear menu on Companion, then the template sharing option is hidden. |
+| F-5-3 | Given the composer gear menu on Companion, then a toggle option allows staff to pause and resume the Care Bot. |
+| F-5-4 | Given the "Assign Responsible" action, then a concise popup renders directly above the gear box. |
+| F-5-5 | Given the responsible member list, then only verified organization team members and an "Unassigned" option are selectable. |
+
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
@@ -162,6 +199,7 @@ Enables clinicians and patients to share clinical documents (lab results, radiol
 | F-2 | Process-Driven AI Care Bot & Shortcuts | F-2.1 Intent Classifier, F-2.2 Process Response, F-2.3 Action Shortcuts, F-2.4 Emergency Escalation | AI bot evaluating practice processes (Booking, Billing, Intake, Check-in) and returning interactive shortcuts. |
 | F-3 | Companion Settings & Requirement Mapping | F-3.1 Settings Button, F-3.2 Requirement Mapping, F-3.3 AI Responder Toggle, F-3.4 Working Hours | Dedicated settings drawer mapping client requirement choices to organizational workflow processes. |
 | F-4 | Secure Clinical Media & Contextual Quoting | F-4.1 Attachment Pipeline, F-4.2 In-Line Quoting, F-4.3 Read Receipts | 25MB clinical document exchange, in-thread quote replies, and delivery status tracking. |
+| F-5 | Scoped Composer Controls & In-Line Responsible Assignment | F-5.1 Topbar Removal, F-5.2 Bot Pause/Resume, F-5.3 Template Removal, F-5.4 Concise Popup, F-5.5 Org Team Members | In-composer Care Bot pause/resume and concise popup above gear box for assigning organization team members. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
@@ -172,6 +210,8 @@ Enables clinicians and patients to share clinical documents (lab results, radiol
 | 4 | Practice Administrator | When patients use the Companion portal, I want routine inquiries automatically resolved via identified processes, so that phone volume to front desk staff is minimized. | F-2 |
 | 5 | Practice Administrator | When configuring the patient portal, I want to map patient choices to exact back-office processes, so that intake and booking workflows execute automatically. | F-3 |
 | 6 | Clinician | When discussing lab results with a patient, I want to attach PDF documents and quote questions directly, so that patient communication is precise and well-documented. | F-4 |
+| 7 | Care Coordinator | When taking over a patient conversation from the Care Bot, I want to pause the bot and assign a clinician from a concise popup above the composer, so that I can manage routing without leaving the chat stream. | F-5 |
+| 8 | Practice Administrator | When assigning responsibles on Companion, I want member choices restricted strictly to our organization team members, so that patient threads cannot be routed to arbitrary external contacts. | F-5 |
 
 ### Open Items
 - To confirm: Should patients who leave a Care Group via the Companion portal be allowed to re-join without a staff invite?
