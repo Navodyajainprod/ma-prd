@@ -4,7 +4,6 @@ import { loadPrd, hasPrd } from "@/lib/prdLoader";
 import { getModuleById, getProductLink, ProductId } from "@/lib/modulesConfig";
 import PrdRenderer from "@/components/PrdRenderer";
 import PrdLayoutClient from "@/components/PrdLayoutClient";
-import ProductSwitchCtas from "@/components/ProductSwitchCtas";
 
 interface PageProps {
   params: {
