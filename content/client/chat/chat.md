@@ -231,8 +231,3 @@ Provides real-time feedback on message transport states across external networks
 | 11 | Care Coordinator | When dispatching urgent instructions, I want to verify if the message was delivered and read, so that I know the patient received care guidance. | F-5 |
 | 12 | Staff Member | When a message delivery fails, I want to see the error indicator and retry option, so that I can re-attempt communication. | F-5 |
 
-### Open Items
-- To confirm: Should patients in the Companion portal be allowed to create their own Care Groups independently or remain staff-initiated only?
-- To confirm: What is the exact data retention policy for clinical chat attachments across HIPAA-regulated tenant archives?
-- To confirm: Can a patient who leaves a Care Group self-rejoin without clinician intervention?
-- To confirm: How should WhatsApp template approvals outside the 24-hour Meta service window be alerted if template sync is delayed?

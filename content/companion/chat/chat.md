@@ -263,8 +263,3 @@ Provides a slide-over `PatientGroupInfoDrawer` displaying group details, care te
 | 11 | Patient | When looking for clinical guides sent weeks ago, I want to view a shared files list in the group drawer, so that I do not have to scroll through hundreds of messages. | F-6 |
 | 12 | Patient | When I complete a clinical program, I want to leave the group myself, so that my messaging sidebar remains clean and uncluttered. | F-6 |
 
-### Open Items
-- To confirm: Should patients be able to re-join a Care Group after clicking "Leave Group" without staff re-invitation?
-- To confirm: What happens if a patient does not currently have an assigned primary physician in their clinic profile?
-- To confirm: Can the Care Chat Bot book an appointment directly without user confirmation in `/patient/book`?
-- To confirm: How are clinical lab report attachments handled if the MIME type is unsupported or corrupted?

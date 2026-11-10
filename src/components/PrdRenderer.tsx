@@ -36,12 +36,14 @@ function MarkdownBlock({
     const rawLine = lines[i];
     const trimmed = rawLine.trim();
 
-    // 1. Skip dashes (---, ___, ***), raw markdown headers (# ..., ## ...), and legacy "Item | Detail" lines
+    // 1. Skip dashes (---, ___, ***), raw markdown headers (# ..., ## ...), legacy "Item | Detail" lines, and Open Items
     if (
       trimmed === "" ||
       /^[-*_\s]{3,}$/.test(trimmed) ||
       trimmed.startsWith("# ") ||
       trimmed.startsWith("## ") ||
+      /^###\s*Open Items/i.test(trimmed) ||
+      /^(-\s*)?To confirm:/i.test(trimmed) ||
       /^\|\s*Item\s*\|\s*Detail\s*\|/i.test(trimmed) ||
       /^\|\s*:?---+\s*\|\s*:?---+\s*\|/i.test(trimmed)
     ) {
@@ -484,25 +486,6 @@ export default function PrdRenderer({
             </div>
           </section>
         ))}
-
-        {/* Open Items ("To confirm: ...") */}
-        {prd.openItems && prd.openItems.length > 0 && (
-          <section id="open-items" className="scroll-mt-24 pt-6 border-t border-slate-200 dark:border-zinc-800 space-y-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-zinc-300">
-              Open Items (To confirm)
-            </h3>
-            <ul className="space-y-2 text-xs sm:text-[13px] text-slate-700 dark:text-zinc-300 list-disc pl-5">
-              {prd.openItems.map((item, idx) => (
-                <li key={idx} className="leading-relaxed">
-                  <span className="font-semibold text-slate-900 dark:text-zinc-100">
-                    {item.split(":")[0]}:
-                  </span>
-                  <span>{item.substring(item.indexOf(":") + 1)}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
       </div>
 
       {/* Footer Audit Link to Date & Edit Logs in Sidebar */}

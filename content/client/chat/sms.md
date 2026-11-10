@@ -164,7 +164,3 @@ Configures topbar actions specific to the SMS channel. Staff have access to send
 | 4 | Front Desk Staff | When drafting SMS reminders, I want to see character and segment counts, so that I keep messages concise and avoid unnecessary carrier segment costs. | F-3 |
 | 5 | Practice Coordinator | When triaging SMS chats, I want a clean topbar without group buttons, so that workflow actions match carrier capabilities. | F-4 |
 
-### Open Items
-- To confirm: Should outbound SMS allow MMS attachments (images/vCards) or remain strictly text-only across carrier trunks?
-- To confirm: Can multiple practice SMS numbers be configured per department or is one central 10DLC number shared?
-

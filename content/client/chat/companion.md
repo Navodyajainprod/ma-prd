@@ -213,7 +213,3 @@ Streamlines clinical conversation controls on the Companion channel by removing 
 | 7 | Care Coordinator | When taking over a patient conversation from the Care Bot, I want to pause the bot and assign a clinician from a concise popup above the composer, so that I can manage routing without leaving the chat stream. | F-5 |
 | 8 | Practice Administrator | When assigning responsibles on Companion, I want member choices restricted strictly to our organization team members, so that patient threads cannot be routed to arbitrary external contacts. | F-5 |
 
-### Open Items
-- To confirm: Should patients who leave a Care Group via the Companion portal be allowed to re-join without a staff invite?
-- To confirm: How are multi-practitioner assignment notifications routed if more than two clinicians are tagged in a Care Group?
-

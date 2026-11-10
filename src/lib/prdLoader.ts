@@ -72,7 +72,6 @@ export interface PrdDocument {
   dateLog: string[];
   editLog: { date: string; section: string; change: string }[];
   sections: PrdSection[];
-  openItems: string[];
   rawFullMarkdown: string;
 }
 
@@ -291,15 +290,6 @@ export function loadPrd(
     });
   }
 
-  // 5. Parse Open Items / Questions ("To confirm: ...")
-  const openItems: string[] = [];
-  const openItemsMatches = cleanContent.match(/To confirm:[^\n]+/g);
-  if (openItemsMatches) {
-    openItemsMatches.forEach((item) => {
-      openItems.push(item.trim());
-    });
-  }
-
   return {
     title: frontmatter.title || `${product} ${moduleName} PRD`,
     product,
@@ -313,7 +303,6 @@ export function loadPrd(
     dateLog,
     editLog,
     sections,
-    openItems,
     rawFullMarkdown: content,
   };
 }

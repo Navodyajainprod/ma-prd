@@ -211,7 +211,3 @@ Configures topbar and composer actions strictly tailored for Website chat. The t
 | 6 | Practice Manager | When visitors chat after clinic closing, I want working hours enforced inside Responsible Settings, so that realistic response expectations are set. | F-4 |
 | 7 | Clinical Coordinator | When triaging website chats, I want a clean composer without extraneous setting icons, so that messaging is streamlined and uncluttered. | F-5 |
 
-### Open Items
-- To confirm: Should visitor session transcripts be automatically sent to the visitor's email upon session resolution?
-- To confirm: What is the timeout threshold before an inactive website chat session is marked as resolved?
-

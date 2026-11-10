@@ -177,7 +177,3 @@ Configures the channel-specific topbar controls for WhatsApp. The topbar include
 | 6 | Practice Manager | When standardizing clinical communication, I want approved templates with locked wording, so that medical disclaimers are uniformly followed. | F-3 |
 | 7 | Clinical Coordinator | When triaging WhatsApp chats, I want a focused topbar with template shortcuts and phone switchers, so that I don't see irrelevant controls. | F-4 |
 
-### Open Items
-- To confirm: What is the maximum number of registered WhatsApp Business numbers supported per practice tenant?
-- To confirm: Should outbound WhatsApp media messages be restricted to PDF and JPG, or should audio voice notes also be permitted?
-

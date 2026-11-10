@@ -30,10 +30,6 @@ export default function TableOfContents({ prd }: TableOfContentsProps) {
       }
     });
 
-    if (prd.openItems && prd.openItems.length > 0) {
-      ids.push("open-items");
-    }
-
     const observer = new IntersectionObserver(
       (entries) => {
         // Find visible entries
@@ -174,20 +170,6 @@ export default function TableOfContents({ prd }: TableOfContentsProps) {
             )}
           </div>
         ))}
-
-        {prd.openItems && prd.openItems.length > 0 && (
-          <button
-            type="button"
-            onClick={() => scrollToElement("open-items")}
-            className={`w-full text-left py-1 px-2 rounded-md transition-colors truncate block ${
-              activeId === "open-items"
-                ? "text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-950/30"
-                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200"
-            }`}
-          >
-            Open Items (To confirm)
-          </button>
-        )}
       </div>
     </nav>
   );
