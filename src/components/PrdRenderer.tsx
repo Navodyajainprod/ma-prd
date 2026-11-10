@@ -72,7 +72,7 @@ function MarkdownBlock({
         renderedElements.push(
           <div
             key={`table-${i}`}
-            className="mt-3 mb-7 overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs"
+            className="mt-4 mb-10 overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs"
           >
             <table className="w-full text-left text-xs sm:text-[13px] border-collapse">
               <thead>
@@ -152,7 +152,7 @@ function MarkdownBlock({
         <h3
           key={`h3-${i}`}
           id={anchorId}
-          className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-14 mb-5 tracking-tight scroll-mt-24 pt-6 border-t border-slate-200 dark:border-zinc-800 first:border-t-0 first:pt-0 first:mt-4"
+          className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-24 sm:mt-28 mb-6 tracking-tight scroll-mt-24 pt-12 border-t-2 border-slate-200/90 dark:border-zinc-800 first:border-t-0 first:pt-0 first:mt-6"
         >
           {formatInlineMarkdown(headingText)}
         </h3>
@@ -173,11 +173,17 @@ function MarkdownBlock({
         partSlug = partText.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       }
 
+      const isFirstPart = partMatch && partMatch[1] === "1";
+
       renderedElements.push(
         <h4
           key={`h4-${i}`}
           id={partSlug}
-          className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-zinc-100 mt-10 mb-3 scroll-mt-24"
+          className={`text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-4 scroll-mt-24 ${
+            isFirstPart
+              ? "mt-5"
+              : "pt-14 sm:pt-20 mt-10"
+          }`}
         >
           {formatInlineMarkdown(partText)}
         </h4>
