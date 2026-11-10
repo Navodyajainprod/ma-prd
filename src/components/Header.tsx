@@ -74,7 +74,7 @@ export default function Header({
             </button>
           )}
 
-          <Link href={`/${activeProduct || "client"}/chat`} className="flex items-center gap-2.5 group">
+          <Link href={getProductLink(activeProduct || "client")} className="flex items-center gap-2.5 group">
             <div className="relative h-6 w-24 sm:w-28 md:w-32">
               <Image
                 src="/ma_logo.png"

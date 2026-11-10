@@ -55,6 +55,27 @@ export const PRODUCTS: ProductConfig[] = [
 export const ALL_MODULES: ModuleDefinition[] = [
   // ── Client Modules ──
   {
+    id: "overview",
+    name: "Overview Dashboard",
+    category: "WORKSPACE",
+    description: "Central dashboard with daily visit agendas, real-time clinical activity feed, and conversion funnel metrics.",
+    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "clients",
+    name: "Contact / Patients",
+    category: "WORKSPACE",
+    description: "Comprehensive EHR patient chart, demographic directory, clinical intake histories, and encounter logs.",
+    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "call-logs",
+    name: "Call Logs & Telephony",
+    category: "WORKSPACE",
+    description: "VoIP and SIP dialer hub with call recordings, transcriptions, voicemail triage, and telecom performance.",
+    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
+  },
+  {
     id: "chat",
     name: "Chats & Care Groups",
     category: "WORKSPACE",
@@ -88,27 +109,6 @@ export const ALL_MODULES: ModuleDefinition[] = [
         },
       ],
     },
-  },
-  {
-    id: "overview",
-    name: "Overview Dashboard",
-    category: "WORKSPACE",
-    description: "Central dashboard with daily visit agendas, real-time clinical activity feed, and conversion funnel metrics.",
-    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
-  },
-  {
-    id: "clients",
-    name: "Contact / Patients",
-    category: "WORKSPACE",
-    description: "Comprehensive EHR patient chart, demographic directory, clinical intake histories, and encounter logs.",
-    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
-  },
-  {
-    id: "call-logs",
-    name: "Call Logs & Telephony",
-    category: "WORKSPACE",
-    description: "VoIP and SIP dialer hub with call recordings, transcriptions, voicemail triage, and telecom performance.",
-    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
   },
   {
     id: "processes",
@@ -568,6 +568,15 @@ export function getModulesForProduct(product: ProductId): ModuleDefinition[] {
         submodules: subs || undefined,
       };
     });
+
+  if (product === "companion") {
+    const order = ["today", "appointments", "tasks", "documents", "forms", "billing", "pharmacy", "chat"];
+    mods.sort((a, b) => {
+      const idxA = order.indexOf(a.id);
+      const idxB = order.indexOf(b.id);
+      return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+    });
+  }
 
   if (product === "ai-receptionist") {
     const order = ["checkin", "directions", "my-visit", "avatar", "billing", "settings"];
