@@ -13,6 +13,7 @@ export async function GET(request: Request) {
     const clientPrd = loadPrd("client", id);
     const adminPrd = loadPrd("admin", id);
     const companionPrd = loadPrd("companion", id);
+    const receptionPrd = loadPrd("ai-receptionist", id);
 
     return {
       moduleId: id,
@@ -20,10 +21,10 @@ export async function GET(request: Request) {
       clientContent: clientPrd?.rawFullMarkdown || null,
       adminContent: adminPrd?.rawFullMarkdown || null,
       companionContent: companionPrd?.rawFullMarkdown || null,
-      hasAnyPrd: Boolean(clientPrd || adminPrd || companionPrd),
+      receptionContent: receptionPrd?.rawFullMarkdown || null,
+      hasAnyPrd: Boolean(clientPrd || adminPrd || companionPrd || receptionPrd),
     };
   });
 
   return NextResponse.json({ modules: results });
 }
-

@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import PrdLayoutClient from "@/components/PrdLayoutClient";
 import { Clock, History, Calendar, FileEdit, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ProductId, getProductLink } from "@/lib/modulesConfig";
 
 interface PageProps {
   params: {
@@ -11,14 +12,20 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const product = params.product.toUpperCase();
+  const product = params.product.replace("-", " ").toUpperCase();
   return {
     title: `Date & Edit Logs | ${product} - MantraAssist PRD`,
     description: `Audited changelog and version history for MantraAssist ${product} modules.`,
   };
 }
 
-const LOG_ENTRIES = {
+const LOG_ENTRIES: Record<
+  ProductId,
+  {
+    dates: { date: string; event: string; module: string; author: string; status: string; note: string }[];
+    edits: { date: string; module: string; section: string; change: string }[];
+  }
+> = {
   client: {
     dates: [
       {
@@ -31,11 +38,11 @@ const LOG_ENTRIES = {
       },
       {
         date: "2026-11-10",
-        event: "Cross-Product Sync Specification Added",
-        module: "Chats & Care Groups",
+        event: "Multi-Module PRD Expansion",
+        module: "All Client Modules",
         author: "MantraAssist Product Core",
         status: "In Review",
-        note: "Added cross-product propagation to Companion portal for staff-created Care Groups.",
+        note: "Authored full PRDs across Appointments, Settings, Process, Overview, Contacts, Telephony, Scribe, Invoices, Claims, and Workflows.",
       },
       {
         date: "2026-11-10",
@@ -61,33 +68,49 @@ const LOG_ENTRIES = {
       },
       {
         date: "2026-11-10",
-        module: "Chats & Care Groups",
-        section: "Cover & Overview",
-        change: "Established the Unified Conversation Threading Invariant and multi-channel scope.",
+        module: "Appointments & Visits",
+        section: "Calendar, List & Availability",
+        change: "Authored individual tab PRD pages for provider schedules, appointments table, and weekly working hours buffers.",
       },
       {
         date: "2026-11-10",
-        module: "Chats & Care Groups",
-        section: "Section 2 (How It Works Today)",
-        change: "Documented existing channel tabs, responsible member assignment, and WhatsApp 24h Meta window.",
+        module: "Settings & Team",
+        section: "9 Sub-Tabs Specification",
+        change: "Documented Organization Profile, Team Roles, Billing, AI Voices, Custom Fields, Integrations, Audit Logs, Security, and Reception Kiosk settings.",
+      },
+    ],
+  },
+  admin: {
+    dates: [
+      {
+        date: "2026-11-10",
+        event: "Admin Platform PRD Suite Created",
+        module: "Platform Control & Blueprints",
+        author: "Platform Engineering",
+        status: "In Review",
+        note: "Authored specifications for Multi-Tenant Organizations, Custom Fields Master, Industry Categories, Plans & Credits, and AI Voices.",
       },
       {
         date: "2026-11-10",
-        module: "Chats & Care Groups",
-        section: "Section 5 & 6 (Core Rule & FRs)",
-        change: "Defined FR-1 through FR-8 including slide-over group drawer, message replies, and 25MB attachment limit.",
+        event: "RBAC & Sidebar Navigation Rules Defined",
+        module: "Security & Control",
+        author: "Platform Engineering",
+        status: "In Review",
+        note: "Specified granular menu editor, feature flags, and role studio permissions matrix.",
+      },
+    ],
+    edits: [
+      {
+        date: "2026-11-10",
+        module: "Custom Fields Master",
+        section: "Fields & Sections Tabs",
+        change: "Documented global data dictionary, validation formulas, and grouped accordion section layouts.",
       },
       {
         date: "2026-11-10",
-        module: "Chats & Care Groups",
-        section: "Section 7 (Worked Examples)",
-        change: "Authored 12 clinical situations covering care team groups, MRI attachments, and member removals.",
-      },
-      {
-        date: "2026-11-10",
-        module: "Chats & Care Groups",
-        section: "Section 10 & 11 (Decisions & AC)",
-        change: "Enforced drawers instead of modals, no colorful badges, and 10 precise acceptance criteria.",
+        module: "Billing Plans & Addons",
+        section: "Plans, Pricing & Credit Actions",
+        change: "Documented industry tiers, packed pricing seat bundles, and per-minute credit deduction rate cards.",
       },
     ],
   },
@@ -99,104 +122,101 @@ const LOG_ENTRIES = {
         module: "Chat & Care Bot",
         author: "MantraAssist Product Core",
         status: "In Review",
-        note: "Specification extracted from PatientMessagesScreen.tsx, PatientCareBotScreen.tsx, and PatientGroupInfoDrawer.tsx.",
+        note: "Initial patient portal messaging specification covering Care Chat Bot shortcuts and multi-party Care Groups.",
       },
       {
         date: "2026-11-10",
-        event: "Care Bot Renaming & Shortcuts",
-        module: "Chat & Care Bot",
-        author: "MantraAssist Product Core",
-        status: "In Review",
-        note: "Renamed to Care Chat Bot with explicit AI badge and 5 fixed health action cards.",
-      },
-      {
-        date: "2026-11-10",
-        event: "Status Transition to In Review",
-        module: "Chat & Care Bot",
+        event: "Full Patient Suite Specification Added",
+        module: "All Companion Modules",
         author: "Patient Experience Team",
         status: "In Review",
-        note: "Tri-Entity Care Boundary Invariant verified across doctor, bot, and group channels.",
+        note: "Authored PRDs for Today's Agenda, Visit Booking, Health Records, Prescriptions, Intake Forms, and Copay Checkout.",
       },
     ],
     edits: [
       {
         date: "2026-11-10",
-        module: "Chat & Care Bot",
-        section: "Cross-Product Summary",
-        change: "Specified patient reception of Care Groups created by clinical staff in Client workspace.",
+        module: "Today's Visit Agenda",
+        section: "Queue Tracker & Doctor ETA",
+        change: "Documented real-time queue position display, check-in card, and doctor room routing instructions.",
       },
       {
         date: "2026-11-10",
-        module: "Chat & Care Bot",
-        section: "Section 1 & 5 (Overview & Core Rule)",
-        change: "Enforced Tri-Entity Care Boundary Invariant strictly isolating Bot, Doctor, and Groups.",
-      },
-      {
-        date: "2026-11-10",
-        module: "Chat & Care Bot",
-        section: "Section 6 (Requirements)",
-        change: "Authored FR-1 through FR-8 covering Care Chat Bot shortcuts, replies, media, and leave drawer.",
-      },
-      {
-        date: "2026-11-10",
-        module: "Chat & Care Bot",
-        section: "Section 7 & 8 (Worked Examples & UI)",
-        change: "Documented 12 worked examples and patient drawer UI spec (Members, Files, Tasks tabs).",
+        module: "Billing & Invoices",
+        section: "Copay Ledger & UPI/Card Payment",
+        change: "Documented itemized copay breakdown, digital payment gateway checkout, and invoice receipt history.",
       },
     ],
   },
-  admin: {
+  "ai-receptionist": {
     dates: [
       {
         date: "2026-11-10",
-        event: "Platform Module Architecture Cataloged",
-        module: "All Admin Modules",
-        author: "MantraAssist Product Core",
-        status: "Planning",
-        note: "Inventoried 17 admin modules from AdminSidebar.tsx and AdminProcessTemplates.tsx.",
+        event: "AI Receptionist PRD Suite Created",
+        module: "Kiosk & Touch Console",
+        author: "Hardware & AI Experience Core",
+        status: "In Review",
+        note: "Authored full specifications for Check-In, Wayfinding, Billing, My Visit Status, Aria Avatar Stage, and Station Settings.",
       },
     ],
     edits: [
       {
         date: "2026-11-10",
-        module: "Platform Blueprints",
-        section: "Workflows & Automations",
-        change: "Cataloged master process templates, AI chatbot triggers, and credit plans.",
+        module: "Check-In & Booking",
+        section: "Scheduled & Walk-In Tabs",
+        change: "Documented face verification scan, phone OTP fallback, walk-in registration, and automated queue token issuance.",
+      },
+      {
+        date: "2026-11-10",
+        module: "Billing & QR Payments",
+        section: "Dues Lookup & Dynamic QR",
+        change: "Documented phone number bill query, itemized charges, instant UPI QR code modal, and receipt confirmation.",
+      },
+      {
+        date: "2026-11-10",
+        module: "Wayfinding & Directions",
+        section: "Departments & Room Routing",
+        change: "Documented interactive department directory, floor maps, and turn-by-turn guidance to doctor consultation rooms.",
       },
     ],
   },
 };
 
 export default function LogsPage({ params }: PageProps) {
-  const validProducts = ["client", "admin", "companion"] as const;
+  const validProducts = ["client", "admin", "companion", "ai-receptionist"] as const;
   const product = params.product.toLowerCase() as (typeof validProducts)[number];
 
   if (!validProducts.includes(product)) {
     notFound();
   }
 
-  const data = LOG_ENTRIES[product] || LOG_ENTRIES.client;
+  const data = LOG_ENTRIES[product] || { dates: [], edits: [] };
+  const returnHref = getProductLink(product);
 
   return (
     <PrdLayoutClient product={product} prd={null}>
-      <div className="max-w-4xl mx-auto py-10 px-4 sm:px-8 space-y-10">
-        {/* Header Block */}
-        <div className="space-y-3 pb-6 border-b border-slate-200 dark:border-zinc-800">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/80 px-2 py-0.5 rounded-md">
-              {product.toUpperCase()} AUDIT
-            </span>
-            <span className="text-[11px] font-medium text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 px-2 py-0.5 rounded-md">
-              Changelog & Versioning
-            </span>
-          </div>
+      <div className="max-w-5xl mx-auto py-10 px-4 sm:px-8 space-y-10">
+        {/* Header Breadcrumb & Title */}
+        <div className="space-y-3">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-zinc-400">
+            <span className="capitalize">{product.replace("-", " ")}</span>
+            <span className="text-slate-300 dark:text-zinc-700">/</span>
+            <span className="text-slate-800 dark:text-zinc-200 font-semibold">Audit & Logs</span>
+          </nav>
 
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white font-display">
-            Date & Edit Logs
-          </h1>
-          <p className="text-xs sm:text-[13px] text-slate-600 dark:text-zinc-400 leading-relaxed max-w-2xl">
-            Immutable audit record of all document milestones, clinical reviews, status changes, and section-by-section revisions for MantraAssist {product}.
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
+              <History className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white font-display">
+                Date & Edit Logs
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
+                Complete audit trail of document creation, milestone transitions, and section-by-section revisions for MantraAssist {product.replace("-", " ").toUpperCase()}.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Section 1: Date Log */}
@@ -204,7 +224,7 @@ export default function LogsPage({ params }: PageProps) {
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-              Date Log (Milestones & Status)
+              Date Log (Milestones & Status History)
             </h2>
           </div>
 
@@ -216,7 +236,7 @@ export default function LogsPage({ params }: PageProps) {
                     Date
                   </th>
                   <th className="py-2.5 px-3.5 font-semibold text-slate-800 dark:text-zinc-200 text-[11px] uppercase">
-                    Event / Milestone
+                    Milestone / Event
                   </th>
                   <th className="py-2.5 px-3.5 font-semibold text-slate-800 dark:text-zinc-200 text-[11px] uppercase">
                     Module
@@ -311,13 +331,13 @@ export default function LogsPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Back to Chat PRD CTA */}
+        {/* Back to Module PRD CTA */}
         <div className="pt-4">
           <Link
-            href={`/${product}/chat`}
+            href={returnHref}
             className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors"
           >
-            <span>Return to Chat PRD</span>
+            <span>Return to Module PRD</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -325,4 +345,3 @@ export default function LogsPage({ params }: PageProps) {
     </PrdLayoutClient>
   );
 }
-

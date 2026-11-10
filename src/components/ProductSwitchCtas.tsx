@@ -4,16 +4,12 @@ import React from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import Tooltip from "./Tooltip";
-import { PRODUCTS } from "@/lib/modulesConfig";
+import { PRODUCTS, ProductId, getProductLink } from "@/lib/modulesConfig";
 
 interface ProductSwitchCtasProps {
-  currentProduct: "client" | "admin" | "companion";
+  currentProduct: ProductId;
   currentModule: string;
-  hasPrdInProduct: {
-    client: boolean;
-    admin: boolean;
-    companion: boolean;
-  };
+  hasPrdInProduct: Record<ProductId, boolean>;
 }
 
 export default function ProductSwitchCtas({
@@ -26,13 +22,14 @@ export default function ProductSwitchCtas({
   return (
     <div className="flex flex-wrap items-center gap-2">
       {otherProducts.map((p) => {
-        const hasPrd = hasPrdInProduct[p.id as keyof typeof hasPrdInProduct];
+        const hasPrd = hasPrdInProduct[p.id];
+        const targetHref = getProductLink(p.id, currentModule);
 
         if (hasPrd) {
           return (
             <Link
               key={p.id}
-              href={`/${p.id}/${currentModule}`}
+              href={targetHref}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg hover:border-slate-300 dark:hover:border-zinc-700 hover:text-slate-900 dark:hover:text-white transition-colors shadow-2xs"
             >
               <span>View in {p.name}</span>
@@ -42,7 +39,7 @@ export default function ProductSwitchCtas({
         }
 
         return (
-          <Tooltip key={p.id} content="Not documented yet" position="bottom">
+          <Tooltip key={p.id} content="Not documented in this product" position="bottom">
             <button
               type="button"
               disabled

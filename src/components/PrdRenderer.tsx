@@ -5,15 +5,12 @@ import Link from "next/link";
 import { Download, CheckCircle2, History } from "lucide-react";
 import { PrdDocument } from "@/lib/prdLoader";
 import { downloadFile } from "@/lib/downloadUtils";
+import { ProductId } from "@/lib/modulesConfig";
 import ProductSwitchCtas from "./ProductSwitchCtas";
 
 interface PrdRendererProps {
   prd: PrdDocument;
-  hasPrdInOtherProducts: {
-    client: boolean;
-    admin: boolean;
-    companion: boolean;
-  };
+  hasPrdInOtherProducts: Record<ProductId, boolean>;
 }
 
 /**

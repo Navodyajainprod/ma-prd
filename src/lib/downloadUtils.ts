@@ -29,13 +29,18 @@ export interface ModulePrdContent {
   clientContent?: string | null;
   adminContent?: string | null;
   companionContent?: string | null;
+  receptionContent?: string | null;
 }
 
 export function buildMultiModuleMarkdown(modules: ModulePrdContent[]): { filename: string; content: string } {
   const parts: string[] = [];
 
   for (const mod of modules) {
-    const hasAnyContent = mod.clientContent || mod.adminContent || mod.companionContent;
+    const hasAnyContent =
+      mod.clientContent ||
+      mod.adminContent ||
+      mod.companionContent ||
+      mod.receptionContent;
     if (!hasAnyContent) continue;
 
     parts.push(`# ${mod.moduleName}\n`);
@@ -52,6 +57,10 @@ export function buildMultiModuleMarkdown(modules: ModulePrdContent[]): { filenam
       parts.push(`## Companion\n\n${mod.companionContent.trim()}\n`);
     }
 
+    if (mod.receptionContent) {
+      parts.push(`## AI Receptionist\n\n${mod.receptionContent.trim()}\n`);
+    }
+
     parts.push("\n---\n");
   }
 
@@ -65,4 +74,3 @@ export function buildMultiModuleMarkdown(modules: ModulePrdContent[]): { filenam
     content: parts.join("\n"),
   };
 }
-

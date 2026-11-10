@@ -100,7 +100,7 @@ export default function DownloadModuleDrawer({
         {/* Drawer Description & Bulk Actions */}
         <div className="p-5 border-b border-slate-100 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-[#09090b]/60">
           <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed mb-3">
-            Select one or more modules below. This bundles the full content across all three products (Client, Admin, Companion) into a single unified Markdown document.
+            Select one or more modules below. This bundles the full content across all four products (Client, Admin, Companion, AI Receptionist) into a single unified Markdown document.
           </p>
 
           <div className="flex items-center justify-between text-xs">

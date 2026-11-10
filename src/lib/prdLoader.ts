@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { ProductId } from "./modulesConfig";
 
 /**
  * Pure zero-dependency frontmatter parser to eliminate Webpack esprima/gray-matter chunk errors
@@ -61,7 +62,7 @@ export interface PrdSection {
 
 export interface PrdDocument {
   title: string;
-  product: "client" | "admin" | "companion";
+  product: ProductId;
   module: string;
   channel?: string;
   status: string;
@@ -76,15 +77,12 @@ export interface PrdDocument {
 }
 
 export function getPrdPath(product: string, moduleName: string, channelName?: string): string | null {
-  // If specific channel is requested (e.g. whatsapp, sms, website, companion)
+  // If specific channel / tab is requested (e.g. whatsapp, calendar, fields, scheduled)
   if (channelName) {
-    if (product !== "client") {
-      // Sub-channels only exist for Client
-      return null;
-    }
     const channelPaths = [
       path.join(process.cwd(), "content", product, moduleName, `${channelName}.md`),
       path.join(process.cwd(), "content", product, `${moduleName}-${channelName}.md`),
+      path.join(process.cwd(), "content", product, `${channelName}.md`),
     ];
     for (const p of channelPaths) {
       if (fs.existsSync(p)) return p;
@@ -93,10 +91,10 @@ export function getPrdPath(product: string, moduleName: string, channelName?: st
   }
 
   const possiblePaths = [
+    path.join(process.cwd(), "content", product, `${moduleName}.md`),
     path.join(process.cwd(), "content", product, moduleName, `${moduleName}.md`),
     path.join(process.cwd(), "content", product, moduleName, "prd.md"),
     path.join(process.cwd(), "content", product, moduleName, "chat.md"),
-    path.join(process.cwd(), "content", product, `${moduleName}.md`),
   ];
 
   for (const p of possiblePaths) {
@@ -117,7 +115,7 @@ export function getPrdPath(product: string, moduleName: string, channelName?: st
 }
 
 export function loadPrd(
-  product: "client" | "admin" | "companion",
+  product: ProductId,
   moduleName: string,
   channelName?: string
 ): PrdDocument | null {
@@ -307,6 +305,6 @@ export function loadPrd(
   };
 }
 
-export function hasPrd(product: "client" | "admin" | "companion", moduleName: string, channelName?: string): boolean {
+export function hasPrd(product: ProductId, moduleName: string, channelName?: string): boolean {
   return getPrdPath(product, moduleName, channelName) !== null;
 }
