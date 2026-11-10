@@ -72,7 +72,7 @@ function MarkdownBlock({
         renderedElements.push(
           <div
             key={`table-${i}`}
-            className="my-4 overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs"
+            className="mt-3 mb-7 overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs"
           >
             <table className="w-full text-left text-xs sm:text-[13px] border-collapse">
               <thead>
@@ -152,7 +152,7 @@ function MarkdownBlock({
         <h3
           key={`h3-${i}`}
           id={anchorId}
-          className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-8 mb-3 tracking-tight scroll-mt-24 pt-2 border-t border-slate-100 dark:border-zinc-800/60 first:border-t-0 first:pt-0"
+          className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-14 mb-5 tracking-tight scroll-mt-24 pt-6 border-t border-slate-200 dark:border-zinc-800 first:border-t-0 first:pt-0 first:mt-4"
         >
           {formatInlineMarkdown(headingText)}
         </h3>
@@ -177,7 +177,7 @@ function MarkdownBlock({
         <h4
           key={`h4-${i}`}
           id={partSlug}
-          className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-200 mt-5 mb-1.5 scroll-mt-24"
+          className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-zinc-100 mt-10 mb-3 scroll-mt-24"
         >
           {formatInlineMarkdown(partText)}
         </h4>
@@ -239,7 +239,7 @@ function MarkdownBlock({
     renderedElements.push(
       <p
         key={`p-${i}`}
-        className="my-2.5 text-xs sm:text-[13px] leading-relaxed text-slate-700 dark:text-zinc-300"
+        className="mt-2 mb-6 text-xs sm:text-[13px] leading-relaxed text-slate-700 dark:text-zinc-300"
       >
         {formatInlineMarkdown(rawLine)}
       </p>
@@ -441,7 +441,7 @@ export default function PrdRenderer({
       </div>
 
       {/* ── PRD Sections ── */}
-      <div className="space-y-10 pt-2">
+      <div className="space-y-14 pt-4">
         {/* Cross-Product Summary (if present) */}
         {prd.crossProductSummaryRaw && (
           <section
@@ -459,9 +459,9 @@ export default function PrdRenderer({
 
         {/* Sections 1, 2, and 3 */}
         {prd.sections.map((sec) => (
-          <section key={sec.slug} id={sec.slug} className="scroll-mt-24 pt-4 border-t border-slate-200/80 dark:border-zinc-800">
+          <section key={sec.slug} id={sec.slug} className="scroll-mt-24 pt-6 border-t border-slate-200/80 dark:border-zinc-800">
             {/* Clean Section Heading without Section-Level Download Button */}
-            <div className="pb-3 mb-4 border-b border-slate-200/70 dark:border-zinc-800/80">
+            <div className="pb-3 mb-6 border-b border-slate-200/70 dark:border-zinc-800/80">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 <span className="font-mono text-sm text-slate-400 dark:text-zinc-500">
                   {sec.number}.
