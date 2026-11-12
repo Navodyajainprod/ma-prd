@@ -29,6 +29,14 @@ const LOG_ENTRIES: Record<
   client: {
     dates: [
       {
+        date: "2026-11-12",
+        event: "Tasks Queue Cross-Product PRD Expansion",
+        module: "Tasks Queue",
+        author: "MantraAssist Product Core",
+        status: "In Review",
+        note: "Expanded Client Tasks PRD to cover My Tasks vs Tasks by me separation, Admin top-down role delegations, 2-step Task Studio (Configure & Preview), per-person deliverable breakdown, direct Companion Chat sharing, and overdue observer SLA alerts.",
+      },
+      {
         date: "2026-11-10",
         event: "PRD Created & Drafted",
         module: "Chats & Care Groups",
@@ -54,6 +62,12 @@ const LOG_ENTRIES: Record<
       },
     ],
     edits: [
+      {
+        date: "2026-11-12",
+        module: "Tasks Queue",
+        section: "Cross-Product Sync & Task Studio (F-1 to F-5)",
+        change: "Documented My Tasks vs Tasks by me permission isolation, Client Contact routing to Companion App, per-person progress breakdowns with 100% auto-closure, Client Portal chat share dispatch, and overdue observer notifications.",
+      },
       {
         date: "2026-11-10",
         module: "Chats & Care Groups",
@@ -83,6 +97,14 @@ const LOG_ENTRIES: Record<
   admin: {
     dates: [
       {
+        date: "2026-11-12",
+        event: "Admin Tasks Governance PRD Added (Scheduling Omitted)",
+        module: "Tasks Queue",
+        author: "Platform Engineering",
+        status: "In Review",
+        note: "Created Admin Tasks PRD covering corporate workspace isolation (/admin/tasks), industry/org/role scoping rules, Task Parameters (Mark as Important + Observers with scheduling/recurrence removed), Task Studio multimedia deliverables, per-person completion tracking, and strict patient portal firewall.",
+      },
+      {
         date: "2026-11-10",
         event: "Admin Platform PRD Suite Created",
         module: "Platform Control & Blueprints",
@@ -101,6 +123,12 @@ const LOG_ENTRIES: Record<
     ],
     edits: [
       {
+        date: "2026-11-12",
+        module: "Tasks Queue",
+        section: "Cross-Org Tasks & Firewall (F-1 to F-4)",
+        change: "Added /admin/tasks PRD detailing industry-role scoping, Mark as Important + Observers (scheduling/deadlines omitted for Admin), Client My Tasks handoff, expandable assignee breakdowns, and Patient Companion exclusion.",
+      },
+      {
         date: "2026-11-10",
         module: "Custom Fields Master",
         section: "Fields & Sections Tabs",
@@ -116,6 +144,14 @@ const LOG_ENTRIES: Record<
   },
   companion: {
     dates: [
+      {
+        date: "2026-11-12",
+        event: "Patient My Tasks & Live Sync PRD Expanded",
+        module: "Tasks Queue",
+        author: "Patient Experience Team",
+        status: "In Review",
+        note: "Updated Companion Tasks PRD for Action Needed/Completed tabs, clean title sanitization (stripping internal codes), Mark as done/Undo deliverable execution, multimedia protocol cards, live Client Portal completion sync, and Admin task firewall.",
+      },
       {
         date: "2026-11-10",
         event: "PRD Created & Drafted",
@@ -134,6 +170,12 @@ const LOG_ENTRIES: Record<
       },
     ],
     edits: [
+      {
+        date: "2026-11-12",
+        module: "Tasks Queue",
+        section: "My Tasks, Deliverables & Privacy Firewall (F-1 to F-4)",
+        change: "Documented patient deliverable execution, inline Image/Video/File/URL/HTML protocols, Companion Chat task notifications, real-time sync with Client Task Detail, and Admin/cross-patient lock screen.",
+      },
       {
         date: "2026-11-10",
         module: "Today's Visit Agenda",

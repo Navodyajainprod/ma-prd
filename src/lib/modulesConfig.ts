@@ -137,8 +137,24 @@ export const ALL_MODULES: ModuleDefinition[] = [
     id: "tasks",
     name: "Tasks Queue",
     category: "WORKSPACE",
-    description: "Collaborative care team task checklist with priority flags, SLA tracking, and patient chart deep-links.",
+    description: "Cross-product task delegation across Admin (org/role scoping), Client (My Tasks vs Tasks by me), and Patient Companion (deliverables & live sync).",
     availableIn: { client: true, admin: true, companion: true, "ai-receptionist": false },
+    submodulesByProduct: {
+      client: [
+        {
+          id: "my-tasks",
+          name: "My Tasks",
+          channel: "my-tasks",
+          description: "Focused work inbox for tasks assigned to you by clinic teammates or top-down Admin role delegations.",
+        },
+        {
+          id: "tasks-by-me",
+          name: "Tasks by me",
+          channel: "tasks-by-me",
+          description: "Delegation workspace for Team Member & Client Contact (Companion) tasks, Workflow stages, Task Studio, and Sharing.",
+        },
+      ],
+    },
   },
   {
     id: "appointments",
