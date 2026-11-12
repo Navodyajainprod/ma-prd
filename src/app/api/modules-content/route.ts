@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server";
-import { ALL_MODULES } from "@/lib/modulesConfig";
+import { ALL_MODULES, ModuleDefinition, ProductId } from "@/lib/modulesConfig";
 import { loadPrd } from "@/lib/prdLoader";
+
+function loadCombinedModuleMarkdown(product: ProductId, id: string, modDef?: ModuleDefinition): string | null {
+  const subs = modDef?.submodulesByProduct?.[product] || modDef?.submodules;
+  if (subs && subs.length > 0) {
+    const parts = subs
+      .map((sub) => loadPrd(product, id, sub.channel || sub.id)?.rawFullMarkdown)
+      .filter((content): content is string => Boolean(content));
+    if (parts.length > 0) {
+      return parts.join("\n\n---\n\n");
+    }
+  }
+  return loadPrd(product, id)?.rawFullMarkdown || null;
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -10,19 +23,19 @@ export async function GET(request: Request) {
 
   const results = moduleIds.map((id) => {
     const modDef = ALL_MODULES.find((m) => m.id === id);
-    const clientPrd = loadPrd("client", id);
-    const adminPrd = loadPrd("admin", id);
-    const companionPrd = loadPrd("companion", id);
-    const receptionPrd = loadPrd("ai-receptionist", id);
+    const clientContent = loadCombinedModuleMarkdown("client", id, modDef);
+    const adminContent = loadCombinedModuleMarkdown("admin", id, modDef);
+    const companionContent = loadCombinedModuleMarkdown("companion", id, modDef);
+    const receptionContent = loadCombinedModuleMarkdown("ai-receptionist", id, modDef);
 
     return {
       moduleId: id,
       moduleName: modDef?.name || id,
-      clientContent: clientPrd?.rawFullMarkdown || null,
-      adminContent: adminPrd?.rawFullMarkdown || null,
-      companionContent: companionPrd?.rawFullMarkdown || null,
-      receptionContent: receptionPrd?.rawFullMarkdown || null,
-      hasAnyPrd: Boolean(clientPrd || adminPrd || companionPrd || receptionPrd),
+      clientContent,
+      adminContent,
+      companionContent,
+      receptionContent,
+      hasAnyPrd: Boolean(clientContent || adminContent || companionContent || receptionContent),
     };
   });
 

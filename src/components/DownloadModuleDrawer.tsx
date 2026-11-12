@@ -132,7 +132,6 @@ export default function DownloadModuleDrawer({
         <div className="flex-1 overflow-y-auto p-4 space-y-1">
           {ALL_MODULES.map((mod) => {
             const isChecked = selectedModuleIds.includes(mod.id);
-            const isChat = mod.id === "chat";
 
             return (
               <div
@@ -159,15 +158,9 @@ export default function DownloadModuleDrawer({
                     <span className="text-xs font-semibold text-slate-900 dark:text-zinc-100 truncate">
                       {mod.name}
                     </span>
-                    {isChat ? (
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-400 shrink-0">
-                        Documented
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 shrink-0">
-                        Coming soon
-                      </span>
-                    )}
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-400 shrink-0">
+                      Documented
+                    </span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate mt-0.5">
                     {mod.description}

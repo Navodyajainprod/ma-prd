@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Download, CheckCircle2, History } from "lucide-react";
 import { PrdDocument } from "@/lib/prdLoader";
 import { downloadFile } from "@/lib/downloadUtils";
-import { ProductId } from "@/lib/modulesConfig";
+import { ProductId, getProductLink } from "@/lib/modulesConfig";
 import ProductSwitchCtas from "./ProductSwitchCtas";
 
 interface PrdRendererProps {
@@ -360,14 +360,14 @@ export default function PrdRenderer({
         <div className="space-y-1.5 min-w-0">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-zinc-400">
             <Link
-              href={`/${prd.product}/chat`}
+              href={getProductLink(prd.product)}
               className="hover:text-slate-800 dark:hover:text-zinc-200 transition-colors capitalize"
             >
-              {prd.product}
+              {prd.product === "ai-receptionist" ? "AI Receptionist" : prd.product}
             </Link>
             <span className="text-slate-300 dark:text-zinc-700">/</span>
             <Link
-              href={`/${prd.product}/chat`}
+              href={getProductLink(prd.product, prd.module)}
               className="hover:text-slate-800 dark:hover:text-zinc-200 transition-colors truncate"
             >
               {prd.module === "chat" ? (prd.product === "companion" ? "Patient Messaging & Care Hub" : "Chats & Care Groups") : prd.module}
@@ -406,7 +406,7 @@ export default function PrdRenderer({
         </button>
       </div>
 
-      {/* ── Buttons to Open the Same Module in the Other Two Products ── */}
+      {/* ── Buttons to Open the Same Module in the Other Products ── */}
       <ProductSwitchCtas
         currentProduct={prd.product}
         currentModule={prd.module}
@@ -419,7 +419,9 @@ export default function PrdRenderer({
           <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80 bg-white dark:bg-[#0c0c0e]">
             <tr>
               <td className="py-2.5 px-3.5 font-medium text-slate-500 dark:text-zinc-400 w-36 bg-slate-50/70 dark:bg-zinc-900/40">Product</td>
-              <td className="py-2.5 px-3.5 text-slate-900 dark:text-white font-semibold capitalize">{prd.product}</td>
+              <td className="py-2.5 px-3.5 text-slate-900 dark:text-white font-semibold">
+                {prd.product === "ai-receptionist" ? "AI Receptionist" : <span className="capitalize">{prd.product}</span>}
+              </td>
             </tr>
             <tr>
               <td className="py-2.5 px-3.5 font-medium text-slate-500 dark:text-zinc-400 bg-slate-50/70 dark:bg-zinc-900/40">Module</td>
@@ -447,7 +449,7 @@ export default function PrdRenderer({
 
       {/* ── PRD Sections ── */}
       <div className="space-y-14 pt-4">
-        {/* Cross-Product Summary (if present) */}
+        {/* Cross-Product Summary */}
         {prd.crossProductSummaryRaw && (
           <section
             id="cross-product-summary"
