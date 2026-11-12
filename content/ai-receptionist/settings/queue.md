@@ -19,7 +19,7 @@ last_updated: "2026-11-12"
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client | Reception Settings Console | Clinic managers tune token prefixes, grace sliders, anti-starvation caps, and onboarding defaults directly from Reception Settings. | [View in Client](/client/settings/reception) |
+| Client | Reception Settings Console | Clinic managers configure grace sliders, anti-starvation caps, and onboarding defaults centrally from Reception Settings. | [View in Client](/client/settings/reception) |
 | Client | Onboarding Process Pipeline | Walk-in and newly arrived patients enter whichever Default Onboarding Process is selected here on the clinic Kanban board. | [View in Client](/client/processes/kanban) |
 | Client | Appointment Schedule Matching | Late Arrival Window and Early Arrival Buffer policies determine whether arriving visitors are treated as on-time check-ins or offered walk-in handling. | [View in Client](/client/appointments/list) |
 | AI Receptionist | Scheduled Check-In Token Issuance | Issues station-prefixed queue tickets and validates arrival timing rules at check-in. | [View in AI Receptionist](/ai-receptionist/checkin/scheduled) |
@@ -44,7 +44,7 @@ Admins can customize prefixes to match local signage, and each queue tracks clea
 #### 2. What it includes
 | Item | Type | What it does | Notes |
 | :--- | :--- | :--- | :--- |
-| F-1.1: Core Prefix Inputs | Settings Controls | Configures prefix strings for Doctor (`D-`), Pharmacy (`P-`), and Diagnostic Lab (`L-`) | Editable right inside Reception Settings |
+| F-1.1: Core Department Prefixing | Automatic Prefixes | Applies standardized station prefixes (`D-`, `P-`, `L-`) without requiring manual configuration | Applied consistently across waiting-room displays |
 | F-1.2: Extended Desk Prefixes | Station Defaults | Assigns `B-` to Billing Desk and `R-` to Front Desk tickets | Ensures every department issues distinct tokens |
 | F-1.3: Sequential Ticket Formatting | Token Generator | Formats incremented daily numbers cleanly as `PREFIX-###` (e.g., `D-014`) | Matches wall displays and verbal voice announcements |
 

@@ -30,6 +30,14 @@ const LOG_ENTRIES: Record<
     dates: [
       {
         date: "2026-11-12",
+        event: "Horizontal AI Receptionist Settings, Merged Queue & Unified Rooms Table",
+        module: "Settings & Team (AI Receptionist)",
+        author: "MantraAssist Product Core",
+        status: "In Review",
+        note: "Matched standard product page spacing, removed the top organization hero banner card, adopted one unified Topbar component across Kiosk & Terminals and Clinic Rooms & Desks with clean vertical spacing, removed card heading dividers and subtext, arranged Kiosk & Terminals into four full-width horizontal sections (Clinic & Persona, Kiosk Features, Queue & Onboarding Rules, and Receptionist Terminals), standardized Clinic Rooms & Desks columns to Room Label, Room Number, Direction, Responsible, and Active, and moved Add/Edit Room into a right-hand slide-over drawer.",
+      },
+      {
+        date: "2026-11-12",
         event: "Website Widget Requirement-to-Workflow Mapping & Contact Category Update",
         module: "Chats & Care Groups (Website)",
         author: "MantraAssist Product Core",
@@ -70,6 +78,12 @@ const LOG_ENTRIES: Record<
       },
     ],
     edits: [
+      {
+        date: "2026-11-12",
+        module: "Settings & Team (AI Receptionist)",
+        section: "F-1 to F-5 (Horizontal Kiosk & Terminals Layout, Queue Section & Unified Rooms)",
+        change: "Matched MantraAssist product spacing, removed the top hero banner card and setting card dividers/subtext, consolidated navigation and contextual actions into one standard Page Topbar component with standard vertical spacing, arranged Kiosk & Terminals into four full-width horizontal sections with Queue & Onboarding Rules merged inside it, standardized Rooms table columns to Room Label, Room Number, Direction, Responsible, and Active, and moved Add/Edit Room from a popup modal to a slide-over drawer.",
+      },
       {
         date: "2026-11-12",
         module: "Chats & Care Groups (Website)",

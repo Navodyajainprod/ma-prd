@@ -306,9 +306,9 @@ export const ALL_MODULES: ModuleDefinition[] = [
         },
         {
           id: "reception",
-          name: "Reception Kiosk",
+          name: "AI Receptionist",
           channel: "reception",
-          description: "Clinic rooms & desks setup, token prefixes (D-, P-, L-, B-, R-), arrival grace sliders, and onboarding defaults.",
+          description: "Full-width horizontal clinic persona, kiosk features, queue & onboarding rules, multi-terminal launching, and unified clinic rooms (Products & Services + standalone).",
         },
       ],
       "ai-receptionist": [
