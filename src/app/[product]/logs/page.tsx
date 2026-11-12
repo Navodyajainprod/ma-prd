@@ -34,7 +34,7 @@ const LOG_ENTRIES: Record<
         module: "Chats & Care Groups (Website)",
         author: "MantraAssist Product Core",
         status: "In Review",
-        note: "Updated Website Widget Settings PRD so each pre-chat Requirement maps to a Process Entity and Workflow Name (without stages) for workflow prompt execution, and Auto Create Contact uses Contact Category selection instead of Entity.",
+        note: "Updated Website Widget Settings PRD so each pre-chat Requirement maps across Process Entity -> Workflow Name -> Stage for exact stage workflow prompt execution, and Auto Create Contact uses Contact Category selection instead of Entity.",
       },
       {
         date: "2026-11-12",
@@ -74,7 +74,7 @@ const LOG_ENTRIES: Record<
         date: "2026-11-12",
         module: "Chats & Care Groups (Website)",
         section: "F-2 & F-3 (Requirement Workflow Mapping & Contact Category)",
-        change: "Added Process Entity -> Workflow Name mapping (no stages) per requirement for workflow prompt activation, and replaced Entity selector under Auto Create Contact with Contact Category selection.",
+        change: "Added Process Entity -> Workflow Name -> Stage mapping per requirement for exact stage workflow prompt activation, and replaced Entity selector under Auto Create Contact with Contact Category selection.",
       },
       {
         date: "2026-11-12",

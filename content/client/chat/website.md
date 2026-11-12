@@ -59,73 +59,73 @@ Aggregates live chat sessions initiated by website visitors into an omnichannel 
 
 ### F-2: Process-Driven AI Assistant First Responder & Workflow Prompt Routing
 #### 1. What it does
-Provides an intelligent AI First Responder that evaluates inbound messages and pre-chat requirement selections against each requirement's mapped Process Entity and Workflow Name. When a visitor chooses a requirement or discusses that topic in chat, the AI maps the conversation to the corresponding workflow prompt and instructions (such as `Appointment Flow`, `Billing & Invoicing`, `Insurance and Claims`, or `Client Intake`), formulates a workflow-aligned response, and offers interactive shortcut actions or smooth handoff to human coordinators.
+Provides an intelligent AI First Responder that evaluates inbound messages and pre-chat requirement selections against each requirement's mapped **Process Entity**, **Workflow Name**, and **Stage**. When a visitor chooses a requirement or discusses that topic in chat, the AI maps the conversation to that workflow stage's configured prompt and instructions (such as `Appointment Flow → Booked`, `Billing & Invoicing → Draft`, `Insurance and Claims → Draft & Intake`, or `Client Intake → Initial Contact`), formulates a stage-aligned response, and offers interactive shortcut actions or smooth handoff to human coordinators.
 
 #### 2. What it includes
 | Item | Type | What it does | Notes |
 | :--- | :--- | :--- | :--- |
-| F-2.1: Requirement-to-Workflow Prompt Resolver | Logic | Reads the Process Entity and Workflow Name mapped to the visitor's chosen requirement and loads that workflow's prompt | Uses workflow name, not stages |
-| F-2.2: Process-Specific Response | Generator | Formulates a tailored response following the mapped workflow prompt and conversational context | Explains next steps clearly |
-| F-2.3: Interactive Action Card | UI Component | Renders clickable shortcut buttons when configured on the workflow (e.g. booking links, billing guidance, or intake actions) | One-tap workflow launch |
+| F-2.1: Requirement-to-Workflow Stage Prompt Resolver | Logic | Reads the Process Entity, Workflow Name, and Stage mapped to the visitor's chosen requirement and loads that stage's workflow prompt | Exact stage prompt resolution |
+| F-2.2: Stage-Specific Response | Generator | Formulates a tailored response following the mapped workflow stage prompt and conversational context | Explains next steps clearly |
+| F-2.3: Interactive Action Card | UI Component | Renders clickable shortcut buttons when configured on the mapped stage (e.g. booking links, billing guidance, or intake actions) | One-tap workflow launch |
 | F-2.4: Escalation to Human Queue | Fallback | Escalates to Responsible Settings queue when the query cannot be resolved or the visitor requests a human agent | Notifies on-duty staff |
 
 #### 3. Worked example
 | # | Situation | What the visitor does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Visitor selects "Book an Appointment" (mapped to `Appointment` → `Appointment Flow`) | Submits pre-chat form and asks for availability | **AI maps the conversation to `Appointment Flow`, loads that workflow's prompt, and replies with scheduling guidance** |
-| 2 | Visitor asks: "Can I pay my overdue bill here?" under "Billing & Invoices" (mapped to `Invoice` → `Billing & Invoicing`) | Sends billing question | **AI applies the `Billing & Invoicing` workflow prompt and responds with balance and payment guidance** |
-| 3 | Visitor asks about policy coverage under "Insurance & Coverage Inquiry" (mapped to `Insurance & Claims` → `Insurance and Claims`) | Sends coverage question | **AI responds using the `Insurance and Claims` workflow prompt** |
+| 1 | Visitor selects "Book an Appointment" (mapped to `Appointment` → `Appointment Flow` → `Booked`) | Submits pre-chat form and asks for availability | **AI maps the conversation to `Appointment Flow · Booked`, loads that stage's prompt, and replies with scheduling guidance** |
+| 2 | Visitor asks: "Can I pay my overdue bill here?" under "Billing & Invoices" (mapped to `Invoice` → `Billing & Invoicing` → `Draft`) | Sends billing question | **AI applies the `Billing & Invoicing · Draft` stage workflow prompt and responds with balance and payment guidance** |
+| 3 | Visitor asks about policy coverage under "Insurance & Coverage Inquiry" (mapped to `Insurance & Claims` → `Insurance and Claims` → `Draft & Intake`) | Sends coverage question | **AI responds using the `Insurance and Claims · Draft & Intake` stage prompt** |
 | 4 | Visitor types: "I need to speak with someone at reception" | Requests human help | **AI escalates the active thread to the assigned Responsible Settings team queue** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Website Visitor | When I choose a requirement and start chatting on the clinic website, I want instant, relevant answers aligned with that specific service workflow, so that I do not receive generic replies. |
-| F-2-J2 | Practice Administrator | When visitors select a pre-chat requirement, I want the AI to automatically load the prompt from the mapped workflow, so that each inquiry type follows the right conversational script. |
+| F-2-J1 | Website Visitor | When I choose a requirement and start chatting on the clinic website, I want instant, relevant answers aligned with that specific service workflow stage, so that I do not receive generic replies. |
+| F-2-J2 | Practice Administrator | When visitors select a pre-chat requirement, I want the AI to automatically load the prompt from the mapped workflow stage, so that each inquiry type follows the right conversational script. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Given a visitor selects a requirement mapped to a Process Entity and Workflow Name, then the AI First Responder loads that workflow's prompt for the conversation without requiring any stage assignment. |
-| F-2-2 | Given a visitor tests the chat inside Website Widget Settings or the Website Bot Simulator, then the response header/context displays the active mapped Workflow Name. |
+| F-2-1 | Given a visitor selects a requirement mapped to a Process Entity, Workflow Name, and Stage, then the AI First Responder loads that stage's workflow prompt for the conversation. |
+| F-2-2 | Given a visitor tests the chat inside Website Widget Settings or the Website Bot Simulator, then the response header/context displays the active mapped Workflow Name and Stage. |
 | F-2-3 | Given an unrecognized inquiry or explicit escalation trigger, then the AI hands the conversation over to on-duty team members. |
 
 ### F-3: Pre-Chat Intake Form, Requirement Workflow Mapping & Auto Create Contact (Contact Category)
 #### 1. What it does
-Gathers preliminary visitor details before starting a chat session. Includes a greeting message, toggleable visitor intake fields (`Full Name`, `Email Address`, `Phone Number`, `Requirement`), and **Requirement Options & Workflow Mapping**. For each requirement option visitors can pick, the administrator configures the **Requirement Option** label, selects its **Process Entity** (`Processes`, `Appointment`, `Invoice`, `Insurance & Claims`, `Task`), and chooses the target **Workflow Name** belonging to that entity — without selecting stages — so the AI maps the right workflow prompt when visitors discuss that requirement. Also includes an **Auto Create Contact** toggle: when enabled, administrators select the target **Contact Category** (`Lead`, `Client`, `Supplier`, `Vendor`, or custom contact categories) under which visitor records are automatically created, without assigning or triggering any pipeline stage.
+Gathers preliminary visitor details before starting a chat session. Includes a greeting message, toggleable visitor intake fields (`Full Name`, `Email Address`, `Phone Number`, `Requirement`), and **Requirement Options & Workflow Mapping**. For each requirement option visitors can pick, the administrator configures the **Requirement Option** label and maps it across three cascading dropdowns: **Process Entity** (`Processes`, `Appointment`, `Invoice`, `Insurance & Claims`, `Task`), **Workflow Name** (filtered by entity), and **Stage** (filtered by workflow), so the AI activates the exact stage workflow prompt when visitors discuss that requirement. Also includes an **Auto Create Contact** toggle: when enabled, administrators select the target **Contact Category** (`Lead`, `Client`, `Supplier`, `Vendor`, or custom contact categories) under which visitor records are automatically created, without enrolling the contact itself into a pipeline stage.
 
 #### 2. What it includes
 | Item | Type | What it does | Notes |
 | :--- | :--- | :--- | :--- |
 | F-3.1: Greeting Message Input | Text Input | Configures customizable welcome text displayed on the pre-chat card | Multi-line greeting |
 | F-3.2: Contact Field Checkboxes | Checkboxes | Toggles collection of Visitor Full Name, Email Address, Phone Number, and Requirement | Requirement toggles options list |
-| F-3.3: Requirement Options & Workflow Mapping | Row Builder | For each requirement option, captures the Requirement label, **Process Entity** dropdown, and **Workflow Name** dropdown | Maps workflow prompt; no stage dropdown |
-| F-3.4: Cascading Entity-to-Workflow Filtering | Selection Rule | Selecting a Process Entity updates the Workflow Name dropdown to list only workflows configured for that entity | Resets workflow cleanly on entity switch |
+| F-3.3: Requirement Options & Workflow Mapping | Row Builder | For each requirement option, captures the Requirement label, **Process Entity**, **Workflow Name**, and **Stage** dropdowns | 3-step cascading mapping |
+| F-3.4: Cascading Entity → Workflow → Stage Filtering | Selection Rule | Selecting a Process Entity updates Workflow Name choices; selecting a Workflow Name updates Stage choices | Defaults cleanly on switch |
 | F-3.5: Auto Create Contact Toggle | Toggle | When ON, automatically creates a Contact record in Contacts upon visitor form submission | Preserves contact-only intake |
-| F-3.6: Contact Category Selector Dropdown | Dropdown | Selects the Contact Category (`Lead`, `Client`, `Supplier`, `Vendor`, or custom categories) for auto-created contacts | Replaces legacy Entity selector; no stage selection |
+| F-3.6: Contact Category Selector Dropdown | Dropdown | Selects the Contact Category (`Lead`, `Client`, `Supplier`, `Vendor`, or custom categories) for auto-created contacts | Replaces legacy Entity selector on contacts |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Admin maps "Book an Appointment" in Requirement Options | Selects Process Entity `Appointment`, then selects Workflow Name `Appointment Flow` | **Requirement saves with Process Entity and Workflow Name only; no Stage selector is shown** |
-| 2 | Admin changes Process Entity on a requirement from `Processes` to `Invoice` | Picks `Invoice` in Process Entity dropdown | **Workflow Name dropdown refreshes to `Billing & Invoicing` (and any other invoice workflows)** |
-| 3 | Admin enables Auto Create Contact | Turns Auto Create Contact toggle ON | **Contact Category dropdown appears listing `Lead`, `Client`, `Supplier`, `Vendor`, and custom contact categories (no Entity or Stage selector)** |
-| 4 | Admin chooses `Lead` and tests visitor submission | Enters "John Doe, john@example.com", picks "Book an Appointment", and submits | **Contact "John Doe" is created in Contacts under the `Lead` Contact Category with no stage enrollment, and the chat activates the `Appointment Flow` workflow prompt** |
-| 5 | Admin turns Auto Create ON without picking a Contact Category, or leaves a requirement unmapped | Clicks Save Configuration | **Validation prevents saving and displays a clear error asking for a Contact Category or complete Requirement Process Entity and Workflow Name mapping** |
+| 1 | Admin maps "Book an Appointment" in Requirement Options | Selects Process Entity `Appointment`, Workflow Name `Appointment Flow`, and Stage `Booked` | **Requirement saves with complete Process Entity, Workflow Name, and Stage mapping** |
+| 2 | Admin changes Process Entity or Workflow Name on a requirement | Switches Process Entity to `Invoice` and selects `Billing & Invoicing` | **Stage dropdown refreshes automatically to list stages of `Billing & Invoicing` (`Draft`, `Payment recorded`, `Paid`, `Overdue`)** |
+| 3 | Admin enables Auto Create Contact | Turns Auto Create Contact toggle ON | **Contact Category dropdown appears listing `Lead`, `Client`, `Supplier`, `Vendor`, and custom contact categories (not Entity)** |
+| 4 | Admin chooses `Lead` and tests visitor submission | Enters "John Doe, john@example.com", picks "Book an Appointment", and submits | **Contact "John Doe" is created in Contacts under the `Lead` Contact Category while the AI conversation applies the `Appointment Flow · Booked` stage prompt** |
+| 5 | Admin turns Auto Create ON without picking a Contact Category, or leaves a requirement unmapped | Clicks Save Configuration | **Validation prevents saving and asks for a Contact Category or complete Requirement Process Entity, Workflow Name, and Stage mapping** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Practice Manager | When visitors pick a pre-chat requirement, I want to map it first to a Process Entity and then to a Workflow Name (without choosing stages), so that the AI responds with the exact workflow prompt for that topic. |
+| F-3-J1 | Practice Manager | When visitors pick a pre-chat requirement, I want to map it across Process Entity, Workflow Name, and Stage, so that the AI responds with the exact stage workflow prompt for that topic. |
 | F-3-J2 | Front-Desk Lead | When auto-creating contacts from website chat visitors, I want to assign them to a Contact Category such as `Lead` or `Client` instead of a system entity, so that new website inquiries land in the right contact segment immediately. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given the Requirement Options & Workflow Mapping list, each requirement displays a text label input, a Process Entity dropdown (`Processes`, `Appointment`, `Invoice`, `Insurance & Claims`, `Task`), and a Workflow Name dropdown filtered by the selected Process Entity, with no Stage dropdown present. |
-| F-3-2 | Given a Process Entity change on a requirement row, then the Workflow Name dropdown immediately refreshes to show only workflows belonging to that entity. |
-| F-3-3 | Given the Auto Create Contact toggle set to ON, then a **Contact Category** dropdown populated from configured Contact Categories (`Lead`, `Client`, `Supplier`, `Vendor`, plus custom categories) is displayed instead of an Entity dropdown, and Stage selectors remain absent. |
-| F-3-4 | Given form submission with Auto Create Contact ON, then the new Contact record is stored under the selected Contact Category while the AI conversation maps to the chosen requirement's Workflow Name prompt. |
+| F-3-1 | Given the Requirement Options & Workflow Mapping list, each requirement displays a text label input plus cascading Process Entity, Workflow Name, and Stage dropdowns. |
+| F-3-2 | Given a Process Entity or Workflow Name change on a requirement row, then downstream Workflow Name and Stage dropdowns refresh immediately to match. |
+| F-3-3 | Given the Auto Create Contact toggle set to ON, then a **Contact Category** dropdown populated from configured Contact Categories (`Lead`, `Client`, `Supplier`, `Vendor`, plus custom categories) is displayed instead of an Entity dropdown. |
+| F-3-4 | Given form submission with Auto Create Contact ON, then the new Contact record is stored under the selected Contact Category while the AI conversation maps to the chosen requirement's Workflow Name and Stage prompt. |
 
 ### F-4: Responsible Settings & Sequential Priority Queue Routing
 #### 1. What it does
@@ -196,8 +196,8 @@ Configures topbar and composer actions strictly tailored for Website chat. The t
 | ID | Feature | Sub-features | One-line summary |
 | :--- | :--- | :--- | :--- |
 | F-1 | Inbound Web Widget Live Thread Aggregation | F-1.1 Session Card, F-1.2 Visitor Metadata, F-1.3 Human Takeover, F-1.4 Resolve Session | Real-time website visitor thread tracking with active page presence and manual agent takeover. |
-| F-2 | Process-Driven AI Assistant First Responder | F-2.1 Workflow Prompt Resolver, F-2.2 Process Response, F-2.3 Action Cards, F-2.4 Queue Escalation | AI engine resolving each requirement's mapped Process Entity and Workflow Name prompt during visitor chat. |
-| F-3 | Pre-Chat Intake Form, Workflow Mapping & Contact Category | F-3.1 Greeting Message, F-3.2 Field Checkboxes, F-3.3 Process Entity & Workflow Mapping, F-3.4 Cascading Filtering, F-3.5 Auto Create Toggle, F-3.6 Contact Category Selector | Welcome greeting, requirement mapping (Process Entity then Workflow Name, no stages), and Contact Category auto-creation. |
+| F-2 | Process-Driven AI Assistant First Responder | F-2.1 Stage Prompt Resolver, F-2.2 Stage Response, F-2.3 Action Cards, F-2.4 Queue Escalation | AI engine resolving each requirement's mapped Process Entity, Workflow Name, and Stage prompt during visitor chat. |
+| F-3 | Pre-Chat Intake Form, Workflow Mapping & Contact Category | F-3.1 Greeting Message, F-3.2 Field Checkboxes, F-3.3 Entity / Workflow / Stage Mapping, F-3.4 Cascading Filtering, F-3.5 Auto Create Toggle, F-3.6 Contact Category Selector | Welcome greeting, cascading requirement mapping (Process Entity, Workflow Name, Stage), and Contact Category auto-creation. |
 | F-4 | Responsible Settings & Sequential Priority Queue | F-4.1 Member Multi-Select, F-4.2 Distribution Selector, F-4.3 Drag Reorder List, F-4.4 Persistence, F-4.5 Working Hours | Responsible team routing with drag-to-reorder sequential priority (no arrow buttons) and embedded working hours. |
 | F-5 | Website Topbar Controls & Scoped Composer | F-5.1 Widget Settings Cog, F-5.2 Test Chat Button, F-5.3 Group Button Removal, F-5.4 Composer Scoping | Topbar drawer triggers and clean composer stripping New Group and Message Actions buttons. |
 
@@ -205,9 +205,9 @@ Configures topbar and composer actions strictly tailored for Website chat. The t
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
 | 1 | Triage Coordinator | When website visitors ask questions on our clinic website, I want to see their active page and query in real time, so that I understand their clinical interest immediately. | F-1 |
-| 2 | Website Visitor | When I choose a requirement and start chatting on the clinic website, I want instant, relevant answers aligned with that specific service workflow, so that I do not receive generic replies. | F-2 |
-| 3 | Practice Administrator | When visitors select a pre-chat requirement, I want the AI to automatically load the prompt from the mapped workflow, so that each inquiry type follows the right conversational script. | F-2 |
-| 4 | Practice Manager | When visitors pick a pre-chat requirement, I want to map it first to a Process Entity and then to a Workflow Name (without choosing stages), so that the AI responds with the exact workflow prompt for that topic. | F-3 |
+| 2 | Website Visitor | When I choose a requirement and start chatting on the clinic website, I want instant, relevant answers aligned with that specific service workflow stage, so that I do not receive generic replies. | F-2 |
+| 3 | Practice Administrator | When visitors select a pre-chat requirement, I want the AI to automatically load the prompt from the mapped workflow stage, so that each inquiry type follows the right conversational script. | F-2 |
+| 4 | Practice Manager | When visitors pick a pre-chat requirement, I want to map it across Process Entity, Workflow Name, and Stage, so that the AI responds with the exact stage workflow prompt for that topic. | F-3 |
 | 5 | Front-Desk Lead | When auto-creating contacts from website chat visitors, I want to assign them to a Contact Category such as `Lead` or `Client` instead of a system entity, so that new website inquiries land in the right contact segment immediately. | F-3 |
 | 6 | Clinic Administrator | When configuring sequential routing, I want to drag team members into priority order without cluttered up/down arrows, so that escalation hierarchy is simple to manage. | F-4 |
 | 7 | Practice Manager | When visitors chat after clinic closing, I want working hours enforced inside Responsible Settings, so that realistic response expectations are set. | F-4 |
