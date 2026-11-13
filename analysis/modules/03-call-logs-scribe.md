@@ -13,10 +13,10 @@ _Sources:_ PRD files `content/client/call-logs.md`, `content/client/scribe.md` |
 | Call Logs list (`/call-logs`, G3-L) | 2 | 1 | 6 | 3 | 2 | 9 | 20.8% |
 | Call detail (drawer + `/call-logs/:id`, G3-D) | 2 | 1 | 4 | 1 | 4 | 7 | 31.3% |
 | AI Scribe (`/scribe` + recorder + transcript drawer, G3-S) | 2 | 0 | 7 | 2 | 5 | 13 | 18.2% |
-| Hand-offs (Call/Kiosk → logs; Scribe → Invoice/Claim/Profile, G3-X) | 0 | 0 | 5 | 0 | 1 | 5 | 0.0% |
-| **G3 total** | **6** | **2** | **22** | **6** | **12** | **34** | **19.4%** |
+| Hand-offs (Call/Kiosk → logs; Scribe → Invoice/Claim/Profile, G3-X) | 0 | 0 | 4 | 0 | 1 | 6 | 0.0% |
+| **G3 total** | **6** | **2** | **21** | **6** | **12** | **35** | **20.0%** |
 
-**Overall coverage: 19.4% · PRD-backed coverage: 19.4%.** Every scored screen falls under one of the two PRD files. The hand-off rows are scored against the "cross-product synchronization" claims in both PRDs.
+**Overall coverage: 20.0% (7 ÷ 35) · PRD-backed coverage: 20.0%.** Every scored screen falls under one of the two PRD files. The hand-off rows are scored against the "cross-product synchronization" claims in both PRDs.
 
 Coverage % = (Matches + 0.5×Partial) ÷ (Matches + Partial + Missing + Contradicts). PRD-only and Prototype defect rows are excluded.
 
@@ -256,7 +256,7 @@ Unused files that are not mounted anywhere: `components/scribe/AIScribeModal.tsx
 | Scribe saved | activity entry (diagnosis, meds, transcript preview, extracted data) | Client Profile timeline | `lib/scribeSessionStore.ts:637-662` | `app/components/activity/ActivityTab.tsx:632-704` |
 | Scribe saved / Download PDF | prescription document | Client Documents | `lib/scribeSessionStore.ts:719-781` | `lib/clientDocumentsStore` |
 | Scribe launched from Invoice drawer | transcript excerpt, chief complaint, diagnosis → invoice custom fields (notes, diagnosis, chief_complaint). Billing-code lines are coded but never filled | Invoice detail fields | `app/components/invoices/InvoiceDetailDrawer.tsx:1163-1180` | `InvoiceDetailDrawer.tsx:489-537` |
-| Create Claim from appointment | latest scribe session for that client → rendering provider, gender, estimated DOB, diagnosis codes A/B | Claim diagnoses | `lib/scribeSessionStore.ts:597` | `app/components/claims/CreateClaimDrawer.tsx:247-289, 712-722` |
+| **Not reachable from the UI.** Create Claim from appointment (Scribe → Claim) | latest scribe session for that client → rendering provider, gender, estimated DOB, diagnosis codes A/B | Claim diagnoses | `lib/scribeSessionStore.ts:597` | unmounted component (not reachable): `app/components/claims/CreateClaimDrawer.tsx:247-289, 712-722`, which no page imports. The live Create Claim button (`app/pages/Claims.tsx:430-436`) opens an empty claim form and reads no appointment, invoice or Scribe data. |
 | Scribe launched from Appointment drawer | client, process, appointment ID as generic record ID (never as appointment link) | Scribe session | `app/components/appointments/AppointmentDetailDrawer.tsx:1270-1285` | `AIScribePopup.tsx:334-338` |
 
 ---
@@ -397,8 +397,8 @@ Unused files that are not mounted anywhere: `components/scribe/AIScribeModal.tsx
 | G3-X-03 | X-ref | Stage change on a call-log row syncs to client and process (deal) records | Missing in PRD | — | `lib/processLogsStore.ts:200-310` | |
 | G3-X-04 | X-ref | Scribe → Invoice: fills invoice notes, diagnosis, chief complaint | Missing in PRD | — | `InvoiceDetailDrawer.tsx:489-537, 1163-1180` | |
 | G3-X-05 | X-ref | Scribe → Invoice billing lines | Prototype defect | — | `InvoiceDetailDrawer.tsx:496-525` | see E-29; Q-14 |
-| G3-X-06 | X-ref | Scribe → Claim: ICD-10 diagnosis pointers, rendering provider, patient gender | Missing in PRD | — | `CreateClaimDrawer.tsx:247-289` | |
-| G3-X-07 | X-ref | Scribe → Claim code and DOB derivation | Prototype defect | — | `CreateClaimDrawer.tsx:249-289, 717` | see E-30; Q-14 |
+| G3-X-06 | X-ref | Scribe → Claim: ICD-10 diagnosis pointers, rendering provider, patient gender (built but orphaned: the component is not mounted by any page, so this hand-off is not reachable from the UI) | Prototype defect | — | `CreateClaimDrawer.tsx:247-289` (no page uses it) | see E-30 (e); G7-C-28 |
+| G3-X-07 | X-ref | Scribe → Claim code and DOB derivation | Prototype defect | — | `CreateClaimDrawer.tsx:249-289, 717` | see E-30; Q-14. Built but orphaned: the builder is not reachable from the UI (see G7-C-28) |
 | G3-X-08 | X-ref | Scribe keeps its appointment link | Prototype defect | — | `AIScribePopup.tsx:320-338`; `AppointmentDetailDrawer.tsx:1270-1278` | see E-31 |
 | G3-X-09 | X-ref | Scribe → Client Profile activity timeline | Missing in PRD | — | `lib/scribeSessionStore.ts:637-662`; `ActivityTab.tsx:632-704` | |
 | G3-X-10 | X-ref | Appointment drawer call list | Prototype defect | — | `AppointmentDetailDrawer.tsx:658-697` | see E-32 |
@@ -639,7 +639,7 @@ last_updated: "2026-11-12"
 | :--- | :--- | :--- | :--- |
 | Client (Client Profile) | Scribe activity and prescription document | Saving a session adds a "Scribe Recorded / Uploaded" entry to the client's activity timeline and files a prescription document in the client's Documents. | [View Clients](/clients) |
 | Client (Invoices) | Fill invoice from Scribe | Starting Scribe from an invoice fills the invoice's notes, diagnosis and chief complaint from the session. | [View Invoices](/invoices) |
-| Client (Claims) | Diagnosis codes for claims | Creating a claim for an appointment pulls the session's ICD-10 diagnosis, rendering provider and patient gender. | [View Claims](/claims) |
+| Client (Claims) | Diagnosis codes for claims | Intended: creating a claim for an appointment pulls the session's ICD-10 diagnosis, rendering provider and patient gender. Not yet built: no page offers this today (see F-6.2). | [View Claims](/claims) |
 | Client (Appointments, Process) | Launch points | Scribe can be started from Appointments, an appointment's details, the Process board, Clients, Client Profile and the AI assistant capsule. The patient and context are prefilled. | [View Appointments](/appointments) |
 
 ## 1. Module Summary
@@ -799,13 +799,13 @@ Session data is reused in billing.
 | Item | Type | What it does | Notes |
 | :--- | :--- | :--- | :--- |
 | F-6.1: Fill invoice | Action | From an invoice, Scribe fills notes (transcript excerpt + chief complaint), diagnosis and chief complaint | Decision needed: should Scribe propose billable services or CPT lines (see G3-Q-14) |
-| F-6.2: Claim diagnoses | Auto-fill | Creating a claim for an appointment uses the session linked to that appointment: ICD-10 as pointer A, secondary diagnosis as pointer B, rendering provider, patient gender | Codes come from the session's extracted codes only. Decision needed: clinician confirmation of AI codes (G3-Q-14) |
+| F-6.2: Claim diagnoses | Auto-fill | Intended: creating a claim for an appointment uses the session linked to that appointment: ICD-10 as pointer A, secondary diagnosis as pointer B, rendering provider, patient gender | Not yet built (see below). Codes come from the session's extracted codes only. Decision needed: clinician confirmation of AI codes (G3-Q-14) |
 | F-6.3: Activity timeline | Entry | Adds "Scribe Recorded / Uploaded" with diagnosis, medicines and duration to the client timeline | |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Biller creates a claim | Picks the appointment | **Diagnosis A = the session's ICD-10 code; provider = session doctor** |
+| 1 | Biller creates a claim (intended; not yet built) | Picks the appointment | **Diagnosis A = the session's ICD-10 code; provider = session doctor** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
@@ -823,6 +823,7 @@ Session data is reused in billing.
 - 4-section SOAP container (pending G3-Q-12), rich-text editor with version history, Sign & Attach to Chart with lock (pending G3-Q-13).
 - Note generation step (target about 8 s) and EHR sync.
 - Speech-to-text engine naming: PRD said Whisper, the in-app help says Deepgram Nova-2 Medical (G3-Q-15).
+- Claim creation from an appointment that pulls diagnoses, provider and gender from the linked Scribe session (F-6.2). A builder exists in the prototype but no page uses it; the live Create Claim button reads no appointment, invoice or Scribe data (see G7-C-28, G3-E-30).
 
 ## 3. Comprehensive Summary
 
@@ -879,7 +880,7 @@ Session data is reused in billing.
 | G3-E-27 | Transcript-drawer "playback" is a counting timer with no audio. The session rating is never saved. | `TranscriptDetailDrawer.tsx:306-321, 489` | Medium | G3-S-18 |
 | G3-E-28 | Upload mode lets the user finish with no file, and the uploaded file is ignored. | `AIScribePopup.tsx:530, 653-660` | Medium | G3-S-09 |
 | G3-E-29 | Scribe → Invoice reads "assessment" and "billingCodes" fields that Scribe never produces. Invoice line items and totals are never filled, and the coded fallbacks ($120 fee, 5% tax) are placeholders. | `app/components/invoices/InvoiceDetailDrawer.tsx:496-525`; `lib/scribeSessionStore.ts:26-46` | High | G3-X-05 |
-| G3-E-30 | Scribe → Claim has several problems: (a) when no ICD-10 is stored, codes are guessed by keyword with silent defaults (M17.0 knee osteoarthritis; secondary I10 / E11.9 / F41.1 anxiety); (b) the badge falls back to H25.11; (c) patient DOB is invented as 10 May of (current year − age); (d) the matched session is any session for that client, not the appointment's. This produces inaccurate claim data. | `app/components/claims/CreateClaimDrawer.tsx:249-289, 717` | Critical | G3-X-07 |
+| G3-E-30 | Scribe → Claim has several problems: (a) when no ICD-10 is stored, codes are guessed by keyword with silent defaults (M17.0 knee osteoarthritis; secondary I10 / E11.9 / F41.1 anxiety); (b) the badge falls back to H25.11; (c) patient DOB is invented as 10 May of (current year − age); (d) the matched session is any session for that client, not the appointment's; (e) the builder is not mounted by any page, so none of this can be reached from the UI today (the live Create Claim button opens an empty claim form, `app/pages/Claims.tsx:430-436`; see G7-C-28). This produces inaccurate claim data once the builder is mounted. | `app/components/claims/CreateClaimDrawer.tsx:249-289, 717` | Critical | G3-X-06, G3-X-07 |
 | G3-E-31 | Scribe launched from an appointment stores the appointment only as a generic record ID, never as its appointment link. Claim matching then falls back to "any session for this client". | `AIScribePopup.tsx:320-338`; `AppointmentDetailDrawer.tsx:1270-1278` | Medium | G3-X-08 |
 | G3-E-32 | The appointment drawer invents two sample calls (Completed, with recording and transcript) when the client has none. | `app/components/appointments/AppointmentDetailDrawer.tsx:667-697` | Medium | G3-X-10 |
 | G3-E-33 | [SECURITY] No role or permission check on call recordings, transcripts or Scribe. Any signed-in user can view PHI, record, choose any doctor as the responsible clinician, and issue "Attested"/"Verified" documents. | `app/routes.tsx:215, 222, 230-231`; `app/components/auth/ProtectedRoute.tsx`; `AIScribePopup.tsx:126` | High | G3-L-20, G3-S-29 |
