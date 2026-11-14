@@ -67,14 +67,14 @@ _(append one line per ambiguous choice)_
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/automation.md` | todo |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/web-forms.md` | todo |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/knowledge-base.md` | todo |
-| G7 Client Settings | `content/client/settings/audit-logs.md` | todo |
-| G7 Client Settings | `content/client/settings/billing.md` | todo |
+| G7 Client Settings | `content/client/settings/audit-logs.md` | done |
+| G7 Client Settings | `content/client/settings/billing.md` | done |
 | G7 Client Settings | `content/client/settings/custom-fields.md` | todo |
 | G7 Client Settings | `content/client/settings/integrations.md` | todo |
-| G7 Client Settings | `content/client/settings/organization.md` | todo |
+| G7 Client Settings | `content/client/settings/organization.md` | done |
 | G7 Client Settings | `content/client/settings/reception.md` | todo |
-| G7 Client Settings | `content/client/settings/security.md` | todo |
-| G7 Client Settings | `content/client/settings/team.md` | todo |
+| G7 Client Settings | `content/client/settings/security.md` | done |
+| G7 Client Settings | `content/client/settings/team.md` | done |
 | G7 Client Settings | `content/client/settings/voices.md` | todo |
 | G8 Companion remaining | `content/companion/today.md` | todo |
 | G8 Companion remaining | `content/companion/appointments.md` | todo |
