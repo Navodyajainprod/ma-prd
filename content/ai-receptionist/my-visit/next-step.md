@@ -3,135 +3,209 @@ title: "Process Stage & Personalized Next-Step Guidance"
 product: "ai-receptionist"
 module: "my-visit"
 channel: "next-step"
+route: "/reception/my-visit"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-12"
-last_updated: "2026-11-12"
+last_updated: "2026-11-14"
 ---
 
-| Product | AI Receptionist |
-| :--- | :--- |
-| Module | My Visit & Process Guidance - Next-Step Guidance (`/reception/my-visit`) |
+| Product | AI RECEPTIONIST |
+| Module | MY VISIT: NEXT-STEP GUIDANCE (`/reception/my-visit`) |
+| Route | `/reception/my-visit` |
 | Status | In Review |
+| Build status | Partly simulated |
 | Created | 2026-11-12 |
-| Last updated | 2026-11-12 |
+| Last updated | 2026-11-14 |
+
+## At a glance
+
+| | |
+| :--- | :--- |
+| **What it is** | A kiosk card that shows the patient's next stage in a clinic process, with a **View Details** sheet of guidance text. It has no address of its own: it opens by voice or from the check-in flow. |
+| **Who uses it** | Patient (at the lobby kiosk). Care Coordinator (writes the stage titles, descriptions and guidance in Process settings). |
+| **Where you start it** | Asking Aria "What's next?" or "My status", then confirming by face or phone. |
+| **Where the result goes** | Nowhere. It only displays. Moving a patient's card on the Process board changes what it shows. |
+| **How real is it** | 0 features work, 3 are partly simulated, 0 are not built. See the legend below. |
+
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client | Process Pipeline & Stage Visibility | Only processes connected to AI Receptionist and stages enabled for patient/kiosk display surface on the lobby Next-Step cards; moving a patient card in Kanban updates kiosk guidance live. | [View in Client](/client/processes/kanban) |
-| Client | Process List & Stage Builder | Coordinators author Card Titles, Card Descriptions, and HTML guidance sheets inside Stage Portal & Reception Settings. | [View in Client](/client/processes/list) |
-| Client | Station & Stage Guidance Settings | Reception Settings configures station mappings while stage templates populate personalized doctor, room, and invoice details cleanly. | [View in Client](/client/settings/reception) |
-| Companion | Shared Next-Step Instructions | Personalized care instructions and stage cards shown at the kiosk mirror the patient's mobile Companion experience. | [View in Companion](/companion/today) |
+| Client (Process board) | Stage position | The card shows the patient's next enabled stage in a process connected to AI Receptionist. If the patient is in no such process, the kiosk uses the first AI-connected process. | [View Process Board](/client/processes/kanban) |
+| Client (Process list) | Stage card text and guidance | A coordinator writes the card title, description and guidance sheet for each stage. The kiosk shows them. | [View Process List](/client/processes/list) |
+| Client (Reception Settings) | Connection to the kiosk | A process is shown only when it is connected to AI Receptionist. | [View Reception Settings](/client/settings/reception) |
+| Companion | Same instructions on the phone | Not connected. Companion Today does not read the kiosk's stage card. | [View Companion Today](/companion/today) |
 
 ## 1. Module Summary
-- The **Process Stage & Personalized Next-Step Guidance** experience turns clinical workflows configured by clinic staff into clear, patient-friendly next actions right at the lobby kiosk.
-- When a verified patient asks Aria *"What's next?"* or *"My status"*, or navigates inside My Visit, the kiosk reads their current stage in any **AI Receptionist-connected process**, filters out internal-only staff stages, and presents a branded summary card plus a rich **"View Details"** instruction sheet filled automatically with their actual name, doctor, room, appointment time, and balance.
+
+### The story in one minute
+
+Sarah Johnson finishes intake and asks Aria, "What's next for me?" The kiosk asks her to confirm by phone. It then looks for a process connected to AI Receptionist and shows the next stage as a card. The card has the stage's color, a title, a short description and her name and client ID. Aria reads the title aloud. Sarah taps **View Details**. A guidance sheet opens that a coordinator wrote. Parts of it are filled in for her. But the doctor, time, room and invoice values in that sheet are fixed sample values, not hers. Meera Iyer, at the desk, controls which stages Sarah can see by moving her card on the Process board.
+
+**Naming note:** the old PRD said "Clinic Coordinator" and "Practice Coordinator". The role used here is Care Coordinator.
+
+### What is real and what is not
+
+- **Real in the prototype:** the voice and touch trigger, the stage card with accent, title, description and voice readout, and the View Details sheet that shows the coordinator's guidance text.
+- **Simulated:** the appointment and invoice values in the sheet are fixed samples (G11-E-32). If a patient is in no AI-connected process, the kiosk shows the first one. Hidden staff-only stages can still appear in two cases (G11-E-33).
+- **Not built:** a "Step X of Y" label, blanking of unfilled markers, and safe display of the guidance text.
+
+### Journey position
+
+```
+"What's next?" ─▶ Verify (face or phone) ─▶ Find process ─▶ Stage card ─▶ View Details
+```
 
 ## 2. Feature Requests
 
-### F-1: Voice & Touch `"What's Next?"` Process Discovery
+### F-1: Ask "What's next?" and find the stage
+
 #### 1. What it does
-Visitors can check what step comes next in their clinical journey by asking Aria *"What's next?"*, *"What is my status?"*, or *"Next step"*, or by opening Next-Step guidance after verifying via Phone & OTP. Once verified, the kiosk locates the patient's active **AI Receptionist-connected process** (automatically using their assigned clinic pipeline or matching active care workflow) and prepares their current or next patient-visible stage cleanly.
+Sarah asks for her next step by voice, or opens the flow from check-in. After face or phone confirmation the kiosk finds a process connected to AI Receptionist and picks the next enabled stage. If she is in none, it uses the first AI-connected process. With several people on one phone number the kiosk picks the first one without asking.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: Conversational Next-Step Trigger | Voice Intent | Understands natural queries (`"What's next?"`, `"My status"`) anywhere on kiosk | Initiates quick verification if visitor is unauthenticated |
-| F-1.2: AI-Connected Process Lookup | Workflow Resolution | Inspects processes marked enabled for AI Receptionist in Process settings | Ignores internal back-office workflows automatically |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: Voice and touch trigger | Voice intent | "What's next?" and "My status" start the flow after verification | ● Works | G11-I-135 |
+| F-1.2: AI-connected process lookup | Rule | Uses the patient's process that is connected to AI Receptionist | ◐ Simulated | Falls back to the first AI-connected process (G11-I-136, G11-E-33). Decision needed: D-126 |
+| F-1.3: Household member | Rule | On a phone with several profiles, the first match is taken silently | ◐ Simulated | The picker is skipped (G11-E-07) |
+| F-1.4: Verification | Rule | Face or phone confirmation before the card | ◐ Simulated | Phone code 1234 or 0000 works for any number, and the face match is a mock (G11-E-03, G11-E-01). Decision needed: D-41 |
+| F-1.5: No process or no stage | State | A patient in no AI-connected process | ○ Not built | No dedicated message. Decision needed: D-126 |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Post-intake patient asks Aria "What's next for me?" | Speaks phrase and verifies phone/OTP | **Kiosk resolves their active onboarding workflow and opens their customized Next-Step stage card** |
+| 1 | Sarah has finished intake | Says "What's next for me?" and confirms by phone | **The stage card of her process opens** |
+| 2 | Sarah's phone number is shared with her husband | Confirms by phone | **The first matching person's card opens. No picker is shown** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Returning / Multi-Step Patient | Between intake, lab tests, and follow-ups, I want to ask "What's next?" and immediately see my current step in the clinic's care workflow. |
+| F-1-J1 | Patient | Between intake, tests and follow-ups, I want to ask what is next, so that I see my current step without asking staff. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Given a verified patient is enrolled in a process connected to AI Receptionist, when asking `"What's next?"`, then the kiosk MUST display their active process stage card rather than internal back-office workflows. |
+| F-1-1 | **Given** a verified patient, **when** they ask what is next, **then** the card of the next enabled stage in an AI-connected process is shown. |
+| F-1-2 | **Given** the patient is in no AI-connected process, **then** the first AI-connected process is used. |
+| F-1-3 | **Given** several profiles share the phone, **then** the first is chosen without a picker. |
 
----
+### F-2: Stage summary card
 
-### F-2: Patient-Friendly Stage Summary Cards & Visibility Filtering
 #### 1. What it does
-Instead of exposing internal operational column names (like *"Verify Insurance — Billing Hold"*), each patient-visible stage renders its dedicated **Next-Step Summary Card** authored by clinic coordinators:
-- **Stage Card Header & Color Accent:** Displays the stage's accent dot, custom **Card Title** (or friendly stage name fallback), process progress position (e.g., *Step 2 of 4*), and **Card Description** summarizing the immediate action.
-- **Voice Readout:** Aria reads the stage title and summary aloud in clear language.
-- **Internal Stage Hiding:** Stages toggled OFF for patient/kiosk visibility are skipped automatically so internal staff triage notes never display publicly on lobby glass, advancing cleanly to the next visible patient milestone.
-- **Action Button:** Prominent **View Details** CTA (also triggered by saying *"View Details"*) opens the full instruction sheet.
+The card shows the stage's accent color, the card title (or the stage name), a description, and the patient's name and client ID. Aria reads the title and summary. **View Details** opens the sheet. Staff can turn a stage off for kiosk display. The filter applies when a visible next stage exists.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: Custom Stage Card Presentation | UI Card | Displays stage color badge, **Card Title**, step position, and **Card Description** | Concise and easy to scan in 3 seconds |
-| F-2.2: Patient Visibility Filter | Privacy Guard | Hides staff-only workflow stages automatically from lobby display | Respects per-stage coordinator toggles |
-| F-2.3: **"View Details"** Voice & Touch CTA | Drill-Down | Opens full formatted guidance page via tap or spoken *"View Details"* | Keeps summary card uncluttered |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Card title and description | Card | Shows the stage's accent, title and description, with a voice readout | ● Works | G11-I-137 |
+| F-2.2: Patient name and client ID | Display | Shown on the card in the public lobby | ◐ Simulated | Not masked (G11-E-34). Decision needed: D-39 |
+| F-2.3: View Details button | Button | Opens the guidance sheet by tap or voice | ● Works | |
+| F-2.4: Hide staff-only stages | Rule | Stages turned off for kiosk display are skipped | ◐ Simulated | If no visible next stage exists, the card falls back to the current or first stage, which may be staff-only (G11-E-33) |
+| F-2.5: "Step X of Y" | Label | Described in the earlier PRD | ○ Not built | G11-I-138 |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Staff move patient from `"Internal Triage Review"` (hidden) into `"Pre-Consult Vitals"` (visible) | Patient checks Next Step at kiosk | **Hidden triage stage stays invisible; kiosk displays "Proceed to Vitals Station" card and View Details CTA** |
+| 1 | Meera moves Sarah from a hidden triage stage to a visible Vitals stage | Sarah asks what is next | **The Vitals card shows with her name and client ID** |
+| 2 | No visible stage lies ahead | Sarah asks what is next | **The current or first stage is shown, even if it is staff-only** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Clinic Coordinator | When designing internal process stages, I want staff-only columns hidden from patients while exposing clear patient-friendly card titles and summaries. |
+| F-2-J1 | Care Coordinator | When I design process stages, I want staff-only columns hidden from patients and clear card titles shown, so that the lobby screen never shows internal notes. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Given a workflow stage has kiosk/portal visibility turned OFF, then that stage MUST NOT be shown on the kiosk Next-Step card. |
-| F-2-2 | Given a visible stage has custom **Card Title** and **Card Description**, then both MUST display prominently alongside **View Details**. |
+| F-2-1 | **Given** a visible next stage, **then** the card shows its title, description and a View Details button. |
+| F-2-2 | **Given** no visible next stage, **then** the current or first stage is shown even if it is hidden from patients. |
+| F-2-3 | **Given** the card, **then** the patient's name and client ID are visible on the lobby screen. |
 
----
+### F-3: View Details guidance sheet
 
-### F-3: Dynamic Personalized Guidance Sheet (**View Details**)
 #### 1. What it does
-Selecting **View Details** (by tap or voice) opens the rich **Next-Step Details** preparation screen designed by coordinators using the visual guidance editor, automatically substituting live patient and visit placeholders:
-- **Patient Fields:** Full Name, First Name, Last Name, Phone, Email, Client ID.
-- **Appointment Fields:** Date, Time, Consultation/Service Name, Assigned Doctor, Consultation Room.
-- **Billing & Stage Fields:** Invoice ID, Invoice Total, Outstanding Balance Due, Payment Status, Current Stage Name, Active Care Workflow, and Clinic Name.
-- **Clean Unresolved Placeholder Guard:** Any optional variable missing data for that patient cleanly resolves blank rather than showing raw unfilled placeholder brackets on the lobby screen! Also includes a clear Back action returning to the Stage Summary Card or Home.
+**View Details** opens the guidance a coordinator wrote for that stage. The kiosk replaces markers such as the patient's name with values. For appointment and invoice markers it inserts fixed sample values. Other markers are left as typed. The text is shown as raw HTML.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Rich HTML Guidance Canvas | Instruction Sheet | Displays formatted headings, checklists, fasting instructions, and room notes | Easily authored by non-technical coordinators |
-| F-3.2: Live Patient & Visit Merge | Personalization | Fills real patient name, doctor, time, room, and open invoice amounts dynamically | Reflects latest calendar and billing values |
-| F-3.3: Placeholder Cleanup Guard | Display Polish | Hides unresolved optional fields cleanly so raw placeholder markers never appear | Guarantees clean copy even on walk-ins without invoices |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Guidance sheet | Sheet | Shows the stage's formatted guidance | ● Works | |
+| F-3.2: Patient markers | Merge | Fills the patient's own name, phone, email and client ID | ● Works | |
+| F-3.3: Appointment and invoice markers | Merge | Fills doctor, time, room, invoice number and balance | ◐ Simulated | Fixed sample values such as "Dr. Rajesh Patel", "11:30 AM" and "$78.75", not the patient's (G11-E-32). Decision needed: D-39 |
+| F-3.4: Unfilled markers | Rule | Described in the earlier PRD: blank when missing | ○ Not built | Unknown markers stay on screen as typed (G11-E-32) |
+| F-3.5: Safe display | Rule | Guidance HTML is shown without cleaning | ◐ Simulated | A name typed at the kiosk can run script text on the screen (G11-E-09) |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Fasting Lab stage card inserts **Patient First Name**, **Appointment Provider**, and **Invoice Balance Due** fields | Patient taps **View Details** | **Displays: "Welcome, Priya! Please proceed to Lab 1 before seeing Dr. Mehta at 10:30 AM. Current balance due: $0.00."** |
-| 2 | Patient has no open invoice yet | Guidance sheet includes optional Invoice Balance Due field | **Unfilled field disappears cleanly with zero raw placeholder text on screen** |
+| 1 | The Vitals sheet uses doctor and room markers | Sarah taps **View Details** | **Her name is right. The doctor, time and room are the same fixed sample values for every patient** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Patient Preparing for Next Step | When I open "View Details", I want step-by-step instructions tailored with my own doctor, room, time, and balance rather than generic boilerplate. |
+| F-3-J1 | Patient | When I open View Details, I want steps for my own doctor, room, time and balance, so that I am not given generic text. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given **View Details** opens for a patient with an active appointment, then personalized patient and appointment details MUST display real values and zero unfilled placeholder markers MUST remain visible. |
+| F-3-1 | **Given** View Details opens, **then** patient markers show the patient's own values. |
+| F-3-2 | **Given** appointment or invoice markers, **then** fixed sample values are shown, not the patient's. |
+| F-3-3 | **Given** a marker the kiosk does not know, **then** it stays on screen unchanged. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Voice & Touch `"What's Next?"` Lookup | F-1.1 to F-1.2 | Authenticates visitors and finds their active stage inside AI-connected clinic workflows. |
-| F-2 | Stage Summary Cards & Visibility Filter | F-2.1 to F-2.3 | Displays custom card titles, descriptions, and View Details while hiding staff-only stages. |
-| F-3 | Personalized Rich **View Details** Sheet | F-3.1 to F-3.3 | Substitutes live patient, doctor, room, and billing variables cleanly with zero raw tokens. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | Ask what is next | F-1.1 – F-1.5 | ● / ◐ / ○ | Trigger works; process fallback and household pick are unsafe. |
+| F-2 | Stage summary card | F-2.1 – F-2.5 | ● / ◐ / ○ | Card works; staff-only stage can leak; no Step X of Y. |
+| F-3 | View Details sheet | F-3.1 – F-3.5 | ● / ◐ / ○ | Patient fields work; appointment and invoice values are samples. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | Clinic Patient | Ask "What's next?" and read clear, personalized preparation steps tailored to my exact visit stage. | F-1, F-2, F-3 |
-| 2 | Practice Coordinator | Control which internal workflow stages patients see and author rich instructions centrally. | F-2, F-3 |
+| 1 | Patient | See my current step without asking staff | F-1 |
+| 2 | Care Coordinator | Hide staff-only stages and show clear cards | F-2 |
+| 3 | Patient | Read steps for my own visit | F-3 |
+
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Any visitor at the kiosk | Open Next Step after a phone code or a mock face match | Nothing real. The phone code works for any number |
+| Care Coordinator | Write stage cards and guidance in Process settings | Nothing is checked |
+
+The old PRD described a verified patient only. Decision needed: D-41.
+
+## 5. Metrics and definitions
+
+The screen shows no metric. The invoice balance in the guidance sheet is a fixed sample value. **Hardcoded, formula undefined.**
+
+## 6. Cross-module journeys this module appears in
+
+This module is in none of the four journeys. It reads process data from Workflows and Process settings.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-126 | If a verified patient is in no AI-connected process, what should Next Step show? | F-1.2, F-1.5 |
+| D-41 | What may a successful verification authorise and for how long? | F-1.4 |
+| D-39 | Which details may appear on screen or be spoken in a public lobby? | F-2.2, F-3.3 |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-12 | First version (generated stub). |

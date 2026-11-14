@@ -3,133 +3,206 @@ title: "Voice Deep-Linking & Turn-by-Turn Room Guide"
 product: "ai-receptionist"
 module: "directions"
 channel: "rooms"
+route: "/reception/directions/:categoryId/:roomId"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-12"
-last_updated: "2026-11-12"
+last_updated: "2026-11-14"
 ---
 
-| Product | AI Receptionist |
-| :--- | :--- |
-| Module | Wayfinding & Directions - Room Guide & Voice Deep-Linking (`/reception/directions/:cat/:room`) |
+| Product | AI RECEPTIONIST |
+| Module | DIRECTIONS: ROOM GUIDE AND VOICE DEEP-LINKING (`/reception/directions/:categoryId/:roomId`) |
+| Route | `/reception/directions/:categoryId/:roomId` |
 | Status | In Review |
+| Build status | Partly simulated |
 | Created | 2026-11-12 |
-| Last updated | 2026-11-12 |
+| Last updated | 2026-11-14 |
+
+## At a glance
+
+| | |
+| :--- | :--- |
+| **What it is** | A room card with the room name, floor or wing and plain walking text, read aloud by Aria. A visitor reaches it by tapping a room or by asking for a place, a doctor or a room by voice. |
+| **Who uses it** | Patient (any visitor at the lobby kiosk). No sign-in and no identity check. |
+| **Where you start it** | A room in the room list, or a spoken request on any kiosk screen such as "Where is the washroom?". The address `/reception/directions/:categoryId/:roomId` also opens it. |
+| **Where the result goes** | Nowhere. It only shows and speaks directions. |
+| **How real is it** | 0 features work, 3 are partly simulated, 0 are not built. See the legend below. |
+
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client | Room Directions & Landmark Authoring | Walking instructions, floor labels, and doctor-room links edited by admins in Reception Settings update the kiosk's room guide cards and voice matching automatically. | [View in Client](/client/settings/reception) |
-| Client | Provider & Service Location Consistency | Consultation services and provider assignments match the physical rooms visitors ask for by doctor or room name. | [View in Client](/client/services) |
-| Companion | Visit Room Continuity | Room names and arrival instructions match across lobby walking cards and the patient's mobile Companion app. | [View in Companion](/companion/today) |
+| Client (Reception Settings) | Room directions text | The walking text is the Direction field an admin writes on a room. With none, the card says "Room N is located at <location>. Please follow hallway signs." | [View Reception Settings](/client/settings/reception) |
+| Client (Services) | Doctor and service matching | Voice matching reads room titles, numbers and the assigned doctor on the room. It does not read the Services page. | [View Services](/client/services) |
+| Companion | Room continuity | Not connected. Companion has no directions screen that reads the same room data. | [View Companion Today](/companion/today) |
 
 ## 1. Module Summary
-- The **Voice Deep-Linking & Turn-by-Turn Room Guide** brings visitors directly to plain-language walking directions for any clinic room (`/reception/directions/:category/:room`) either by drilling down from Departments or by speaking naturally to Aria (*"Where is the washroom?"*, *"Where is Dr. Sharma?"*, *"Dawai kahan milegi?"*).
-- High-priority bilingual voice matching jumps straight to the **Room Directions Result** card (skipping category menus completely), displays a **Direct Match** pill, reads walking landmarks aloud in English or Hindi, and provides clear follow-up CTAs.
+
+### The story in one minute
+
+Sarah Johnson is late and needs the washroom. She does not touch the screen. She says, "Where is the washroom?" Aria hears her, skips the department grid and opens the room card at once. A **Direct Match** pill sits on the card. The card shows the room name, the floor or wing and the walking text. Aria reads the text aloud. Sarah can also ask in Hindi, for example "Dawai kahan milegi?". The text itself is read as written, so a Hindi visitor hears the same words. Sarah taps **Done & Return Home** when she has what she needs. The card has no clinician row, no walking time and no **Start Check-in** button.
+
+### What is real and what is not
+
+- **Real in the prototype:** voice match by room name, doctor or English and Hindi words, the Direct Match pill, the room card with floor or wing and walking text, the spoken readout, the context-aware Back control and the Done button.
+- **Simulated:** the Hindi readout speaks the same untranslated text (G11-E-37).
+- **Not built:** the assigned clinician row, the walking time estimate and a Start Check-in button on the card.
+
+### Journey position
+
+```
+Voice or room list ─▶ Room card (Direct Match) ─▶ Spoken readout ─▶ Back / Done & Return Home
+```
 
 ## 2. Feature Requests
 
-### F-1: Bilingual Direct Voice Wayfinding & Synonym Matching
+### F-1: Find a room by voice
+
 #### 1. What it does
-When a visitor asks Aria where to go — whether by **room name** (*"Lab 1"*), **room number** (*"Room 101"*), **doctor name** (*"Dr. Sharma"*), or everyday **English/Hindi terms** (*washroom, toilet, restroom, baathroom, shauchalaya, pharmacy, dawai, water, paani, cash/billing counter*) — the kiosk prioritizes specific destination matching ahead of all general menus. Instead of landing on top-level Department Categories, the kiosk jumps straight to the matching **Room Directions Result** card, tags it with a **`Direct Match`** badge, and reads the directions aloud.
+Sarah asks Aria for a room name, a room number, a doctor or an everyday word in English or Hindi. The kiosk checks specific places and doctors first. It then opens the matching room card directly. A **Direct Match** pill tells her it was a voice hit.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: Live Room & Doctor Voice Scan | Voice Matching | Searches active room titles, room numbers, and assigned provider names | Reflects newly added clinic rooms automatically |
-| F-1.2: English & Hindi Synonym Map | Bilingual Resolver | Understands colloquial words (`dawai`, `paani`, `washroom`, `baathroom`, `lab`, `billing`) | Bridges everyday patient phrasing to official room names |
-| F-1.3: `Direct Match` Badge & Skip-Ahead | Instant UX | Bypasses Category and Room list menus straight into the exact room guide | Saves time for hurried or distressed visitors |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: Room, number and doctor match | Voice | Matches spoken text to room titles, numbers and assigned doctors, ahead of the general menus | ● Works | G11-I-91 |
+| F-1.2: English and Hindi words | Voice | Understands everyday words such as washroom, pharmacy and dawai | ● Works | Covered by an automated test in the prototype |
+| F-1.3: Direct Match pill | Badge | Shown on the card when the visitor arrived by voice | ● Works | |
+| F-1.4: Skip category menus | Rule | A voice hit opens the room card without the grid or the list | ● Works | |
+| F-1.5: No match | State | An unclear phrase gets one polite prompt | ● Works | The speech stage belongs to the Aria speech page |
+| F-1.6: Room edits | Rule | Voice matching reads the rooms loaded when the screen opened | ◐ Simulated | A room added by an admin is not matched on a running kiosk until reload (G11-E-36) |
 
 #### 3. Worked example
+Sarah needs the pharmacy.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Visitor needs restroom urgently and says "Where is the washroom please?" | Speaks question on Home or active screen | **Kiosk skips category grids and opens Ground Floor Restroom directions with a Direct Match badge and spoken guidance** |
-| 2 | Hindi speaker asks "Dawai kahan milegi?" | Speaks Hindi pharmacy query | **Matches Pharmacy Counter A directly and speaks directions aloud** |
-| 3 | Patient asks "Where is the billing counter?" | Mentions both "where is" and "billing" | **Specific room match beats generic Billing checkout, opening Billing Desk directions** |
+| 1 | Home screen is showing | Says "Where is the washroom please?" | **The room card opens with a Direct Match pill and Aria reads the walking text** |
+| 2 | She asks in Hindi | Says "Dawai kahan milegi?" | **The pharmacy room card opens directly** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Visitor in a Hurry | When I ask Aria aloud for a restroom, doctor, or pharmacy in English or Hindi, I want walking directions immediately without tapping through category menus. |
+| F-1-J1 | Patient | When I ask aloud for a restroom, a doctor or the pharmacy, I want directions at once, so that I do not tap through menus. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Given a visitor speaks a query matching an active room, doctor, or English/Hindi synonym, then the kiosk MUST navigate directly to that room's **Room Directions Result** screen and display **Direct Match**. |
+| F-1-1 | **Given** a spoken request names an active room, a doctor or a known English or Hindi word, **then** the room card opens directly with a Direct Match pill. |
+| F-1-2 | **Given** a room was added after the kiosk screen opened, **then** voice matching does not find it until the screen reloads. |
 
----
+### F-2: Room card and spoken directions
 
-### F-2: Large-Print Walking Directions Card & Spoken Landmarks
 #### 1. What it does
-On the **Room Directions Result** card, visitors see high-contrast, easy-to-scan spatial landmarks tailored for standing lobby reading:
-- **Header Metadata:** Category zone badge, **Direct Match** pill (when voice-matched), prominent **Room Number** tag (e.g., `Room 101`), and large **Room / Destination Name**.
-- **Location & Doctor Row:** Clear **Floor / Wing** badge and **Assigned Clinician** name (for doctor rooms).
-- **Turn-by-Turn Walking Text:** Generous large-font walking instructions using real physical landmarks (e.g., *"Walk past reception desk, turn left at water station, restrooms are on the left."*), paired with estimated walking time (`~1–2 min walk`).
-- **Spoken Readout:** Aria automatically reads the walking instructions aloud in English or Hindi (unless muted) so visually impaired visitors hear every turn clearly.
+The room card shows the room name, the floor or wing and large walking text. Aria reads the text as soon as it opens, unless the kiosk is muted. The room number is part of the floor or wing text. The address follows the visitor so the card can be bookmarked or refreshed.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: Structured Landmark Card | Visual Card | Displays Zone badge, Room `#`, Floor/Wing, Assigned Doctor, and large walking copy | High contrast for effortless reading |
-| F-2.2: Automatic Spoken Guidance | Audio Output | Reads room landmarks aloud in English or Hindi upon opening | Respects global Mute toggle |
-| F-2.3: Direct Deep-Link URL | Route Sync | Updates URL to `/reception/directions/:categoryId/:roomId` | Supports direct refresh or bookmarking |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Landmark card | Card | Shows the room name, floor or wing and walking text | ● Works | G11-I-92. The text is the room's Direction field, or a generic fallback sentence (G11-I-97) |
+| F-2.2: Spoken readout | Audio | Reads the walking text aloud when the card opens | ◐ Simulated | In Hindi mode the same untranslated text is spoken (G11-E-37) |
+| F-2.3: Deep-link address | Route | `/reception/directions/:categoryId/:roomId` | ● Works | An unknown room falls back to the room list |
+| F-2.4: Assigned clinician row | Field | Described in the earlier PRD | ○ Not built | Decision needed: D-125 |
+| F-2.5: Walking time (about 1 to 2 minutes) | Field | Described in the earlier PRD | ○ Not built | Decision needed: D-125 |
+| F-2.6: Hindi walking text | Content | Described in the earlier PRD as spoken in Hindi | ○ Not built | Rooms have one text field |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Visitor opens **Pharmacy Counter A** | Views Directions Result card | **Card shows Pharmacy & Labs badge, Counter A, Ground Floor location, crisp walking path, and Aria reads directions aloud** |
+| 1 | Sarah taps **Pharmacy Counter A** in the list | Reads the card | **The room name, floor or wing and walking text show, and Aria reads them. No clinician and no walk time are shown** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Visually Impaired / Senior Visitor | When getting directions to a room, I want large legible text plus clear spoken landmark instructions so I don't miss a turn. |
+| F-2-J1 | Patient | When I get directions to a room, I want large text and clear spoken landmarks, so that I do not miss a turn. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Given a room directions card opens, then Room Name, Floor/Wing, landmark walking text, and spoken guidance (when unmuted) MUST present together. |
+| F-2-1 | **Given** the room card opens, **then** the room name, floor or wing and walking text show together and the text is spoken unless muted. |
+| F-2-2 | **Given** Hindi is selected, **then** the spoken walking text is the same text as in English. |
+| F-2-3 | **Given** a room has no Direction text, **then** the card says "Room N is located at <location>. Please follow hallway signs." |
 
----
+### F-3: Back, Done and the next step
 
-### F-3: Context-Aware Back Navigation & **Start Check-in** / **Done & Return Home** CTAs
 #### 1. What it does
-To keep navigation intuitive regardless of how a visitor reached a room guide:
-- **Context-Aware Back Control:** When arriving via browsing **Departments -> Rooms**, Back returns cleanly to that department's room list; when jumping via **Voice Direct Match**, Back returns smoothly to Home (or Departments) cleanly without dead-ends.
-- **Action Footer:** Provides **Done & Return Home** (clearing the session back to the lobby home screen) plus **Start Check-in** for visitors who came looking for a doctor's suite first and now want to get a queue token.
+**Back** takes Sarah to the room list if she browsed, or to Home if she arrived by voice. **Done & Return Home** clears the session. The card has no button to start check-in. She uses the dock for that.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Smart Back Behavior | Navigation | Returns to Room List after browse entry or Home/Directory after direct voice jump | Eliminates confusing extra hops |
-| F-3.2: **Done & Return Home** + **Start Check-in** | Footer CTAs | Lets visitor exit cleanly or launch Check-In directly from directions | Connects wayfinding smoothly into care |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Context-aware Back | Button | Returns to the room list after browsing, or to Home after a voice jump | ● Works | G11-I-95 |
+| F-3.2: Done & Return Home | Button | Clears the session and shows the home screen | ● Works | |
+| F-3.3: Start Check-in button | Button | Described in the earlier PRD | ○ Not built | Only Back and Done exist. The dock still opens Check-In. Decision needed: D-125 |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient arrived via voice *"Where is Dr. Sharma?"*, sees Room 101, then wants to check in | Taps **Start Check-in** in footer | **Transitions cleanly straight into Face Check-In** |
-| 2 | Visitor browsed Facilities -> Restroom and wants to check another facility | Taps Back arrow | **Returns to Facilities room list cleanly** |
+| 1 | Sarah browsed Diagnostics and opened a lab | Taps Back | **The Diagnostics room list opens** |
+| 2 | She arrived by voice | Taps Back | **Home opens** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Visiting Relative or Patient | After reading directions, I want to return cleanly to the room list, go back Home, or jump directly to Check-In in one tap. |
+| F-3-J1 | Patient | After reading directions, I want to go back to the list or Home in one tap, so that I can check another place. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given a visitor opened Room Directions via Category/Room browsing, when Back is tapped, then the kiosk MUST return to that category's Room List; tapping **Done & Return Home** MUST reset to Home. |
+| F-3-1 | **Given** the card was opened from the room list, **when** Back is tapped, **then** the list opens. |
+| F-3-2 | **Given** the card was opened by voice, **when** Back is tapped, **then** Home opens. |
+| F-3-3 | **Given** the room card, **then** there is no Start Check-in button. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Bilingual Direct Voice Wayfinding | F-1.1 to F-1.3 | Resolves English/Hindi room, doctor, and synonym speech directly to the target room guide. |
-| F-2 | Large-Print Walking Directions & Audio | F-2.1 to F-2.3 | Displays floor, room `#`, doctor, and physical landmark steps while reading guidance aloud. |
-| F-3 | Context-Aware Back & Check-In CTAs | F-3.1 to F-3.2 | Provides smart back history plus one-tap **Done & Return Home** or **Start Check-in** actions. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | Find a room by voice | F-1.1 – F-1.6 | ● / ◐ | Voice match works; new rooms need a reload. |
+| F-2 | Room card and spoken directions | F-2.1 – F-2.6 | ● / ◐ / ○ | Card and readout work; clinician and walk time absent; Hindi is not translated. |
+| F-3 | Back, Done and next step | F-3.1 – F-3.3 | ● / ○ | Back and Done work; no Start Check-in. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | English or Hindi Visitor | Ask aloud for any room or facility and get turn-by-turn spoken and large-print directions instantly. | F-1, F-2 |
-| 2 | Self-Navigating Patient | Transition smoothly from finding a doctor's room straight into checking in for care. | F-3 |
+| 1 | Patient | Get directions at once by asking aloud | F-1 |
+| 2 | Patient | Read and hear clear landmarks | F-2 |
+| 3 | Patient | Go back or Home in one tap | F-3 |
+
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Any visitor at the kiosk | Ask for or open any room card | Nothing. The kiosk routes sit outside sign-in |
+| Front-desk Staff (Meera) | Write room directions in Reception Settings | Nothing is checked |
+
+The old PRD named visitors only and set no access rules. Decision needed: D-46.
+
+## 5. Metrics and definitions
+
+The screen shows no metric. The old PRD's "about 1 to 2 minute walk" estimate is not built, so no formula exists.
+
+## 6. Cross-module journeys this module appears in
+
+This module is in none of the four journeys. It is an information screen with no hand-off.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-125 | Should the room card show the assigned clinician, a walking time and a Start Check-in button, and where do departments come from? | F-2.4, F-2.5, F-3.3 |
+| D-46 | What is the kiosk and patient access model? | Section 4 |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-12 | First version (generated stub). |
