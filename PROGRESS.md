@@ -52,9 +52,9 @@ _(append one line per ambiguous choice)_
 | G3 Tasks | `content/client/tasks/tasks-by-me.md` | done |
 | G3 Tasks | `content/admin/tasks.md` | done |
 | G3 Tasks | `content/companion/tasks.md` | done |
-| G4 Appointments | `content/client/appointments/availability.md` | todo |
-| G4 Appointments | `content/client/appointments/calendar.md` | todo |
-| G4 Appointments | `content/client/appointments/list.md` | todo |
+| G4 Appointments | `content/client/appointments/availability.md` | done |
+| G4 Appointments | `content/client/appointments/calendar.md` | done |
+| G4 Appointments | `content/client/appointments/list.md` | done |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/call-logs.md` | todo |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/processes/kanban.md` | todo |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/processes/list.md` | todo |
