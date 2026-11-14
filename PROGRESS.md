@@ -55,9 +55,9 @@ _(append one line per ambiguous choice)_
 | G4 Appointments | `content/client/appointments/availability.md` | done |
 | G4 Appointments | `content/client/appointments/calendar.md` | done |
 | G4 Appointments | `content/client/appointments/list.md` | done |
-| G5 Call Logs, Process, Clients, Overview, Reports | `content/client/call-logs.md` | todo |
-| G5 Call Logs, Process, Clients, Overview, Reports | `content/client/processes/kanban.md` | todo |
-| G5 Call Logs, Process, Clients, Overview, Reports | `content/client/processes/list.md` | todo |
+| G5 Call Logs, Process, Clients, Overview, Reports | `content/client/call-logs.md` | done |
+| G5 Call Logs, Process, Clients, Overview, Reports | `content/client/processes/kanban.md` | done |
+| G5 Call Logs, Process, Clients, Overview, Reports | `content/client/processes/list.md` | done |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/clients.md` | todo |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/overview.md` | todo |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/reports.md` | todo |
