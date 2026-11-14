@@ -60,7 +60,7 @@ _(append one line per ambiguous choice)_
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/processes/list.md` | done |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/clients.md` | done |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/overview.md` | done |
-| G5 Call Logs, Process, Clients, Overview, Reports | `content/client/reports.md` | todo |
+| G5 Call Logs, Process, Clients, Overview, Reports | `content/client/reports.md` | done |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/services.md` | done |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/claims.md` | done |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/workflows.md` | todo |
