@@ -20,6 +20,17 @@ export interface SearchItem {
 const STATIC_SEARCH_ITEMS: SearchItem[] = [
   // ── Client Modules & Tabs ──
   {
+    id: "client-chat-inbox",
+    title: "Unified Inbox & Care Groups",
+    product: "client",
+    productLabel: "Client",
+    module: "Chats & Care Groups",
+    section: "Inbox & Care Groups",
+    subtitle: "All channels in one inbox, staff care groups, replies, attachments, delivery receipts",
+    href: "/client/chat/chat",
+    keywords: "inbox unified omnichannel care groups replies attachments receipts client chat",
+  },
+  {
     id: "client-chat-whatsapp",
     title: "WhatsApp Messaging & 24h Meta Window",
     product: "client",

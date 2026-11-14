@@ -66,14 +66,125 @@ export interface PrdDocument {
   module: string;
   channel?: string;
   status: string;
+  route?: string;
+  buildStatus?: string;
   created_date: string;
   last_updated: string;
   headerTableRaw: string;
+  atAGlanceRaw: string | null;
+  statusCounts: StatusCounts;
+  changeLog: ChangeLogRow[];
   crossProductSummaryRaw: string | null;
   dateLog: string[];
   editLog: { date: string; section: string; change: string }[];
   sections: PrdSection[];
   rawFullMarkdown: string;
+}
+
+/** Counts of the Status marks (● Works, ◐ Simulated, ○ Not built) found in "Status" table columns of section 2. */
+export interface StatusCounts {
+  works: number;
+  simulated: number;
+  notBuilt: number;
+  total: number;
+}
+
+export interface ChangeLogRow {
+  date: string;
+  change: string;
+}
+
+export interface ChangeLogEntry {
+  date: string;
+  module: string;
+  section: string;
+  change: string;
+}
+
+/** Same slug rule the renderer uses for part headings, so table-of-contents links match the page anchors. */
+function slugifyPartTitle(title: string): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
+/** Returns the text under a `##` heading (matched by headingRegex) up to the next `##` heading. */
+function extractBlock(content: string, headingRegex: RegExp): string | null {
+  const m = headingRegex.exec(content);
+  if (!m) return null;
+  const rest = content.slice(m.index + m[0].length);
+  const next = rest.search(/^##[ \t]+/m);
+  const block = (next === -1 ? rest : rest.slice(0, next))
+    .split(/\r?\n/)
+    .filter((line) => !/^[-*_\s]{3,}$/.test(line.trim()))
+    .join("\n")
+    .trim();
+  return block.length > 0 ? block : null;
+}
+
+/** Splits a Markdown table row into trimmed cells. */
+function tableCells(line: string): string[] {
+  return line.trim().split("|").slice(1, -1).map((c) => c.trim());
+}
+
+/** Counts status marks in every table that has a "Status" column. */
+function computeStatusCounts(markdown: string): StatusCounts {
+  const counts: StatusCounts = { works: 0, simulated: 0, notBuilt: 0, total: 0 };
+  let inTable = false;
+  let rowIdx = 0;
+  let statusCol = -1;
+
+  for (const raw of markdown.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line.startsWith("|")) {
+      inTable = false;
+      statusCol = -1;
+      rowIdx = 0;
+      continue;
+    }
+    const cells = tableCells(line);
+    if (!inTable) {
+      inTable = true;
+      rowIdx = 0;
+      statusCol = cells.findIndex((c) => c.replace(/\*+/g, "").trim().toLowerCase() === "status");
+      continue;
+    }
+    rowIdx++;
+    if (rowIdx === 1) continue; // separator row
+    if (statusCol < 0 || statusCol >= cells.length) continue;
+    const mark = cells[statusCol].match(/[●◐○]/);
+    if (!mark) continue;
+    if (mark[0] === "●") counts.works++;
+    else if (mark[0] === "◐") counts.simulated++;
+    else counts.notBuilt++;
+    counts.total++;
+  }
+  return counts;
+}
+
+/** Reads the dated rows of the "Change log" table (first column date, remaining columns joined). */
+function parseChangeLog(markdown: string): ChangeLogRow[] {
+  const rows: ChangeLogRow[] = [];
+  let inTable = false;
+  let rowIdx = 0;
+  for (const raw of markdown.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line.startsWith("|")) {
+      inTable = false;
+      rowIdx = 0;
+      continue;
+    }
+    if (!inTable) {
+      inTable = true;
+      rowIdx = 0;
+      continue; // header row
+    }
+    rowIdx++;
+    if (rowIdx === 1) continue; // separator row
+    const cells = tableCells(line);
+    if (cells.length >= 2 && cells[0]) {
+      rows.push({ date: cells[0], change: cells.slice(1).filter(Boolean).join(" \u00b7 ") });
+    }
+  }
+  return rows;
 }
 
 export function getPrdPath(product: string, moduleName: string, channelName?: string): string | null {
@@ -121,7 +232,15 @@ export function loadPrd(
 ): PrdDocument | null {
   const filePath = getPrdPath(product, moduleName, channelName);
   if (!filePath) return null;
+  return parsePrdFile(filePath, product, moduleName, channelName);
+}
 
+function parsePrdFile(
+  filePath: string,
+  product: ProductId,
+  moduleName: string,
+  channelName?: string
+): PrdDocument {
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data: frontmatter, content } = parseFrontmatter(fileContent);
 
@@ -138,6 +257,9 @@ export function loadPrd(
       .join("\n")
       .trim();
   }
+
+  // 2b. Extract the "At a glance" block (v2 template)
+  const atAGlanceRaw = extractBlock(cleanContent, /^##[ \t]+At a glance[^\r\n]*\r?\n/im);
 
   // 3. Extract Logs (Date Log & Edit Log)
   const dateLog: string[] = [];
@@ -228,14 +350,18 @@ export function loadPrd(
         const featBody = sectionBody.substring(fStart, fEnd).trim();
         const featSlug = curFeat.id.toLowerCase();
 
-        // Parse the 5 parts
-        const parts: FeaturePart[] = [
-          { number: 1, title: "What it does", slug: `${featSlug}-what-it-does` },
-          { number: 2, title: "What it includes", slug: `${featSlug}-what-it-includes` },
-          { number: 3, title: "Worked example", slug: `${featSlug}-worked-example` },
-          { number: 4, title: "Jobs to be done", slug: `${featSlug}-jobs-to-be-done` },
-          { number: 5, title: "Acceptance criteria", slug: `${featSlug}-acceptance-criteria` },
-        ];
+        // Parts are read from the `#### n. Title` headings that the feature actually contains
+        const parts: FeaturePart[] = [];
+        const partRegex = /^####\s+(\d+)\.\s+([^\r\n]+)$/gm;
+        let partMatch;
+        while ((partMatch = partRegex.exec(featBody)) !== null) {
+          const partTitle = partMatch[2].trim();
+          parts.push({
+            number: parseInt(partMatch[1], 10),
+            title: partTitle,
+            slug: `${featSlug}-${slugifyPartTitle(partTitle)}`,
+          });
+        }
 
         features.push({
           id: curFeat.id,
@@ -288,21 +414,56 @@ export function loadPrd(
     });
   }
 
+  const featureSection = sections.find((s) => s.number === 2);
+  const statusCounts = computeStatusCounts(featureSection ? featureSection.rawMarkdown : "");
+  const changeLogSection = sections.find((s) => s.number === 8);
+  const changeLog = changeLogSection ? parseChangeLog(changeLogSection.rawMarkdown) : [];
+
   return {
     title: frontmatter.title || `${product} ${moduleName} PRD`,
     product,
     module: moduleName,
     channel: channelName || frontmatter.channel,
     status: frontmatter.status || "In Review",
+    route: frontmatter.route || undefined,
+    buildStatus: frontmatter.build_status || undefined,
     created_date: frontmatter.created_date || "2026-11-10",
     last_updated: frontmatter.last_updated || "2026-11-10",
     headerTableRaw: "",
+    atAGlanceRaw,
+    statusCounts,
+    changeLog,
     crossProductSummaryRaw,
     dateLog,
     editLog,
     sections,
     rawFullMarkdown: content,
   };
+}
+
+/** Collects the "Change log" rows of every PRD file of a product, newest first. */
+export function loadChangeLogs(product: ProductId): ChangeLogEntry[] {
+  const root = path.join(process.cwd(), "content", product);
+  const entries: ChangeLogEntry[] = [];
+
+  const walk = (dir: string) => {
+    if (!fs.existsSync(dir)) return;
+    for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, item.name);
+      if (item.isDirectory()) {
+        walk(full);
+      } else if (item.name.endsWith(".md")) {
+        const { data } = parseFrontmatter(fs.readFileSync(full, "utf-8"));
+        const prd = parsePrdFile(full, product, data.module || path.basename(item.name, ".md"), data.channel);
+        prd.changeLog.forEach((row) =>
+          entries.push({ date: row.date, module: prd.title, section: "Change log", change: row.change })
+        );
+      }
+    }
+  };
+
+  walk(root);
+  return entries.sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function hasPrd(product: ProductId, moduleName: string, channelName?: string): boolean {

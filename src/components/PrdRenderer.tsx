@@ -14,6 +14,83 @@ interface PrdRendererProps {
 }
 
 /**
+ * Status marks used in the as-built PRD. Each badge shows a symbol AND a word, so meaning never depends on colour.
+ */
+const STATUS_STYLES: Record<string, { label: string; cls: string }> = {
+  "\u25CF": {
+    label: "Works",
+    cls: "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60",
+  },
+  "\u25D0": {
+    label: "Simulated",
+    cls: "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60",
+  },
+  "\u25CB": {
+    label: "Not built",
+    cls: "bg-slate-100 text-slate-700 border-slate-300 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-600",
+  },
+};
+
+function StatusBadge({ mark, text }: { mark: string; text?: string }) {
+  const style = STATUS_STYLES[mark];
+  if (!style) return <span>{mark} {text}</span>;
+  const label = text && text.length > 0 ? text : style.label;
+  return (
+    <span
+      data-status={style.label}
+      className={`inline-flex items-center gap-1 mr-1 px-2 py-0.5 rounded border text-[11px] font-medium whitespace-nowrap ${style.cls}`}
+    >
+      <span aria-hidden="true">{mark}</span>
+      <span>{label}</span>
+    </span>
+  );
+}
+
+/** Turns a status cell such as "\u25CF Works" or "\u25CF 8 \u25D0 2" into badges; any other text is formatted normally. */
+function renderStatusCell(cell: string): React.ReactNode {
+  const re = /([\u25CF\u25D0\u25CB])\s*([^\u25CF\u25D0\u25CB]*)/g;
+  const badges: React.ReactNode[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(cell)) !== null) {
+    badges.push(<StatusBadge key={badges.length} mark={m[1]} text={m[2].trim()} />);
+  }
+  return badges.length > 0 ? badges : formatInlineMarkdown(cell);
+}
+
+function StatusLegend() {
+  return (
+    <div
+      className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-slate-600 dark:text-zinc-400"
+      aria-label="Status legend"
+    >
+      <span className="font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Legend</span>
+      <span className="inline-flex items-center gap-1.5">
+        <StatusBadge mark={"\u25CF"} /> built and runs as described
+      </span>
+      <span className="inline-flex items-center gap-1.5">
+        <StatusBadge mark={"\u25D0"} /> on screen, but mock, hardcoded or only partly working
+      </span>
+      <span className="inline-flex items-center gap-1.5">
+        <StatusBadge mark={"\u25CB"} /> not in the prototype, or not reachable from the UI
+      </span>
+    </div>
+  );
+}
+
+function BuildStatusBadge({ value }: { value: string }) {
+  const key = value.trim().toLowerCase();
+  if (key === "works") return <StatusBadge mark={"\u25CF"} text="Works" />;
+  if (key === "partial") return <StatusBadge mark={"\u25D0"} text="Partly built" />;
+  if (key === "simulated") return <StatusBadge mark={"\u25D0"} text="Simulated" />;
+  if (key === "not-built") return <StatusBadge mark={"\u25CB"} text="Not built" />;
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 rounded border text-[11px] font-medium bg-slate-100 text-slate-700 border-slate-300 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-600">
+      {value}
+    </span>
+  );
+}
+
+/**
  * High-fidelity Markdown-to-JSX renderer specifically crafted for PRD documents
  */
 function MarkdownBlock({
@@ -97,7 +174,9 @@ function MarkdownBlock({
                         key={cIdx}
                         className="py-2.5 px-3.5 text-slate-700 dark:text-zinc-300 align-top leading-relaxed tabular-nums"
                       >
-                        {formatInlineMarkdown(cell)}
+                        {/^(build )?status$/i.test((headerRow[cIdx] || "").replace(/\*+/g, "").trim())
+                          ? renderStatusCell(cell)
+                          : formatInlineMarkdown(cell)}
                       </td>
                     ))}
                   </tr>
@@ -342,11 +421,16 @@ export default function PrdRenderer({
     setTimeout(() => setDownloadSuccess(false), 2500);
   };
 
-  const channelLabel = prd.channel ? prd.channel.charAt(0).toUpperCase() + prd.channel.slice(1) : "";
+  const isChatInbox = prd.module === "chat" && prd.channel === "chat";
+  const channelLabel = isChatInbox
+    ? "Inbox & Care Groups"
+    : prd.channel
+    ? prd.channel.charAt(0).toUpperCase() + prd.channel.slice(1)
+    : "";
 
   const moduleDisplayName =
     prd.module === "chat"
-      ? prd.channel
+      ? prd.channel && !isChatInbox
         ? `Chats & Care Groups - ${channelLabel} Channel (/chats?channel=${prd.channel})`
         : prd.product === "companion"
         ? "Patient Messaging & Care Hub (/patient/messages)"
@@ -413,6 +497,15 @@ export default function PrdRenderer({
         hasPrdInProduct={hasPrdInOtherProducts}
       />
 
+      {/* ── How real it is: counts of Works / Simulated / Not built (from the Status columns) ── */}
+      {prd.statusCounts.total > 0 && (
+        <div className="flex flex-wrap items-center gap-1" aria-label="Build status counts">
+          <StatusBadge mark={"\u25CF"} text={`${prd.statusCounts.works} Works`} />
+          <StatusBadge mark={"\u25D0"} text={`${prd.statusCounts.simulated} Simulated`} />
+          <StatusBadge mark={"\u25CB"} text={`${prd.statusCounts.notBuilt} Not built`} />
+        </div>
+      )}
+
       {/* ── Clean Metadata Table (Strictly NO "Item | Detail" text) ── */}
       <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs">
         <table className="w-full text-left text-xs sm:text-[13px] border-collapse">
@@ -443,9 +536,42 @@ export default function PrdRenderer({
               <td className="py-2.5 px-3.5 font-medium text-slate-500 dark:text-zinc-400 bg-slate-50/70 dark:bg-zinc-900/40">Last updated</td>
               <td className="py-2.5 px-3.5 text-slate-800 dark:text-zinc-200 font-mono text-xs">{prd.last_updated}</td>
             </tr>
+            {prd.route && (
+              <tr>
+                <td className="py-2.5 px-3.5 font-medium text-slate-500 dark:text-zinc-400 bg-slate-50/70 dark:bg-zinc-900/40">Route</td>
+                <td className="py-2.5 px-3.5 text-slate-800 dark:text-zinc-200 font-mono text-xs">{prd.route}</td>
+              </tr>
+            )}
+            {prd.buildStatus && (
+              <tr>
+                <td className="py-2.5 px-3.5 font-medium text-slate-500 dark:text-zinc-400 bg-slate-50/70 dark:bg-zinc-900/40">Build status</td>
+                <td className="py-2.5 px-3.5 text-slate-800 dark:text-zinc-200">
+                  <BuildStatusBadge value={prd.buildStatus} />
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+
+      {/* ── At a glance (v2 template) ── */}
+      {prd.atAGlanceRaw && (
+        <section
+          id="at-a-glance"
+          className="scroll-mt-24 p-5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0c0c0e] space-y-3 shadow-2xs"
+        >
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-800 dark:text-zinc-200">
+            At a glance
+          </h2>
+          <StatusLegend />
+          <MarkdownBlock
+            content={prd.atAGlanceRaw
+              .split("\n")
+              .filter((l) => !/\u25CF[^\n]*\u25D0[^\n]*\u25CB/.test(l))
+              .join("\n")}
+          />
+        </section>
+      )}
 
       {/* ── PRD Sections ── */}
       <div className="space-y-14 pt-4">

@@ -84,6 +84,12 @@ export const ALL_MODULES: ModuleDefinition[] = [
     submodulesByProduct: {
       client: [
         {
+          id: "chat",
+          name: "Inbox & Care Groups",
+          channel: "chat",
+          description: "Unified inbox across channels, staff care groups, replies, attachments, and delivery receipts.",
+        },
+        {
           id: "whatsapp",
           name: "WhatsApp",
           channel: "whatsapp",
