@@ -175,7 +175,7 @@ Unused files that are not mounted anywhere: `components/scribe/AIScribeModal.tsx
   - Row actions: View Transcript, Download PDF, Share via WhatsApp, Delete Record (`:298-327`).
   - Bulk action: Delete Selected (`:330-340`).
   - WhatsApp modal (`:385-428`). How-it-works modal (`:432-446`).
-- **Recorder popup** (`components/scribe/AIScribePopup.tsx`). Draggable, with 3 steps: record → assign → completed (`:86`).
+- **Recorder popup** (`components/scribe/AIScribePopup.tsx`). Draggable, with 2 steps: record → assign (`:86`). On save, it shows a toast notification and immediately closes without an intermediate confirmation screen.
 - **Transcript detail drawer** (`components/scribe/TranscriptDetailDrawer.tsx`). Renders as a true right-side slide-over drawer (`w-full max-w-4xl bg-[#f8fafc] border-l border-border h-full shadow-2xl animate-in slide-in-from-right duration-300`) with backdrop overlay. Contents:
   - Title "Conversation with <patient>"
   - Recording card (simulated playback, scrub, speed, star rating)
@@ -213,7 +213,7 @@ Unused files that are not mounted anywhere: `components/scribe/AIScribeModal.tsx
    2. Uses the selected attendee as the doctor. Duration is the timer value, or 78 s if it is zero (`:343`). Status "completed" (`:345`).
    3. Saves the session (`lib/scribeSessionStore.ts:630-672`). Saving also: (a) adds a "Scribe Recorded" or "Scribe Uploaded" activity to the client's timeline (`:637-662`); (b) marks the patient "Completed" in the scribe queue (`:665-669`).
    4. Files a prescription document into the client's Documents (`AIScribePopup.tsx:359-361`; `lib/scribeSessionStore.ts:719-781`).
-   5. Shows "Consultation Transcribed!", "Clinical documentation and SOAP notes generated." and an **"Attested"** badge (`AIScribePopup.tsx:883-902`). Buttons: "View Full Transcript & SOAP Notes" (opens the transcript drawer) and "Start Another Scribe" (`:925-945`).
+   5. Shows a success notification "AI Scribe consultation saved for <patient>!" and immediately closes the popup (removing the legacy intermediate confirmation screen). Transcript can be accessed anytime from the Scribe Console or Client Profile.
 7. *Review transcript.* Opens as a right-side slide-over drawer showing:
    - Recording card: the play timer counts to the session duration (speed-adjusted), scrubbing moves the position, rating stays on screen (`TranscriptDetailDrawer.tsx:306-321, 412-500`).
    - Summary: a narrative built from patient age and gender, doctor, chief complaint, diagnosis and medicines (`:365-370, 518`).

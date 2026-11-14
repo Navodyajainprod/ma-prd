@@ -60,7 +60,7 @@ In Step 2 of the AI Scribe popup, clinicians assign encounter metadata using fou
 | F-2.2: Link Appointment Dropdown | Select Dropdown | Allows linking an existing appointment for the selected contact or selecting "No appointment linked" | Auto-updates date and attendee when selected |
 | F-2.3: Session Date / Appointment Date | Date Picker | Editable date input for the consultation date | In Client Profile, filled/edited by user (defaults to today); in Appointment Drawer, pre-filled with appointment date |
 | F-2.4: Attendee Name | Select Dropdown | Lists organization team members (`useTeamMembers`); pre-filled with active user or appointment provider | Captures responsible clinician/provider |
-| F-2.5: Save Action Button | Action Button | Simple, prominent **Save** button (with check icon) replacing verbose "Generate SOAP Notes" | Saves session and creates timeline activity |
+| F-2.5: Save Action Button | Action Button | Simple, prominent **Save** button (with check icon) replacing verbose "Generate SOAP Notes" | Saves session, displays toast notification, and immediately closes popup without confirm screen |
 
 #### 3. Contextual Pre-Fill Behavior
 - **From Contact Profile (`ClientProfile.tsx`)**:
@@ -77,8 +77,8 @@ In Step 2 of the AI Scribe popup, clinicians assign encounter metadata using fou
 #### 4. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Clinician clicks "AI Scribe" from an active appointment drawer | Finishes recording and reviews Step 2 | **Contact, Appointment ID, Appointment Date, and Attending Doctor are all pre-filled. Clinician clicks 'Save'.** |
-| 2 | Clinician starts AI Scribe from a client's profile page | Enters Step 2 | **Contact is pre-filled, Appointment defaults to 'No appointment linked', user sets session date, attendee defaults to user, and clicks 'Save'.** |
+| 1 | Clinician clicks "AI Scribe" from an active appointment drawer | Finishes recording and reviews Step 2 | **Contact, Appointment ID, Appointment Date, and Attending Doctor are all pre-filled. Clinician clicks 'Save'. Popup immediately closes and shows notification.** |
+| 2 | Clinician starts AI Scribe from a client's profile page | Enters Step 2 | **Contact is pre-filled, Appointment defaults to 'No appointment linked', user sets session date, attendee defaults to user, and clicks 'Save'. Popup closes with toast.** |
 
 #### 5. Jobs to be done
 | # | User | Job to be done |
@@ -92,6 +92,7 @@ In Step 2 of the AI Scribe popup, clinicians assign encounter metadata using fou
 | F-2-2 | The primary action button is labeled 'Save' and replaces 'Confirm & Generate SOAP Notes'. |
 | F-2-3 | Opening scribe from an appointment drawer automatically pre-fills contact, appointment ID, appointment date, and attending provider. |
 | F-2-4 | Opening scribe from a client profile pre-fills the contact, lists that client's appointments, and allows the clinician to edit the session date. |
+| F-2-5 | Clicking Save triggers a success toast notification and immediately closes the popup without showing a confirmation screen. |
 
 ---
 
