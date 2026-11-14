@@ -34,14 +34,14 @@ last_updated: "2026-11-12"
 ### F-1: Delegated Pipeline Table & Inline Stage Control (`Tasks by me` Tab)
 #### 1. What it does
 Displays every non-admin task delegated outward (`Tasks by me (N)` badge) with full operational oversight controls:
-- **Workflow Switcher Dropdown:** Filters the table cleanly across **`All Workflows`** or specific task process templates (such as *Clinical & Operational Tasks* or *Compliance & Credentialing*).
+- **Workflow Switcher Dropdown:** Filters the table cleanly across specific task process templates (such as *Task Workflow*, *Compliance & Credentialing*, or *Patient Care Follow-up*), keeping users focused on one specific workflow at a time ("All Workflows" option removed).
 - **Delegation Columns (`WORKFLOW`, `STAGE`, `RESPONSIBLE`):** Shows workflow name, an interactive inline **Segmented Stage Bar** (`Task Created`, `Task Completed`, `Task Overdue`, or custom process stages) for instant 1-click progression, and primary assignee with `+N more` multi-assignee tooltip.
 - **Click-to-Edit & Management Actions:** Clicking a delegated task opens the pre-populated **Edit Task Drawer** cleanly (`?editTaskId=`) for fast scope, deadline, or studio updates; clicking **`New Task`** opens the creation wizard; and row actions provide **`Edit Task`**, **`Mark Completed`**, and **`Delete`** (with confirmation).
 
 #### 2. What it includes
 | Item | Type | What it does | Notes |
 | :--- | :--- | :--- | :--- |
-| F-1.1: Workflow Switcher | Pipeline Filter | Filters delegated tasks by workflow pipeline or views `All Workflows` combined | Active only in `Tasks by me` (and Admin) |
+| F-1.1: Workflow Switcher | Pipeline Filter | Filters delegated tasks by specific workflow pipeline (focuses on dedicated workflows without an "All Workflows" option) | Active only in `Tasks by me` |
 | F-1.2: Inline **Segmented Stage Bar** | Stage Control | Advances a task's stage directly inside the table row with instant toast feedback | Updates stage across detail and chat shares |
 | F-1.3: Click-to-Edit Drawer Flow | Edit Shortcut | Opens the creator drawer pre-loaded with existing task settings and studio deliverables | Contrast with `My Tasks` detail navigation |
 | F-1.4: Full Row Lifecycle Menu | Row Actions | Exposes **Edit Task**, **Mark Completed**, and **Delete** per delegated row | Includes confirmation prompt before deletion |

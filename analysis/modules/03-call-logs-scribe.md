@@ -176,7 +176,7 @@ Unused files that are not mounted anywhere: `components/scribe/AIScribeModal.tsx
   - Bulk action: Delete Selected (`:330-340`).
   - WhatsApp modal (`:385-428`). How-it-works modal (`:432-446`).
 - **Recorder popup** (`components/scribe/AIScribePopup.tsx`). Draggable, with 3 steps: record → assign → completed (`:86`).
-- **Transcript detail drawer** (`components/scribe/TranscriptDetailDrawer.tsx:372-590`). Contents:
+- **Transcript detail drawer** (`components/scribe/TranscriptDetailDrawer.tsx`). Renders as a true right-side slide-over drawer (`w-full max-w-4xl bg-[#f8fafc] border-l border-border h-full shadow-2xl animate-in slide-in-from-right duration-300`) with backdrop overlay. Contents:
   - Title "Conversation with <patient>"
   - Recording card (simulated playback, scrub, speed, star rating)
   - Summary card
@@ -197,21 +197,24 @@ Unused files that are not mounted anywhere: `components/scribe/AIScribeModal.tsx
 
    **The microphone is never accessed** (E-17).
 4. *Upload.* The user picks an audio file and gets the toast "Loaded audio: <name>" (`:520-545`). "Finish & Save Consultation" is available whether or not a file was chosen (`:653-660`, E-28).
-5. *Assign (step 2 of 2).* Fields:
-   - Patient: search existing clients, or switch to "new patient" and type a name
-   - Age and gender
-   - Doctor
-   - **Link Entity** (Client / Patient, Appointment, Invoice, Insurance, Claim)
-   - Consultation title, prefilled as "<name>_Consultation_<date>"
+5. *Assign (step 2 of 2).* Streamlined to 4 essential inputs:
+   - **Contact**: Search existing clients dropdown, or toggle "+ New / Walk-in" to type a new patient name.
+   - **Link Appointment**: Selectable appointment dropdown populated with scheduled appointments for that contact, or "No appointment linked".
+   - **Session Date / Appointment Date**: Date picker input (`YYYY-MM-DD`). In Client Profile, the clinician fills/customizes this date (defaulting to today). In Appointment Drawer, this date is pre-filled automatically from the appointment.
+   - **Attendee Name**: Selectable dropdown populated from active team members (`useTeamMembers()`). Pre-filled with the logged-in user or the assigned appointment clinician.
+   - *Note*: Extraneous inputs (Age, Gender, Link Entity dropdown, and Consultation Title input) are omitted from Step 2; consultation title is auto-generated cleanly as `${patientName}_Consultation_${sessionDate}`.
+   - *Pre-fill behavior*:
+     - **Contact Profile (`ClientProfile.tsx`)**: Contact is pre-filled; Link Appointment lists this contact's appointments (defaulting to "No appointment linked"); Session Date is filled/edited by user; Attendee defaults to logged-in user.
+     - **Appointment Drawer (`AppointmentDetailDrawer.tsx`)**: Contact, Link Appointment, Session Date, and Attendee Name are all pre-filled automatically from the appointment.
 
-   "Back to Recording" returns to step 1 (`:264-276, 680-856`). There is no validation (`:858-866`).
-6. *Confirm & Generate SOAP Notes* (`:286-366`). Steps:
+   "Back to Recording" returns to step 1 (`:264-276, 680-856`).
+6. *Save Consultation* (`:286-366`). Action button is a clean, single **Save** button (replacing "Confirm & Generate SOAP Notes"). Steps:
    1. Builds a session from **preset scenario #1** (ophthalmology / cataract). Only the patient name is swapped in (`:288, 310-323`).
-   2. Uses the selected doctor. Duration is the timer value, or 78 s if it is zero (`:343`). Status "completed" (`:345`).
+   2. Uses the selected attendee as the doctor. Duration is the timer value, or 78 s if it is zero (`:343`). Status "completed" (`:345`).
    3. Saves the session (`lib/scribeSessionStore.ts:630-672`). Saving also: (a) adds a "Scribe Recorded" or "Scribe Uploaded" activity to the client's timeline (`:637-662`); (b) marks the patient "Completed" in the scribe queue (`:665-669`).
    4. Files a prescription document into the client's Documents (`AIScribePopup.tsx:359-361`; `lib/scribeSessionStore.ts:719-781`).
    5. Shows "Consultation Transcribed!", "Clinical documentation and SOAP notes generated." and an **"Attested"** badge (`AIScribePopup.tsx:883-902`). Buttons: "View Full Transcript & SOAP Notes" (opens the transcript drawer) and "Start Another Scribe" (`:925-945`).
-7. *Review transcript.* The drawer shows:
+7. *Review transcript.* Opens as a right-side slide-over drawer showing:
    - Recording card: the play timer counts to the session duration (speed-adjusted), scrubbing moves the position, rating stays on screen (`TranscriptDetailDrawer.tsx:306-321, 412-500`).
    - Summary: a narrative built from patient age and gender, doctor, chief complaint, diagnosis and medicines (`:365-370, 518`).
    - Transcript: Doctor and Patient turns with patient-name substitution (`:528-585`).

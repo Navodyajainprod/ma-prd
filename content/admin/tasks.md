@@ -19,14 +19,14 @@ last_updated: "2026-11-12"
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
 | Client | Top-Down Role & Organization Delegation | Tasks scoped by Admin to clinic roles or organizations route directly into matching staff members' **My Tasks** list while keeping corporate oversight isolated from internal clinic boards. | [View in Client My Tasks](/client/tasks/my-tasks) |
-| Client | Clinic-Scoped Scheduling Separation | While Client **Tasks by me** manages full deadline dates and recurring schedules for practice & patient care flows, Admin tasks currently omit scheduling parameters and focus strictly on scoping, roles, priority, observers, and deliverables. | [View in Tasks by me](/client/tasks/tasks-by-me) |
+| Client | Clinic-Scoped Scheduling Separation | While Client **Tasks by me** manages full deadline dates, recurring schedules, and workflow pipelines for practice & patient care flows, Admin tasks omit workflow pipeline selection and scheduling parameters, focusing strictly on scoping, roles, priority, observers, and deliverables. | [View in Tasks by me](/client/tasks/tasks-by-me) |
 | Companion | Strict Patient Portal Firewall | Administrative and corporate tasks never appear inside any patient's Companion task feed and return a locked access guard if opened directly. | [View in Companion](/companion/tasks) |
 | Admin | Organization & Role Scoping Catalog | Organization rosters and industry role catalogs supply the selectable industries, regions, and role targets used in Admin task scoping rules. | [View Organizations](/admin/organizations) |
 | Admin | Role Permission Directory | Role definitions determine which clinical and operational titles (such as Clinical Director, Lead Physician, Practice Billing Specialist) can receive cross-org task assignments. | [View Roles](/admin/roles) |
 
 ## 1. Module Summary
 - The **Corporate Tasks, Cross-Org Delegation & Governance** module lets Platform Administrators create, scope, assign, and track operational, compliance, and billing governance tasks across tenant organizations from `/admin/tasks`.
-- Corporate tasks operate in a strictly scoped workspace without deadline or recurring-schedule configuration for now: Admins define industry/region/organization scoping, target roles, workflow pipelines, priority (`Mark as Important`), `Observers`, and multi-step `Task Studio` deliverables—routing assignments straight into **Client Portal (`My Tasks`)** while remaining invisible inside patient-facing **Companion** feeds.
+- Corporate tasks operate in a strictly scoped workspace without deadline, recurring-schedule, or workflow pipeline configuration: Admins define industry/region/organization scoping, target roles, priority (`Mark as Important`), `Observers`, and multi-step `Task Studio` deliverables—routing assignments straight into **Client Portal (`My Tasks`)** while remaining invisible inside patient-facing **Companion** feeds.
 
 ## 2. Feature Requests
 
@@ -40,14 +40,14 @@ Provides a dedicated administrative table displaying only corporate-scoped tasks
 - **`ROLE / RESPONSIBLE`** (targeted organizational role or lead assignee)
 - **`CHECKLIST`** (deliverable and multi-assignee completion progress)
 - **`STAGE`**
-Note: The `DEADLINE` column and deadline-tracking copy are omitted from the Admin tasks workspace (`Corporate operational assignments, cross-organization delegation, and checklists`). A **Workflow Switcher** dropdown filters across task pipelines (such as *All Workflows*, *Clinical & Operational Tasks*, or *Compliance & Credentialing*), alongside unified keyword search and row actions (**Edit Task**, **Mark Completed**, **Delete**).
+Note: The `DEADLINE` column and deadline-tracking copy are omitted from the Admin tasks workspace (`Corporate operational assignments, cross-organization delegation, and checklists`). The **Workflow Switcher** dropdown is also omitted from the Admin header to keep corporate governance tasks streamlined, alongside unified keyword search and row actions (**Edit Task**, **Mark Completed**, **Delete**).
 
 #### 2. What it includes
 | Item | Type | What it does | Notes |
 | :--- | :--- | :--- | :--- |
 | F-1.1: Corporate Scope Filter | Isolation Rule | Displays only platform/corporate tasks in `/admin/tasks` while excluding them from clinic-only boards | Keeps corporate governance separate from patient chores |
 | F-1.2: Admin Governance Columns | Data Table | Surfaces `TASK ID`, `TASK NAME`, `SCOPE`, `ORGANIZATION`, `ROLE / RESPONSIBLE`, `CHECKLIST`, `STAGE` | Scheduling/deadline column omitted for Admin tasks |
-| F-1.3: Workflow Switcher & Search | Filter Controls | Filters by task pipeline or searches across codes, roles, observers, and projects | Instant client-side filtering |
+| F-1.3: Unified Keyword Search | Filter Controls | Searches across codes, roles, observers, and projects (Workflow Switcher filter omitted in Admin) | Instant client-side filtering |
 | F-1.4: Row Lifecycle Actions | Quick Actions | Supports **Edit Task**, one-click **Mark Completed** (`Task Completed`), and **Delete** | Confirms before permanent deletion |
 
 #### 3. Worked example
@@ -71,7 +71,7 @@ Note: The `DEADLINE` column and deadline-tracking copy are omitted from the Admi
 ### F-2: Two-Step Admin Task Composer (`Configure` & `Task Studio`, Scheduling Omitted)
 #### 1. What it does
 Selecting **New Task** (or **Edit Task**) opens a two-step authoring drawer tailored for cross-organization rollout:
-- **Step 1 — Configure (Scoping, Roles & Task Parameters):** Admins specify Task Title, Description, **Admin Scoping Rules** (selecting industry verticals such as *Healthcare*, *Automobile*, *Coaching & Advisory*, *Household Care*, *IT/Tech*, *Real Estate*, plus country/org filters), **Target Organization Roles** (filtered dynamically from the selected industry role catalog—or all roles across industries when unscoped), and required Workflow Pipeline. Under **Task Parameters**, Admin exposes **`Mark as Important`** priority toggle and **`Observers`**—explicitly omitting scheduling inputs (`Schedule`, `Deadline Date`, `Target Time`, and `Repeat` recurrence) for now.
+- **Step 1 — Configure (Scoping, Roles & Task Parameters):** Admins specify Task Title, Description, **Admin Scoping Rules** (selecting industry verticals such as *Healthcare*, *Automobile*, *Coaching & Advisory*, *Household Care*, *IT/Tech*, *Real Estate*, plus country/org filters), and **Target Organization Roles** (filtered dynamically from the selected industry role catalog—or all roles across industries when unscoped)—omitting the Workflow Pipeline selector (which is reserved for clinic/client tasks). Under **Task Parameters**, Admin exposes **`Mark as Important`** priority toggle and **`Observers`**—explicitly omitting scheduling inputs (`Schedule`, `Deadline Date`, `Target Time`, and `Repeat` recurrence).
 - **Step 2 — Task Studio (`Builder` & `Preview`):** Builds ordered multi-step deliverables with optional attachments: **File** (up to `1MB`), **Image** (upload or URL), **Video** (upload or URL), **External URL**, or **Sandboxed Custom HTML Block**—and validates HTTP/HTTPS URLs plus at least one deliverable before saving. In **Preview** mode, Admin tasks display title, description, priority badge, and interactive deliverable completion without scheduled due/repeat chips.
 
 #### 2. What it includes
@@ -96,7 +96,7 @@ Selecting **New Task** (or **Edit Task**) opens a two-step authoring drawer tail
 | # | Criteria |
 | :--- | :--- |
 | F-2-1 | Adding **Healthcare** scoping restricts selectable target roles cleanly to Healthcare roles, while clearing scoping exposes roles across all configured industries. |
-| F-2-2 | In Admin mode, Step 1 shows `Task Parameters` (`Mark as Important` + `Observers`) with `Schedule` (`Deadline Date` / `Target Time`) and `Repeat` hidden, and saves zero `deadline` / `recurrence` fields. |
+| F-2-2 | In Admin mode, Step 1 shows `Task Parameters` (`Mark as Important` + `Observers`) with Workflow Pipeline, `Schedule` (`Deadline Date` / `Target Time`), and `Repeat` hidden, saving corporate tasks cleanly without workflow pipeline selection or `deadline` / `recurrence` fields. |
 
 ---
 

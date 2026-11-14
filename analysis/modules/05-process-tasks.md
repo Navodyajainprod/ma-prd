@@ -193,10 +193,11 @@ Overall coverage: 55.2% · PRD-backed coverage: 60.7%
 **Roles:** no role gating on `/admin/*` beyond sign-in (`routes.tsx:278-280`; `AdminLayout.tsx:46` defaults the role label to "SystemAdmin"). See G5-E-28.
 1. Shows only Admin-scope tasks (`Tasks.tsx:195-197`). Subtitle "Corporate operational assignments, cross-organization delegation, and checklists" (`:592-597`).
 2. Columns: TASK ID, TASK NAME, SCOPE (scope name or industry list), ORGANIZATION, ROLE / RESPONSIBLE, CHECKLIST. There is **no STAGE column** and no DEADLINE column (`Tasks.tsx:255-334`, `:488-502`, `:503-540`). ORGANIZATION shows "Demo Mantra Care" for every Admin task because the migration fills it with that value (`tasksStore.ts:796`, see G5-E-27).
-3. Workflow switcher, search, New Task, and row actions Edit Task / Mark Completed / Delete (with confirm) (`Tasks.tsx:546-576`, `:612-683`).
+3. Search, New Task, and row actions Edit Task / Mark Completed / Delete (with confirm) (`Tasks.tsx:546-576`, `:612-683`). Workflow switcher is omitted in admin mode.
 4. Composer in admin mode:
    - "Admin Control" scoping rules: industry category and related criteria (`TaskQuickCreateDrawer.tsx:1296-1308`).
    - Target roles, filtered to the scoped industries' role catalog plus stored custom roles. All roles show when unscoped. "Lead Physician" is pre-selected (`:505-560`, `:732`).
+   - Workflow pipeline section is omitted in admin mode (reserved for client tasks).
    - Important flag and Observers.
    - No deadline or repeat. The task is saved with no deadline or recurrence (`:1080-1082`, `:1117-1119`).
    - Same studio and Preview as the client composer.
