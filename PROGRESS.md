@@ -34,9 +34,9 @@ _(append one line per ambiguous choice)_
 | G1 AI Receptionist kiosk | `content/ai-receptionist/my-visit/biometric-consent.md` | todo |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/my-visit/next-step.md` | todo |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/my-visit/tracker.md` | todo |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/settings/architecture.md` | todo |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/settings/queue.md` | todo |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/settings/stations.md` | todo |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/settings/architecture.md` | done |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/settings/queue.md` | done |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/settings/stations.md` | done |
 | G2 Chats | `content/client/chat/chat.md` | todo |
 | G2 Chats | `content/client/chat/whatsapp.md` | todo |
 | G2 Chats | `content/client/chat/sms.md` | todo |
