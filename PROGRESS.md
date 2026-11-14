@@ -42,12 +42,12 @@ _(append one line per ambiguous choice)_
 | G1 AI Receptionist kiosk | `content/ai-receptionist/settings/architecture.md` | done |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/settings/queue.md` | done |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/settings/stations.md` | done |
-| G2 Chats | `content/client/chat/chat.md` | todo |
-| G2 Chats | `content/client/chat/whatsapp.md` | todo |
-| G2 Chats | `content/client/chat/sms.md` | todo |
-| G2 Chats | `content/client/chat/website.md` | todo |
-| G2 Chats | `content/client/chat/companion.md` | todo |
-| G2 Chats | `content/companion/chat/chat.md` | todo |
+| G2 Chats | `content/client/chat/chat.md` | done |
+| G2 Chats | `content/client/chat/whatsapp.md` | done |
+| G2 Chats | `content/client/chat/sms.md` | done |
+| G2 Chats | `content/client/chat/website.md` | done |
+| G2 Chats | `content/client/chat/companion.md` | done |
+| G2 Chats | `content/companion/chat/chat.md` | done |
 | G3 Tasks | `content/client/tasks/my-tasks.md` | done |
 | G3 Tasks | `content/client/tasks/tasks-by-me.md` | done |
 | G3 Tasks | `content/admin/tasks.md` | done |

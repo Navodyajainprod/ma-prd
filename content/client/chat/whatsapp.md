@@ -1,179 +1,262 @@
 ---
-title: "WhatsApp Messaging, 24-Hour Service Window & Meta HSM Templates"
-product: "Client"
+title: "Chats: WhatsApp Channel"
+product: "client"
 module: "chat"
 channel: "whatsapp"
+route: "/chats?channel=whatsapp"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-10"
-last_updated: "2026-11-10"
+last_updated: "2026-11-14"
 ---
 
-| Product | Client |
-| Module | Chats & Care Groups - WhatsApp Channel (`/chats?channel=whatsapp`) |
+| Product | CLIENT |
+| Module | CHATS: WHATSAPP CHANNEL |
+| Route | `/chats?channel=whatsapp` |
 | Status | In Review |
+| Build status | Partly simulated |
 | Created | 2026-11-10 |
-| Last updated | 2026-11-10 |
+| Last updated | 2026-11-14 |
+
+## At a glance
+
+| | |
+| :--- | :--- |
+| **What it is** | The WhatsApp view of the Chats inbox with a number switcher, an **Inbox** and **Templates** toggle, a template library with a builder, and a template sender in the composer. |
+| **Who uses it** | Care Coordinator (replies, sends templates). Practice Manager (keeps the template library). No role is checked. |
+| **Where you start it** | **Chats** in the sidebar. WhatsApp is the default channel. `/chats?tab=templates` opens the Templates view, and a workflow step editor links there. |
+| **Where the result goes** | The shared conversation store and the client's Activity timeline. Nothing is sent through WhatsApp or Meta. |
+| **How real is it** | 0 features work, 4 are partly simulated, 0 are not built. See the legend below. |
+
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Companion | Direct Patient Outreach via WhatsApp | Outbound clinical notifications (appointment reminders, lab availability alerts) dispatched to the patient's mobile number via WhatsApp appear seamlessly in their thread history without requiring them to install the Companion portal. | [View in Companion](/companion/chat) |
+| Companion | Outreach by WhatsApp | Not connected. Messages stay in the browser store and nothing reaches a patient's phone. The portal does not show WhatsApp threads. | [View Companion Messages](/companion/chat) |
+| Client (Clients) | Activity timeline | Each message or template sent is written to the client's Activity timeline as WhatsApp. | [View Clients](/client/clients) |
+| Client (Workflows) | Link from a workflow step | A step editor links to this channel's Templates view. | [View Workflows](/client/workflows) |
+| Client (Chats) | Shared inbox | Search, assignment, reply, attach and receipts are described on the inbox page. Care groups also appear in this list. | [View Chats Inbox](/client/chat/chat) |
 
 ## 1. Module Summary
-- The WhatsApp channel within Client Chats provides a verified healthcare communication interface connected to the Meta WhatsApp Business Cloud API. It enables clinical care teams and practice staff to manage real-time patient conversations, triage inbound inquiries, switch between multiple clinic phone numbers, and dispatch broadcast notifications.
-- Clinic front desk staff, care coordinators, and medical assistants use this module for immediate patient communication.
-- Accessed in the Client workspace via the main navigation under Chats & Care Groups > WhatsApp.
+
+### The story in one minute
+
+Priya Nair opens **Chats**. WhatsApp is already chosen. A number dropdown lists the clinic's WhatsApp numbers, and she picks the Uptown line. The label changes but the list stays the same. Sarah Johnson's thread has an unread badge. Priya opens it and types a reply. Nothing warns her about the 24 hour window, because the window is forced open for every thread. She opens the gear, presses **Share Template Message** and clicks "Appointment Follow-up". It sends at once, with no preview. The message greets Sarah as "there" because the name placeholder has no data. Then Priya switches to **Templates**, writes a new template and presses **Request approval**. It shows Approved straight away.
+
+### What is real and what is not
+
+- **Real in the prototype:** the thread list and unread badge, search, the Inbox and Templates toggle, creating, editing and deleting templates, and the hidden **New Group** button.
+- **Simulated:** the number switcher changes a label only. The 24 hour window is forced open. A template sent from a thread fills unknown fields with "there". **Request approval** approves the template at once. No message leaves the browser.
+- **Not built:** the window countdown, expiry banner and freeform lock, the variable form and preview before sending, clickable quick reply buttons, and a remembered number.
+
+### Journey position
+
+```
+Staff message or template ─▶ WhatsApp thread ─▶ Client Activity timeline
+Template builder ─▶ Request approval (auto-approved) ─▶ Template sender
+```
 
 ## 2. Feature Requests
 
-### F-1: Active WhatsApp Thread Ingestion & Clinic Number Switcher
+### F-1: WhatsApp threads and number switcher
+
 #### 1. What it does
-Consolidates all inbound WhatsApp inquiries sent to practice-registered WhatsApp Business API phone numbers into a live conversation stream. When a practice operates multiple locations or departments (e.g., Main Clinic, Pediatrics, Urgent Care), staff can use the topbar number switcher to filter threads specifically associated with that phone number.
+Priya sees every WhatsApp thread with name, snippet, time and an unread badge. The top bar has a number switcher and an **Inbox** and **Templates** toggle. She searches and opens a thread as on any channel.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: Multi-Number Switcher | Dropdown | Allows staff to select between registered WhatsApp Business API numbers | Persists selected number across sessions |
-| F-1.2: WhatsApp Inbound Stream | UI List | Renders conversation list with green WhatsApp badges, patient avatar, snippet, and timestamp | Ordered descending by latest activity |
-| F-1.3: Unread Message Counter | UI Badge | Displays unread badge on threads with incoming patient responses | Automatically clears when thread opened |
-| F-1.4: Responsible Assignment | Dropdown | Assigns responsible clinical coordinator to thread | Notifies assigned team member |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: WhatsApp thread list | List | One row per thread, including care groups, with unread badge | ◐ Simulated | A browser store with sample data and cross-tab sync stands in for a webhook. Groups are listed here by mistake (G4-E-03) |
+| F-1.2: Unread counter | Badge | Clears when the thread is opened | ● Works | |
+| F-1.3: Number switcher | Dropdown | Lists numbers from saved WhatsApp integrations plus numbers on threads | ◐ Simulated | Changes only its label. The list is not filtered and the sender does not change (G4-E-01). Decision needed: D-139 |
+| F-1.4: Remember the number | Rule | Keep the chosen number between sessions | ○ Not built | The default is reset each time |
+| F-1.5: Inbox and Templates toggle | Toggle | Switches between threads and the template library | ● Works | |
+| F-1.6: New Group hidden | Rule | No New Group button on WhatsApp | ● Works | |
+| F-1.7: Responsible assignment | Modal | Gear then **Assign Responsible**. Sets the assignee and turns the bot off | ◐ Simulated | No audit event and no alert to the assignee (G4-E-04). Decision needed: D-140 |
 
 #### 3. Worked example
+Priya picks a clinic line.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient sends WhatsApp message to Main Clinic number | Patient sends: "Can I reschedule my appointment?" | **Thread appears at top of WhatsApp list with green badge and bold unread count** |
-| 2 | Practice operates Downtown and Uptown clinic lines | Staff switches number dropdown to "Uptown Clinic (+1-555-0199)" | **Thread list filters to display only conversations routed to the Uptown number** |
-| 3 | Staff opens patient thread | Clicks conversation card | **Chat history loads in center pane and unread badge resets to zero** |
-| 4 | Staff reassigns thread to front desk coordinator | Selects "Charu Arora" from responsible dropdown | **Responsible tag updates in thread header and audit event logs assignment** |
+| 1 | Two WhatsApp numbers are listed | Picks the Uptown number | **The label changes. All threads stay listed** |
+| 2 | She opens Sarah's thread | Clicks the row | **The unread badge clears** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Practice Coordinator | When patients message different practice locations, I want to switch between clinic phone numbers, so that I can triage inquiries for each location separately. |
-| F-1-J2 | Medical Assistant | When new WhatsApp inquiries arrive, I want to see unread indicators in real time, so that urgent patient questions are addressed promptly. |
+| F-1-J1 | Care Coordinator | When patients message different clinic lines, I want to switch numbers, so that I can triage each location apart. |
+| F-1-J2 | Care Coordinator | When new messages arrive, I want to see unread badges, so that urgent questions are answered quickly. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Given registered WhatsApp phone numbers, when staff selects a number from the topbar switcher, then only threads belonging to that phone number render. |
-| F-1-2 | Given an inbound WhatsApp message, when received via webhook, then the thread list updates immediately without full-page refresh. |
-| F-1-3 | Given any WhatsApp thread, when viewed in the Client topbar, then the "New Group" button is hidden. |
+| F-1-1 | **Given** the number switcher, **when** a number is picked, **then** only its label changes and every thread stays listed. |
+| F-1-2 | **Given** the WhatsApp channel, **then** New Group is hidden and the Inbox and Templates toggle is shown. |
+| F-1-3 | **Given** a thread is opened, **then** its unread badge clears. |
 
-### F-2: Meta 24-Hour Service Window Tracker & Policy Enforcement
+### F-2: The 24 hour service window
+
 #### 1. What it does
-Monitors Meta's mandatory 24-hour customer service window for WhatsApp messaging. Within 24 hours of the patient's last incoming message, clinical staff can send freeform text, files, and links. Once the 24-hour window expires, the freeform composer is locked, and staff are guided to select a pre-approved HSM template to re-open the conversation.
+Meta allows free text only within 24 hours of the patient's last message. The code works the window out from the last inbound message, but then forces every thread to "24h remaining, freeform allowed". The composer never reads it. Priya sees no countdown, no banner and no lock.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: 24h Countdown Timer | UI Indicator | Shows remaining time in the active 24-hour window (e.g., "14h remaining") | Displayed above composer |
-| F-2.2: Window Expiration Banner | UI Banner | Displays warning when window has expired with "Send Template" button | Explains Meta policy |
-| F-2.3: Freeform Lock Controller | Logic | Disables text input and file upload when window has expired | Prevents carrier delivery rejections |
-| F-2.4: Window Re-activation Listener | Logic | Automatically re-enables freeform composer when patient sends a new reply | Resets 24h timer to 24:00 |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Window calculation | Rule | Worked out from the last inbound message, then forced open for every thread | ◐ Simulated | Forced open "per user request" (G4-W-06). Decision needed: D-135 |
+| F-2.2: Countdown above the composer | Indicator | Show hours remaining | ○ Not built | (G4-W-06) |
+| F-2.3: Expiry banner with Send Template | Banner | Warn when the window has closed | ○ Not built | (G4-W-06) |
+| F-2.4: Freeform lock | Rule | Disable text and files when the window has closed | ○ Not built | The composer ignores the window. Decision needed: D-135 |
+| F-2.5: Re-open on a new reply | Rule | Unlock and reset the timer when the patient replies | ○ Not built | Nothing to reset |
 
 #### 3. Worked example
+Priya writes to a patient who last replied three days ago.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient replied 2 hours ago | Staff opens conversation | **Timer shows "22h remaining"; freeform composer is active and unlocked** |
-| 2 | Patient last messaged 26 hours ago | Staff opens conversation | **Composer displays locked state with notice: "24-hour window expired. Select an approved template to message."** |
-| 3 | Staff clicks "Send Template" button | Staff selects approved "Appointment Follow-up" template | **Template message dispatches; delivery receipt shows single check** |
-| 4 | Patient responds to the template: "Yes, 10 AM works" | Patient sends incoming WhatsApp message | **24-hour window re-opens immediately; freeform composer unlocks** |
+| 1 | The last inbound message is old | Opens the thread and types | **The composer is open and no warning shows** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Clinic Staff | When communicating after the 24-hour window has expired, I want clear guidance on sending approved templates, so that carrier delivery failures are prevented. |
-| F-2-J2 | Practice Administrator | When reviewing messaging compliance, I want Meta window rules automatically enforced, so that the clinic does not incur carrier policy penalties. |
+| F-2-J1 | Care Coordinator | When the 24 hour window has closed, I want clear guidance to use an approved template, so that delivery does not fail. |
+| F-2-J2 | Practice Admin | When reviewing compliance, I want the window rule enforced, so that the clinic avoids carrier penalties. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Given a thread where patient last messaged < 24 hours ago, when staff views composer, then freeform text and attachments are enabled. |
-| F-2-2 | Given a thread where patient last messaged > 24 hours ago, when staff views composer, then text input is disabled and template picker is prompted. |
-| F-2-3 | Given an expired thread, when a new incoming patient message arrives, then the 24-hour window resets and composer unlocks immediately. |
+| F-2-1 | **Given** any WhatsApp thread, **then** the window is treated as open. No countdown, banner or lock is shown. |
+| F-2-2 | **Given** a thread whose last inbound message is older than 24 hours, **when** staff type, **then** freeform text and files are allowed. |
 
-### F-3: Pre-Approved HSM WhatsApp Template Selection & Dynamic Variable Merge
+### F-3: Send a template from a thread
+
 #### 1. What it does
-Provides a library of Meta pre-approved Highly Structured Message (HSM) templates for clinic outreach (appointment reminders, post-op care checks, lab result notifications, payment links). Staff can preview templates, fill required dynamic variables (`{{1}}`, `{{2}}`), and dispatch messages with automated patient record interpolation.
+Priya opens the composer gear and presses **Share Template Message**. A modal lists templates that are approved or have no status, with name, category and body. She clicks one and it sends at once. There is no preview and no form for variables.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Template Picker Drawer | UI Drawer | Slide-over drawer listing all approved WhatsApp templates by category | Searchable by title and keyword |
-| F-3.2: Variable Merge Form | UI Form | Input fields mapping template variables (e.g. `{{1}} = Patient Name`, `{{2}} = Date`) | Auto-populated from patient chart |
-| F-3.3: Live Template Preview | UI Preview | Real-time preview card showing exact message appearance before sending | Renders header, body, buttons |
-| F-3.4: Quick Reply Action Buttons | UI Component | Supports templates configured with interactive CTA or Quick Reply buttons | Up to 3 quick buttons |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Template picker | Modal | Lists approved or unmarked templates with name, category and body | ● Works | A modal, not a drawer. No search |
+| F-3.2: Send on click | Action | Sends the template into the thread | ◐ Simulated | Nothing is delivered. The message is saved as read (G4-E-11) |
+| F-3.3: Variable values | Rule | Fills placeholders from data | ◐ Simulated | A test resolver returns "there" for every unknown placeholder (G4-E-18). Decision needed: D-136 |
+| F-3.4: Variable form, blocked when empty | Form | Auto-fill from the patient chart and block an empty value | ○ Not built | (G4-W-08) |
+| F-3.5: Preview before sending | Preview | Show the exact message | ○ Not built | A preview exists only in the builder (G4-W-10) |
+| F-3.6: Quick reply buttons | Display | Buttons on a sent template | ◐ Simulated | Shown as chips that do nothing (G4-W-11) |
 
 #### 3. Worked example
+Priya sends a reminder.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Staff needs to send pre-visit reminder | Opens Template Drawer and picks "Appointment Confirmation" | **Drawer shows template body with variables `{{1}}` and `{{2}}`** |
-| 2 | System merges patient data | Form auto-fills `{{1}}` as "Sarah Johnson" and `{{2}}` as "Nov 12, 10:00 AM" | **Live preview displays: "Hi Sarah Johnson, your visit is scheduled for Nov 12, 10:00 AM."** |
-| 3 | Staff clicks Send Template | Staff confirms dispatch | **Template sent via Meta API; card appears in thread with template badge** |
-| 4 | Staff attempts to send with missing variable | Clears date field and clicks send | **Validation blocks submission and highlights missing variable input in red** |
+| 1 | Sarah's thread is open | Opens the gear and presses **Share Template Message** | **A list of approved templates opens** |
+| 2 | She clicks "Appointment Follow-up" | Clicks the template | **It sends at once and greets Sarah as "there"** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Medical Assistant | When reaching out after hours or outside the 24h window, I want to send pre-approved reminders with dynamic patient fields, so that outreach is instant and personalized. |
-| F-3-J2 | Practice Manager | When standardizing clinical communication, I want approved templates with locked wording, so that medical disclaimers are uniformly followed. |
+| F-3-J1 | Care Coordinator | When I reach out after hours, I want to send an approved reminder with the patient's details, so that outreach is quick and personal. |
+| F-3-J2 | Practice Manager | When standardising messages, I want approved wording, so that disclaimers are used every time. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given the WhatsApp template drawer, when opened, then all Meta-approved templates for the tenant are displayed with category tags. |
-| F-3-2 | Given variable placeholders (`{{1}}`, `{{2}}`), when template is selected, then patient name and appointment fields auto-populate. |
-| F-3-3 | Given an unpopulated variable, when the user clicks send, then dispatch is blocked with a validation error. |
+| F-3-1 | **Given** the picker, **then** templates whose status is approved or empty are listed. |
+| F-3-2 | **Given** a template is clicked, **then** it is sent at once with no preview or form. |
+| F-3-3 | **Given** a placeholder with no data, **then** it is filled with "there". |
 
-### F-4: WhatsApp Topbar Controls & Scoped Action Scoping
+### F-4: Template library
+
 #### 1. What it does
-Configures the channel-specific topbar controls for WhatsApp. The topbar includes the phone number switcher, template library button, contact search input, and filter controls. "New Group" is strictly hidden (as group creation is scoped exclusively to the Companion channel). "Message Actions & Settings" cog is enabled on message bubbles.
+Priya switches to **Templates**. A table lists templates, seeded with three defaults. A builder drawer creates and edits them, with variable mapping and a template library to copy from. **Request approval** opens a modal. Submitting it marks the template Approved at once.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-4.1: Topbar Phone Switcher | Dropdown | Switches clinic phone numbers | Shows phone number and label |
-| F-4.2: Template Library Button | Button | Quick-action button opening the WhatsApp Template Drawer | Accessible directly from topbar |
-| F-4.3: New Group Button Removal | Policy | Strictly hides "New Group" button on WhatsApp | Prevents invalid carrier group operations |
-| F-4.4: Message Actions Cog | UI Control | Allows message copy, quotation reply, and forwarding | Enabled for WhatsApp channel |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-4.1: Template table | Table | Lists templates with a row menu | ● Works | Stored in the browser |
+| F-4.2: Create, edit, delete | Drawer | Builder with a live preview | ● Works | |
+| F-4.3: Library | List | Copy a ready made template into your set | ● Works | |
+| F-4.4: Variable mapping | Fields | Map each placeholder to a data field | ● Works | Not used when a template is sent (G4-E-18) |
+| F-4.5: Request approval | Modal | Marks the template Approved at once | ◐ Simulated | No Meta review (G4-E-19). Decision needed: D-136 |
+| F-4.6: Approval states | Rule | States set by Meta | ○ Not built | Decision needed: D-136 |
 
 #### 3. Worked example
+Priya adds a template.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Staff inspects WhatsApp channel topbar | Filters to WhatsApp channel | **Topbar displays Phone Switcher, Template Library button, Search bar; "New Group" is absent** |
-| 2 | Staff clicks Template Library in topbar | Clicks "Templates" button | **Template library drawer slides open from right** |
-| 3 | Staff hovers over sent WhatsApp message | Moves mouse cursor over message bubble | **Message Actions cog appears with Reply and Copy actions** |
+| 1 | She builds "Lab ready" | Saves it | **It is listed in the table** |
+| 2 | She presses **Request approval** | Submits | **The status turns Approved at once** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-4-J1 | Clinical Coordinator | When triaging WhatsApp chats, I want a focused topbar with template shortcuts and phone switchers, so that I don't see irrelevant controls. |
+| F-4-J1 | Practice Manager | When the clinic needs a new message, I want to build it and submit it for approval, so that only approved wording is used. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-4-1 | Given the WhatsApp channel view, then the "New Group" button is not rendered in the topbar. |
-| F-4-2 | Given the WhatsApp channel view, then the topbar contains the Phone Switcher and Templates action button. |
+| F-4-1 | **Given** Request approval is submitted, **then** the template is marked approved with no outside review. |
+| F-4-2 | **Given** a new template, **when** it is saved, **then** it is stored in the browser and listed. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Active WhatsApp Thread Ingestion & Number Switcher | F-1.1 Number Switcher, F-1.2 Inbound Stream, F-1.3 Unread Badge, F-1.4 Responsible Assignment | Multi-clinic phone number filtering with live unread indicators and staff triage assignment. |
-| F-2 | Meta 24-Hour Service Window Tracker & Policy | F-2.1 Countdown Timer, F-2.2 Expiration Banner, F-2.3 Freeform Lock, F-2.4 Window Re-activation | Strict customer service window monitoring with composer locking and automated re-opening. |
-| F-3 | Pre-Approved HSM WhatsApp Template Selection | F-3.1 Template Drawer, F-3.2 Variable Form, F-3.3 Live Preview, F-3.4 Quick Reply Buttons | Meta-compliant template catalog with patient chart variable auto-population and preview. |
-| F-4 | WhatsApp Topbar Controls & Scoped Action Scoping | F-4.1 Topbar Switcher, F-4.2 Template CTA, F-4.3 Group Button Removal, F-4.4 Message Actions | Focused WhatsApp topbar hiding New Group and exposing templates and phone switchers. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | Threads and number switcher | F-1.1 – F-1.7 | ● / ◐ / ○ | Threads work from sample data; switcher changes a label. |
+| F-2 | 24 hour service window | F-2.1 – F-2.5 | ◐ / ○ | Window forced open; no countdown or lock. |
+| F-3 | Send a template | F-3.1 – F-3.6 | ● / ◐ / ○ | Sends on click; unknown fields become "there". |
+| F-4 | Template library | F-4.1 – F-4.6 | ● / ◐ / ○ | Builder works; approval is automatic. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | Practice Coordinator | When patients message different practice locations, I want to switch between clinic phone numbers, so that I can triage inquiries for each location separately. | F-1 |
-| 2 | Medical Assistant | When new WhatsApp inquiries arrive, I want to see unread indicators in real time, so that urgent patient questions are addressed promptly. | F-1 |
-| 3 | Clinic Staff | When communicating after the 24-hour window has expired, I want clear guidance on sending approved templates, so that carrier delivery failures are prevented. | F-2 |
-| 4 | Practice Administrator | When reviewing messaging compliance, I want Meta window rules automatically enforced, so that the clinic does not incur carrier policy penalties. | F-2 |
-| 5 | Medical Assistant | When reaching out after hours or outside the 24h window, I want to send pre-approved reminders with dynamic patient fields, so that outreach is instant and personalized. | F-3 |
-| 6 | Practice Manager | When standardizing clinical communication, I want approved templates with locked wording, so that medical disclaimers are uniformly followed. | F-3 |
-| 7 | Clinical Coordinator | When triaging WhatsApp chats, I want a focused topbar with template shortcuts and phone switchers, so that I don't see irrelevant controls. | F-4 |
+| 1 | Care Coordinator | Switch between clinic phone numbers | F-1 |
+| 2 | Care Coordinator | See unread badges as messages arrive | F-1 |
+| 3 | Care Coordinator | Get guidance when the 24 hour window has closed | F-2 |
+| 4 | Practice Admin | Have the window rule enforced | F-2 |
+| 5 | Care Coordinator | Send an approved reminder with patient details | F-3 |
+| 6 | Practice Manager | Use approved wording every time | F-3 |
+| 7 | Practice Manager | Build a template and submit it for approval | F-4 |
 
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Any signed-in user | Read and reply to every thread, send templates, build and delete templates, request approval | Nothing |
+| Signed-out visitor | Nothing (sent to sign-in) | Everything |
+
+The earlier PRD named front desk staff, coordinators, medical assistants and the practice manager. It did not say who may approve templates. Decision needed: D-18.
+
+## 5. Metrics and definitions
+
+The unread badge is the only figure here. It counts unread inbound messages on the thread and clears on open. Seed values are mock. The 24 hour window is computed from the last inbound message but forced to "24h remaining" on every thread, so no remaining time is shown.
+
+## 6. Cross-module journeys this module appears in
+
+This channel appears in none of the four journeys.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-139 | Is the number selector a list filter, the sending number or both, and is it remembered per user? | F-1.3, F-1.4 |
+| D-140 | Which roster supplies assignees, and should assignment notify? | F-1.7 |
+| D-135 | Should the 24 hour countdown and lock be restored, and in which release? | F-2.1, F-2.4 |
+| D-136 | What are the template approval states, who sets them, and what happens when a variable has no value? | F-3.3, F-4.5, F-4.6 |
+| D-18 | Which roles may send templates and approve them? | Roles |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-10 | First version. |

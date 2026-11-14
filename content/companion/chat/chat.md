@@ -1,265 +1,346 @@
 ---
-title: "Patient Messaging, Care Chat Bot & Care Group Hub"
-product: "Companion"
+title: "Messages: Care Chat Bot, Clinician and Care Groups"
+product: "companion"
 module: "chat"
+route: "/patient/messages"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-10"
-last_updated: "2026-11-10"
+last_updated: "2026-11-14"
 ---
 
+| Product | COMPANION |
+| Module | MESSAGES: CARE CHAT BOT, CLINICIAN AND CARE GROUPS |
+| Route | `/patient/messages` |
+| Status | In Review |
+| Build status | Partly simulated |
+| Created | 2026-11-10 |
+| Last updated | 2026-11-14 |
 
-### Logs
+## At a glance
 
-#### Date Log
-- **2026-11-10**: Baseline PRD authored based on `ma-figma` source of truth (`PatientMessagesScreen.tsx`, `PatientCareBotScreen.tsx`, `PatientGroupInfoDrawer.tsx`).
-- **2026-11-10**: Renamed Care Bot to Care Chat Bot and integrated quick action shortcuts into conversation stream.
-- **2026-11-10**: Specified cross-product group ingestion from Client portal and self-service "Leave Group" flow.
-- **2026-11-10**: Set status to "In Review".
+| | |
+| :--- | :--- |
+| **What it is** | The patient's message screen: a list with the clinician chat, care groups and the Care Bot, a thread pane with a composer, five Care Bot shortcut cards, and a group information drawer with a **Leave Group** action. |
+| **Who uses it** | Patient (reads and sends). Care Coordinator (answers from the clinic side). Dr. Anita Rao appears only as the person a thread is assigned to. |
+| **Where you start it** | The **Messages** item in the patient portal, or a link with `?chat=` that opens one conversation. |
+| **Where the result goes** | The shared conversation store, so the clinic sees it in the Companion channel of Chats. |
+| **How real is it** | 0 features work, 6 are partly simulated, 0 are not built. See the legend below. |
 
-#### Edit Log
-| Date | Section Edited | What Changed |
-| :--- | :--- | :--- |
-| 2026-11-10 | Header & Sections 1-3 | Migrated document structure to new feature-based PRD standard: Module Summary, Feature Requests (F-1 to F-6), and Comprehensive Summary. |
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client | Staff-Initiated Care Groups & Multi-Disciplinary Care Dispatch | When clinic staff create a Care Group in the Client workspace and add the patient as a member, the group instantly surfaces in the patient's Companion chat sidebar under "Care Groups". The patient can exchange messages, review uploaded care plans, and view member rosters without any manual invite link. | [View in Client](/client/chat) |
+| Client (Chats) | Care groups | A group made in Chats shows here at once, from the same browser store. The portal lists a group when the patient is a member, when it contains client CL-001, or when it is public. | [View Companion channel](/client/chat/companion) |
+| Client (Chats) | Patient messages | A message sent here is stored in the shared store and shows in the Companion channel of Chats. | [View Chats Inbox](/client/chat/chat) |
+| Client (Chats) | Care Bot settings | The full page Care Bot reads the greeting, requirement buttons, bot name and photo from Companion Settings. This Messages screen uses its own five shortcut cards. | [View Companion channel](/client/chat/companion) |
+| Client (Tasks) | Task share | A task shared to the client portal posts a plain text message into the patient's chat. | [View Tasks by me](/client/tasks/tasks-by-me) |
+| Companion (Tasks) | Group Tasks tab | The group drawer lists tasks tied to the group. | [View Companion Tasks](/companion/tasks) |
 
 ## 1. Module Summary
-- The Companion Chat module provides patients with a privacy-first, secure mobile and desktop communications console strictly partitioning conversations into three channels: an automated Care Chat Bot with one-tap clinical shortcuts, direct 1:1 messaging with the assigned primary physician, and staff-managed Care Groups. It guarantees immediate clinical touchpoints while preserving medical privacy and clinician availability boundaries.
-- Authenticated patients and their designated family caregivers use this module.
-- Accessed in the Companion portal via the top navigation rail at `/patient/messages`.
+
+### The story in one minute
+
+Sarah Johnson opens **Messages**. The list shows her clinician first, then her care groups, then the Care Bot. She taps the clinician and types a question about her eye drops. Her message shows a double tick at once. The clinic sees it in Chats. She switches to the Care Bot and taps **Billing & Insurance**. A short text answer comes back after a moment. Then she opens the group "Cataract Recovery", taps the info icon and reads the Members & Admin tab. She presses **Leave Group** and confirms. She is taken to the next chat in her list. Nothing here warns her if she types about chest pain.
+
+### What is real and what is not
+
+- **Real in the prototype:** the conversation list, sending text, the reply quote, the five shortcut cards, the group information drawer and **Leave Group** with its confirmation.
+- **Simulated:** every tick is a double tick. A made up clinician thread is shown when the clinic has none. Bot replies are canned text. The Care Bot here is one thread shared by every patient. Attachments keep only a name, size and type. Group visibility is wider than membership.
+- **Not built:** unread badges, an out of hours notice, a clinician credential tag, emergency escalation, a 25MB limit, locking the composer in a moderators only group, group archive, and family caregiver accounts.
+
+**Naming note:** the earlier PRD named the bot "Care Chat Bot" and put it first. The screen shows "Care Bot" and puts the clinician first. Decision needed: D-133.
+
+### Journey position
+
+```
+Sarah opens Messages ─▶ Clinician / Care group / Care Bot ─▶ Send ─▶ Companion channel in Chats
+                                                    └▶ Group info ─▶ Leave Group
+```
 
 ## 2. Feature Requests
 
-### F-1: Tri-Entity Patient Chat Navigation
+### F-1: The conversation list
+
 #### 1. What it does
-Strictly partitions the patient messaging navigation rail into three distinct, non-overlapping channels: Care Chat Bot (pinned at top), Primary Care Clinician (pinned second), and staff-managed Care Groups (collapsible list). Patients cannot initiate unauthorized external chats, maintaining clear clinical boundaries.
+Sarah sees three kinds of conversation in a fixed order: the clinician chat, then her care groups, then the Care Bot. There is no button to start a new chat. On a phone the list and the thread are separate views and the link carries `?chat=` for the open one.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: Care Chat Bot Entry | Sub-feature | Pinned top navigation item loading interactive AI assistant with shortcuts | Distinct bot avatar and AI badge |
-| F-1.2: Assigned Clinician Entry | Sub-feature | Pinned direct messaging conversation with primary care doctor | Shows clinician name and specialty |
-| F-1.3: Care Groups Accordion | Sub-feature | Collapsible list of active multi-disciplinary groups joined by patient | Auto-synchronized from Client portal |
-| F-1.4: Unread Message Indicator | UI Badge | Monochrome unread numeric indicator next to active threads | Subtly highlights threads with new messages |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: List order | List | Clinician, then care groups, then Care Bot | ● Works | The earlier PRD put the bot first. Decision needed: D-133 |
+| F-1.2: Clinician conversation | Item | The first clinic conversation whose client id is the patient, or for a non group whose contact name equals the patient's name | ◐ Simulated | Can pick the patient's own Companion bot conversation (G12-E-30) |
+| F-1.3: Invented clinician thread | State | When the clinic has none, a thread from "Dr. Alistair Mehta" with a greeting is shown | ◐ Simulated | Shown to every patient, and bot replies name that doctor (G12-E-29) |
+| F-1.4: No new chat | Rule | No control to start a chat with other staff or patients | ● Works | |
+| F-1.5: Unread badges | Badge | Show a count of new messages in real time | ○ Not built | The count exists in data but is not shown (G12-I-84) |
+| F-1.6: Phone layout | Layout | List and thread are separate views tracked by `?chat=` | ● Works | |
 
 #### 3. Worked example
+Sarah opens Messages on her phone.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient opens Messages tab in Companion | Navigates to `/patient/messages` | **Sidebar displays Care Chat Bot, Dr. Alistair Mehta, and active "Post-Op Knee Recovery" group** |
-| 2 | Patient receives doctor reply while viewing bot | Dr. Mehta sends message | **Doctor thread displays subtle unread badge and shifts indicator** |
-| 3 | Patient taps on Doctor thread | Clicks Dr. Alistair Mehta in sidebar | **Viewport loads doctor consultation stream; unread badge clears** |
-| 4 | Patient attempts to message unassigned physician | Looks for new message CTA in sidebar | **No direct message initiation exists; messaging is bounded to assigned clinician** |
+| 1 | The list is shown | Reads it | **Clinician first, groups next, Care Bot last** |
+| 2 | She taps the clinician | Taps the row | **The thread opens and the link carries the chat id** |
+| 3 | She looks for a way to message other staff | Scans the screen | **No new chat control exists** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Patient | When I open the messages tab, I want to clearly distinguish between automated AI help, my doctor, and my care groups, so that I communicate in the right context. |
-| F-1-J2 | Caregiver | When checking on updates, I want to see which thread has new messages, so that I can respond to clinical advice promptly. |
+| F-1-J1 | Patient | When I open Messages, I want to tell apart my doctor, my care groups and the bot, so that I write in the right place. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Given an authenticated patient, when opening `/patient/messages`, then the sidebar renders Care Chat Bot, Assigned Doctor, and active Care Groups in exact order. |
-| F-1-2 | Given incoming messages, then unread indicators update in real time without requiring page refreshes. |
-| F-1-3 | Given the navigation sidebar, then no option exists for patients to initiate arbitrary 1:1 threads with unassigned staff or other patients. |
+| F-1-1 | **Given** a signed-in patient, **when** Messages opens, **then** the list shows the clinician chat, then care groups, then the Care Bot. |
+| F-1-2 | **Given** the clinic has no conversation with the patient, **then** an invented thread from "Dr. Alistair Mehta" is shown. |
+| F-1-3 | **Given** the list, **then** no control starts a new chat and no unread badge is shown. |
 
-### F-2: Care Chat Bot with Clinical Shortcut Actions
+### F-2: The Care Bot
+
 #### 1. What it does
-Provides an interactive 24/7 automated care assistant providing instant responses for administrative and triage inquiries. Renders a grid of five one-tap clinical shortcut cards (Appointment Booking, Billing & Insurance, Medical Intake, Clinician Connection, and Visit Check-in) enabling rapid workflow navigation without typing.
+Sarah opens the Care Bot and sees five shortcut cards: **Book an Appointment**, **Billing & Insurance**, **Medical Intake & Questionnaires**, **Connect with Responsible Care Team** and **Check in for Today's Visit**. A tap sends a prepared question. A canned text answer follows after 650 milliseconds. The same bot is also on the full page at `/patient/care-bot`, with its own settings.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: Shortcut Card Grid | UI Grid | Displays 5 quick-action cards for common clinical operations | One-tap inquiry dispatch |
-| F-2.2: Book Appointment Shortcut | Action | Posts booking query and renders direct CTA button to `/patient/book` | Preserves clinic schedule context |
-| F-2.3: Billing & Copay Shortcut | Action | Displays current outstanding balance and deep-link to `/patient/bill` | Fetches live invoice record |
-| F-2.4: Medical Intake Shortcut | Action | Surfaces required pre-consultation health forms and questionnaires | Links to WebForms module |
-| F-2.5: Today's Check-in Shortcut | Action | Advances patient to `/patient/status` check-in queue screen | Active on appointment days |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Shortcut cards | Cards | Five cards that fill and send a question | ● Works | |
+| F-2.2: Keyword replies | Reply | Canned text chosen by words in the message | ◐ Simulated | Plain text only. No button and no live balance (G12-I-86) |
+| F-2.3: Check in reply | Reply | "Check In Confirmed" | ◐ Simulated | No appointment is marked (G12-E-26) |
+| F-2.4: One shared thread | Rule | The Messages bot is one conversation for all patients | ◐ Simulated | One patient's bot messages are stored where every patient reads them (G12-E-27). Decision needed: D-133 |
+| F-2.5: Sender sides | Rule | This screen and the full page bot store the patient's message on opposite sides | ◐ Simulated | The clinic inbox can show swapped sides (G12-E-34) |
+| F-2.6: Reply buttons and deep links | Buttons | Link to booking, billing, forms and status | ○ Not built | Replies are plain text |
+| F-2.7: Emergency escalation | Rule | Detect chest pain and similar and show 911 guidance | ○ Not built | Patient safety gap (G4-C-07, G12-I-88). Decision needed: D-132 |
+| F-2.8: Full page Care Bot | Page | A bot per patient in the Companion channel, using clinic settings | ◐ Simulated | Described on the Companion channel page of Chats |
 
 #### 3. Worked example
+Sarah asks the bot about bills and then about chest pain.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient wants to book follow-up consultation | Taps "Book an Appointment" shortcut card | **Bot responds with available slots and displays "Select Timeslot" button linking to `/patient/book`** |
-| 2 | Patient inquires about outstanding copay | Taps "Billing & Insurance" shortcut | **Bot displays current balance ($120.00) and direct button to settle payment** |
-| 3 | Patient arrives at clinic for scheduled visit | Taps "Check in for Today's Visit" shortcut | **Bot initiates check-in verification and redirects to `/patient/status` queue** |
-| 4 | Patient asks complex medical emergency question | Types: "Severe chest pain radiating to left arm" | **Bot immediately outputs urgent escalation protocol advising emergency contact (911)** |
+| 1 | She wants her bills | Taps **Billing & Insurance** | **A plain text answer pointing to the Billing tab appears** |
+| 2 | She types "severe chest pain" | Presses Send | **The default reply says the care team has the update. No emergency guidance appears** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Patient | When I need to schedule a visit or check my balance, I want to tap a shortcut card, so that I do not have to type lengthy messages on my phone. |
-| F-2-J2 | Patient | When I have routine administrative questions after hours, I want an immediate automated reply, so that I can resolve my inquiry without waiting for office hours. |
+| F-2-J1 | Patient | When I need to book or check a balance, I want to tap a card, so that I do not type on my phone. |
+| F-2-J2 | Patient | When I have a routine question after hours, I want an instant reply, so that I do not wait for the office. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Given the Care Chat Bot view, when opened, then five persistent clinical shortcut cards render prominently above the message input. |
-| F-2-2 | Given a click on any shortcut card, then the inquiry is dispatched and an automated contextual reply renders within 1 second. |
-| F-2-3 | Given medical emergency trigger keywords, then the bot immediately returns emergency warning protocols with priority formatting. |
+| F-2-1 | **Given** a shortcut card is tapped, **then** its question is sent and a canned reply follows after 650 milliseconds. |
+| F-2-2 | **Given** a message with emergency words, **then** the default reply is shown and no emergency guidance appears. |
+| F-2-3 | **Given** two patients open the Care Bot in Messages, **then** both read the same conversation. |
 
-### F-3: Direct Primary Clinician Messaging
+### F-3: Messages with the clinician
+
 #### 1. What it does
-Provides an encrypted, asynchronous messaging channel between the patient and their assigned primary care physician. Supports text, document attachments, and delivery receipts, giving patients peace of mind that their clinical questions reach their doctor's desk.
+Sarah writes to her clinician and the clinic sees it in Chats. The header shows the name and a line of text. Her own messages always show a double tick. A clinician reply from Chats appears in her thread.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Clinician Header Banner | UI Header | Displays doctor avatar, full name, specialty, and clinic affiliation | Subtle verified practitioner badge |
-| F-3.2: Bi-Directional Message Stream | UI Stream | Renders patient and clinician dialogue with timestamps and read states | Formatted in chronological order |
-| F-3.3: Clinician Attribution Tag | UI Tag | Clearly identifies doctor responses with name and credentials | Prevents confusion with bot replies |
-| F-3.4: Operating Hours Notice | UI Notice | Surfaces clinic response time guidelines when messaging outside office hours | Manages patient reply expectations |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Send a message | Composer | Adds the message on the patient side of the shared conversation | ◐ Simulated | Shared browser store, no server |
+| F-3.2: Clinician header | Header | Name and a line of text | ◐ Simulated | No credentials or verified badge. The fallback name is fixed (G12-I-90) |
+| F-3.3: Ticks | Glyph | A double tick on every patient message | ◐ Simulated | No real sent, delivered or read state (G12-E-31) |
+| F-3.4: Clinician reply | Hand-off | A reply sent in Chats shows in the thread | ● Works | |
+| F-3.5: Out of hours notice | Notice | Show the clinic's response hours | ○ Not built | Needs a source for clinic hours (G12-I-92). Decision needed: D-133 |
+| F-3.6: Clinician attribution tag | Tag | Show name and credentials on each reply | ○ Not built | |
 
 #### 3. Worked example
+Sarah asks a dosage question.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient asks question about prescription dosage | Types message in doctor chat and clicks Send | **Message posts with single check (sent) and updates to double check upon server ingestion** |
-| 2 | Doctor reviews and answers from Client workspace | Clinician submits adjustment reply | **Message appears in patient view with "Dr. Alistair Mehta" attribution badge** |
-| 3 | Patient opens doctor message | Views incoming response | **Read receipt updates to dark double check in Client clinical console** |
-| 4 | Patient messages late at night | Submits query at 11:30 PM | **Notice surfaces: "Dr. Mehta typically responds during office hours (Mon-Fri 9AM-5PM)"** |
+| 1 | The clinician thread is open | Types a question and presses Send | **The message shows a double tick at once** |
+| 2 | Priya replies in Chats | Sends from the Companion channel | **The reply appears in Sarah's thread** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Patient | When I have a non-urgent medical question for my physician, I want to send a secure message, so that my doctor can advise me without an in-person visit. |
-| F-3-J2 | Patient | When receiving instructions from my doctor, I want to see clear practitioner attribution, so that I know the advice came directly from my licensed physician. |
+| F-3-J1 | Patient | When I have a non urgent medical question, I want to message my doctor, so that I get advice without a visit. |
+| F-3-J2 | Patient | When I get an answer, I want to see who wrote it, so that I know it came from my care team. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given an authenticated patient, when viewing the Doctor conversation, then all messages are attributed strictly to the assigned clinician and patient. |
-| F-3-2 | Given an outbound message from patient, then delivery status icons display sent and delivered confirmations accurately. |
-| F-3-3 | Given a doctor reply dispatched from Client, then the message renders in Companion with practitioner credential attribution. |
+| F-3-1 | **Given** a patient message is sent, **then** it shows a double tick whatever happens next. |
+| F-3-2 | **Given** a reply from the clinic, **then** it appears in the thread with the clinic's name and no credential tag. |
 
-### F-4: Staff-Initiated Care Group Collaboration & Ingestion
+### F-4: Care groups
+
 #### 1. What it does
-Automatically ingests and surfaces multi-party Care Groups created by clinical staff in the Client workspace. Enables patients to participate in coordinated discussions with specialists, therapists, and coordinators without requiring manual group invitation codes.
+Care groups made in Chats appear under the clinician chat. Sarah reads messages from several people and can post. The list does not limit groups to the ones she belongs to.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-4.1: Care Group List Item | UI Item | Displays group avatar, title, latest message snippet, and unread indicator | Placed under Care Groups accordion |
-| F-4.2: Real-Time Webhook Listener | Data Sync | Listens for group creation events from Client workspace matching patient ID | Populates within 500ms |
-| F-4.3: Multi-Party Message Stream | UI Stream | Displays messages from multiple clinicians with individual author avatars | Full conversation transparency |
-| F-4.4: Posting Restriction Evaluator | UI Logic | Enforces "Moderators Only" posting rules configured by clinic staff | Disables composer when restricted |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-4.1: Group list | List | Groups where the patient is a member, or that contain CL-001, or are public, minus groups she left | ◐ Simulated | Any patient sees groups they do not belong to (G12-E-28, G4-E-07). Decision needed: D-138 |
+| F-4.2: Multi author stream | Stream | Messages from several people | ● Works | |
+| F-4.3: Posting limit | Rule | A moderators only group locks the composer | ○ Not built | The composer is always open (G12-E-32, G4-E-09). Decision needed: D-138 |
+| F-4.4: Archive | Rule | An archived group is closed to the patient | ○ Not built | No archive exists. Decision needed: D-138 |
+| F-4.5: Caregiver accounts | Role | Family caregivers use the screen | ○ Not built | No caregiver sign-in or role (G12-I-100). Decision needed: D-46 |
 
 #### 3. Worked example
+Sarah checks her groups.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Clinic staff creates "Cardio Support Circle" including Sarah | Staff submits creation drawer in Client | **Group immediately appears under "Care Groups" in Sarah's Companion sidebar** |
-| 2 | Physical therapist posts rehab exercises | Therapist sends message in Client | **Message displays in Sarah's group view with therapist's name and role** |
-| 3 | Moderator sets group to "Moderators Only" | Moderator toggles permission in Client | **Sarah's composer disables with notice: "Only care coordinators can post in this group"** |
-| 4 | Clinic archives group after program completion | Staff archives group in Client | **Group moves to archived state and patient real-time listener disconnects** |
+| 1 | A group is public but she is not a member | Opens Messages | **The group is listed for her** |
+| 2 | A group allows moderators only | Types in it | **The message posts** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-4-J1 | Patient | When participating in specialized therapy, I want a single care group with all my clinicians, so that everyone stays aligned on my recovery plan. |
-| F-4-J2 | Caregiver | When reading care group updates, I want to see messages from all specialists in one place, so that care coordination is effortless. |
+| F-4-J1 | Patient | When I take part in therapy, I want one group with all my clinicians, so that everyone stays aligned. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-4-1 | Given a care group created in Client with patient ID, then the group automatically renders in Companion without manual invite links. |
-| F-4-2 | Given a group with "Moderators Only" posting permissions, then the patient's message input is locked with an explanatory notice. |
-| F-4-3 | Given multiple care team members participating in a group, then each message displays individual author avatar and clinical title. |
+| F-4-1 | **Given** a group in the store, **when** the patient is a member, contains CL-001 or the group is public, **then** it is listed unless she left it. |
+| F-4-2 | **Given** a moderators only group, **then** the patient composer is open. |
 
-### F-5: Contextual In-Line Replies & Clinical Media Sharing
+### F-5: Replies and attachments
+
 #### 1. What it does
-Enables patients to cite previous clinician messages using in-line replies and upload clinical photos, lab reports, and insurance documents up to 25MB. Files are validated client-side and rendered with download previews.
+Sarah hovers or taps a message, presses Reply and sees a banner with the quote. She can attach a file with the paperclip. The sent bubble shows the quote and a file card.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-5.1: Message Reply Action | UI Button | Reply button on message hover binding author and snippet to composer | Visible on patient hover/tap |
-| F-5.2: Composer Reply Staging Card | UI Card | Displays quoted message preview above composer with cancel button | Dismissible via X icon |
-| F-5.3: Paperclip Attachment Button | UI Button | Opens system file selector for images and PDF documents | Enforces 25MB threshold |
-| F-5.4: Staged Attachment Preview | UI Chip | Shows thumbnail, filename, and file size prior to message send | Client-side validation |
-| F-5.5: Secure Download Card | UI Card | Renders inline document card with secure download action | Encrypted clinical assets |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-5.1: Reply with quote | Action | A banner above the composer and a quote block on the sent bubble | ● Works | |
+| F-5.2: Attachment | Upload | A staged chip, then a file card | ◐ Simulated | Only name, size and type are kept. The file is not sent (G12-E-33). Decision needed: D-137 |
+| F-5.3: 25MB limit | Rule | Reject a larger file with an error | ○ Not built | No size check (G12-I-97). Decision needed: D-137 |
 
 #### 3. Worked example
+Sarah sends a lab report.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient replies to specific doctor question | Taps Reply icon on doctor's message #4 | **Composer displays reply banner quoting doctor instruction** |
-| 2 | Patient sends reply with explanation | Types response and clicks Send | **Sent bubble embeds clickable quote card linking directly to message #4** |
-| 3 | Patient uploads 1.8MB lab report PDF | Taps paperclip icon and selects `lab_results.pdf` | **File uploads cleanly; renders in stream with PDF icon, file size, and download link** |
-| 4 | Patient attempts to upload 32MB video file | Selects 32MB video file in picker | **Upload blocked instantly; toast displays: "File exceeds 25MB limit"** |
+| 1 | She picks lab_results.pdf | Taps the paperclip | **A chip shows its name and size** |
+| 2 | She sends | Presses Send | **A file card shows. The clinic gets the name only, not the file** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-5-J1 | Patient | When responding to a specific question from my doctor, I want to quote the question directly, so that my doctor knows which issue I am answering. |
-| F-5-J2 | Patient | When I have an external lab report or photo of a rash, I want to upload it securely, so that my care team can review it before my consultation. |
+| F-5-J1 | Patient | When I answer a question, I want to quote it, so that my doctor knows what I mean. |
+| F-5-J2 | Patient | When I have a lab report, I want to attach it, so that my care team can review it. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-5-1 | Given any historical message, when hovered/tapped, then a Reply action is available that attaches a quote preview to the composer. |
-| F-5-2 | Given a document or image under 25MB, when attached, then a staging chip renders and the file uploads securely upon sending. |
-| F-5-3 | Given any file exceeding 25MB, when selected, then upload is immediately rejected with a descriptive error notification. |
+| F-5-1 | **Given** Reply is pressed, **when** a message is sent, **then** the bubble carries a quote block. |
+| F-5-2 | **Given** a file of any size is attached and sent, **then** a card shows and no file is delivered. |
 
-### F-6: Patient Group Information & Leave Workflow
+### F-6: Group information and Leave Group
+
 #### 1. What it does
-Provides a slide-over `PatientGroupInfoDrawer` displaying group details, care team member rosters, shared clinical files, and care tasks. Patients can independently leave groups they no longer wish to participate in.
+The info icon in a group header opens a drawer with three tabs: **Members & Admin**, **Files** and **Tasks**. A **Leave Group** button asks for confirmation. After she confirms, Sarah is removed from the group's members and the group stays hidden for her on this browser.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-6.1: Group Info Header Trigger | Button | Info icon (`i`) in group header opening slide-over drawer | Right-anchored drawer |
-| F-6.2: Drawer Tab Navigation | Tab Bar | Three sub-tabs: Members (roster), Files (shared documents), and Tasks | Clean segmented control |
-| F-6.3: Care Team Member Roster | List | Displays names, roles, and avatars of participating clinicians and patients | Hides personal phone numbers |
-| F-6.4: Shared Files Repository | List | Aggregates all PDFs and images shared in group conversation | Instant download links |
-| F-6.5: Leave Group Action Button | Button | Red action button with confirmation dialog removing patient from group | Self-service departure |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-6.1: Info drawer | Drawer | Right side drawer with a member search | ● Works | |
+| F-6.2: Members & Admin tab | List | Members with roles | ● Works | |
+| F-6.3: Files tab | List | Files shared in the group, with a download icon | ◐ Simulated | Download only shows a toast. Files are name only |
+| F-6.4: Tasks tab | List | Tasks tied to the group | ● Works | |
+| F-6.5: Leave Group | Button | Confirmation, then removes the patient and CL-001 from the members and hides the group | ● Works | The hidden list is kept in this browser only |
+| F-6.6: After leaving | Rule | The next chat in the list opens and a toast confirms | ● Works | |
 
 #### 3. Worked example
+Sarah leaves a group.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient wants to check therapist's name | Taps info icon in "Rehab Group" header | **`PatientGroupInfoDrawer` slides open showing team roster with roles** |
-| 2 | Patient looks for previously shared care guide | Clicks "Files" tab in group drawer | **List displays `knee_rehab_guide.pdf` with direct download link** |
-| 3 | Patient discharged from program leaves group | Clicks "Leave Group" button and confirms dialog | **Patient removed from group; drawer closes and group disappears from sidebar** |
-| 4 | Patient changes mind on leave confirmation | Clicks "Cancel" on leave confirmation dialog | **Leave action cancels; patient remains active member of care group** |
+| 1 | The group info drawer is open | Presses **Leave Group** | **A confirmation dialog appears** |
+| 2 | She confirms | Presses confirm | **A toast says she left. The next chat opens** |
+| 3 | She changes her mind | Presses cancel | **She stays in the group** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-6-J1 | Patient | When looking for clinical guides sent weeks ago, I want to view a shared files list in the group drawer, so that I do not have to scroll through hundreds of messages. |
-| F-6-J2 | Patient | When I complete a clinical program, I want to leave the group myself, so that my messaging sidebar remains clean and uncluttered. |
+| F-6-J1 | Patient | When I need an old care guide, I want a files list, so that I do not scroll through messages. |
+| F-6-J2 | Patient | When my program ends, I want to leave the group, so that my list stays tidy. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-6-1 | Given an active Care Group, when the patient clicks the header info icon, then `PatientGroupInfoDrawer` opens showing Members, Files, and Tasks. |
-| F-6-2 | Given the Files tab, then all documents uploaded in the group conversation are aggregated with secure download links. |
-| F-6-3 | Given the "Leave Group" action, when confirmed by the patient, then the patient is removed from group state and redirected to the Doctor conversation. |
+| F-6-1 | **Given** a group chat, **when** the info icon is pressed, **then** a drawer opens with Members & Admin, Files and Tasks. |
+| F-6-2 | **Given** Leave Group is confirmed, **then** the patient is removed from the member list, the group is hidden for her and the next chat opens. |
+| F-6-3 | **Given** the Files tab, **when** download is pressed, **then** a toast shows and no file is saved. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Tri-Entity Patient Chat Navigation | F-1.1 Care Bot, F-1.2 Assigned Clinician, F-1.3 Care Groups, F-1.4 Unread Badges | Structured three-tier conversation rail separating AI bot, primary doctor, and care groups. |
-| F-2 | Care Chat Bot with Clinical Shortcut Actions | F-2.1 Shortcut Grid, F-2.2 Booking, F-2.3 Billing, F-2.4 Intake, F-2.5 Check-in | 24/7 automated care assistant with five one-tap clinical shortcut cards for quick actions. |
-| F-3 | Direct Primary Clinician Messaging | F-3.1 Doctor Header, F-3.2 Dialogue Stream, F-3.3 Practitioner Tag, F-3.4 Hours Notice | Secure asynchronous messaging channel between patient and assigned primary physician. |
-| F-4 | Staff-Initiated Care Group Collaboration | F-4.1 Group Item, F-4.2 Real-Time Sync, F-4.3 Multi-Party Stream, F-4.4 Posting Rules | Multi-disciplinary clinical rooms automatically ingested from Client workspace creation. |
-| F-5 | Contextual In-Line Replies & Media Sharing | F-5.1 Reply Action, F-5.2 Reply Banner, F-5.3 Paperclip Upload, F-5.4 Staging Chip, F-5.5 Download Card | Contextual message quoting and 25MB secure clinical document and photo sharing pipeline. |
-| F-6 | Patient Group Information & Leave Workflow | F-6.1 Info Trigger, F-6.2 Drawer Tabs, F-6.3 Member Roster, F-6.4 Files List, F-6.5 Leave Group | Slide-over group info drawer with member rosters, shared file repository, and self-service departure. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | Conversation list | F-1.1 – F-1.6 | ● / ◐ / ○ | Fixed order; invented clinician thread; no unread badges. |
+| F-2 | Care Bot | F-2.1 – F-2.8 | ● / ◐ / ○ | Cards work; canned text; shared thread; no emergency path. |
+| F-3 | Messages with clinician | F-3.1 – F-3.6 | ● / ◐ / ○ | Send works; ticks always double. |
+| F-4 | Care groups | F-4.1 – F-4.5 | ● / ◐ / ○ | Groups wider than membership; no posting lock. |
+| F-5 | Replies and attachments | F-5.1 – F-5.3 | ● / ◐ / ○ | Quote works; file not delivered. |
+| F-6 | Group info and Leave Group | F-6.1 – F-6.6 | ● / ◐ | Drawer and leave work; download is a toast. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient | When I open the messages tab, I want to clearly distinguish between automated AI help, my doctor, and my care groups, so that I communicate in the right context. | F-1 |
-| 2 | Caregiver | When checking on updates, I want to see which thread has new messages, so that I can respond to clinical advice promptly. | F-1 |
-| 3 | Patient | When I need to schedule a visit or check my balance, I want to tap a shortcut card, so that I do not have to type lengthy messages on my phone. | F-2 |
-| 4 | Patient | When I have routine administrative questions after hours, I want an immediate automated reply, so that I can resolve my inquiry without waiting for office hours. | F-2 |
-| 5 | Patient | When I have a non-urgent medical question for my physician, I want to send a secure message, so that my doctor can advise me without an in-person visit. | F-3 |
-| 6 | Patient | When receiving instructions from my doctor, I want to see clear practitioner attribution, so that I know the advice came directly from my licensed physician. | F-3 |
-| 7 | Patient | When participating in specialized therapy, I want a single care group with all my clinicians, so that everyone stays aligned on my recovery plan. | F-4 |
-| 8 | Caregiver | When reading care group updates, I want to see messages from all specialists in one place, so that care coordination is effortless. | F-4 |
-| 9 | Patient | When responding to a specific question from my doctor, I want to quote the question directly, so that my doctor knows which issue I am answering. | F-5 |
-| 10 | Patient | When I have an external lab report or photo of a rash, I want to upload it securely, so that my care team can review it before my consultation. | F-5 |
-| 11 | Patient | When looking for clinical guides sent weeks ago, I want to view a shared files list in the group drawer, so that I do not have to scroll through hundreds of messages. | F-6 |
-| 12 | Patient | When I complete a clinical program, I want to leave the group myself, so that my messaging sidebar remains clean and uncluttered. | F-6 |
+| 1 | Patient | Tell apart my doctor, groups and the bot | F-1 |
+| 2 | Patient | Tap a card instead of typing | F-2 |
+| 3 | Patient | Get an instant reply after hours | F-2 |
+| 4 | Patient | Message my doctor with a non urgent question | F-3 |
+| 5 | Patient | See who wrote an answer | F-3 |
+| 6 | Patient | Keep one group with all my clinicians | F-4 |
+| 7 | Patient | Quote the question I answer | F-5 |
+| 8 | Patient | Attach a lab report | F-5 |
+| 9 | Patient | Find an old care guide in a files list | F-6 |
+| 10 | Patient | Leave a group when my program ends | F-6 |
 
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Patient in the portal | Send messages, use the bot, read and post in listed groups, leave groups | Starting a new chat |
+| Any patient | Also sees public groups and groups that contain CL-001, and the shared Care Bot thread | Nothing |
+| Family caregiver | Nothing separate: no caregiver sign-in or role exists | Not applicable |
+
+The earlier PRD named authenticated patients and designated family caregivers. Decision needed: D-46.
+
+## 5. Metrics and definitions
+
+No metric is shown on this screen. A count of unread messages exists in the data but is not displayed.
+
+## 6. Cross-module journeys this module appears in
+
+| Journey | Step | What happens as built |
+| :--- | :--- | :--- |
+| Patient portal ↔ Appointments / Invoices | Staff shares a task to the Client Portal | A plain text message is posted in the patient's chat. The default recipient is CL-001 when the assignee is not a contact. |
+| | Patient sends a message | The message reaches the Companion channel in Chats. The clinician thread is found by client id or by contact name. Groups show for members, CL-001 and public groups. The bot is one shared conversation. |
+
+Full journey: see Journeys page.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-133 | What is the runtime for bot or human first, channel order, one thread per patient for the bot, and clinic hours? | F-1.1, F-2.4, F-3.5 |
+| D-132 | What are the emergency keywords, wording and staff alert? | F-2.7 |
+| D-138 | What are the care group rules, including public groups, archive and leaving? | F-4.1, F-4.3, F-4.4 |
+| D-137 | What are the attachment limits and allowed types? | F-5.2, F-5.3 |
+| D-46 | What is the patient sign-in model, and do caregivers have accounts? | F-4.5 |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-10 | First version. |

@@ -1,215 +1,320 @@
 ---
-title: "Website Live Chat Widget, Process-Driven AI Assistant & Drawer Settings"
-product: "Client"
+title: "Chats: Website Channel"
+product: "client"
 module: "chat"
 channel: "website"
+route: "/chats?channel=website"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-10"
-last_updated: "2026-11-12"
+last_updated: "2026-11-14"
 ---
 
-| Product | Client |
-| Module | Chats & Care Groups - Website Channel (`/chats?channel=website`) |
+| Product | CLIENT |
+| Module | CHATS: WEBSITE CHANNEL |
+| Route | `/chats?channel=website` |
 | Status | In Review |
+| Build status | Partly simulated |
 | Created | 2026-11-10 |
-| Last updated | 2026-11-12 |
+| Last updated | 2026-11-14 |
+
+## At a glance
+
+| | |
+| :--- | :--- |
+| **What it is** | The Website view of the Chats inbox plus a **Website Widget Settings** drawer with five sections (design, pre-chat form, first responder, responsible settings, embed code) and a visitor chat simulator. Only the simulator produces website conversations. |
+| **Who uses it** | Care Coordinator (reads website threads). Practice Admin and Practice Manager (configure the widget). No role is checked. |
+| **Where you start it** | **Chats** in the sidebar, then **Website** in the channel picker. The settings cog is in the top bar. The simulator opens from the small "(dev)" link in the page header and from a test form inside the settings drawer. |
+| **Where the result goes** | A new or matched client in Clients, the client's Activity timeline, the Process call log, and the Website inbox. No hosted widget and no appointment is created. |
+| **How real is it** | 0 features work, 5 are partly simulated, 0 are not built. See the legend below. |
+
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Companion | Process-Aligned Clinical Automation | When website visitors submit inquiries through the web widget, the AI identifies the target workflow process (e.g., Intake, Booking, Billing) and automatically synchronizes the resulting contact and appointment records into the practice management and Companion systems. | [View in Companion](/companion/chat) |
+| Client (Clients) | Visitor becomes a contact | The simulator finds a client by phone, email or name alone. Otherwise it creates a contact in the chosen Contact Category, or "Lead" when Auto Create Contact is off. Contacts are stored in the browser session only. | [View Clients](/client/clients) |
+| Client (Workflows) | Requirement to workflow and stage | Each requirement maps to a Process Entity, Workflow and Stage. The stage sets the reply. The visitor is not enrolled in the process. | [View Workflows](/client/workflows) |
+| Client (Process) | Stage move from the test drawer | A stage move in the Test Website Chat drawer creates or updates a Process call-log row. It shows in the Process List only. | [View Process List](/client/processes/list) |
+| Companion | Contact and appointment sync | Not connected. The earlier PRD promised appointment records. The widget creates no appointment and nothing reaches the patient portal. | [View Companion Messages](/companion/chat) |
+| Client (Chats) | Shared inbox | Simulator messages appear in the Website channel. Assignment, reply and attach follow the inbox page. | [View Chats Inbox](/client/chat/chat) |
 
 ## 1. Module Summary
-- The Website Channel provides real-time triage for visitors and prospective patients engaging with the practice's embeddable website widget. It integrates a process-driven AI Assistant First Responder that dynamically identifies visitor intent and requirement selections, maps them to established practice processes (Booking, Billing, Intake, Check-in), and delivers automated resolution flows before handing off to human clinical agents.
-- Website visitors, prospective patients, practice triage agents, and front-desk coordinators use this module.
-- Accessed in the Client workspace via Chats & Care Groups > Website.
+
+### The story in one minute
+
+Priya Nair picks **Website** in the channel picker. One sample visitor thread is listed. The header shows Bot Active, but she cannot assign the thread and the composer has no gear. She presses the settings cog and the **Website Widget Settings** drawer opens. In **Pre-chat form** she adds a requirement "Book an Appointment" and maps it to Appointment, Appointment Flow and Booked. She turns on **Auto Create Contact** and picks Lead. The drawer saves every edit as she types. She runs a test visitor named Sarah Johnson. The reply uses the Booked stage prompt and a new thread appears in the Website inbox. Priya notices the simulator matched Sarah to her existing record by name alone.
+
+### What is real and what is not
+
+- **Real in the prototype:** the settings drawer and its saved values, the cascading Process Entity, Workflow and Stage pickers, the Contact Category dropdown, the drag-to-reorder priority list, the embed snippet, and the hidden **New Group** button.
+- **Simulated:** every visitor conversation, the stage replies and buttons, and the contacts created. They run only in the simulator, with a contact id of the form `CL-SIM-<time>`. Working hours, distribution mode, priority order and transfer phrases are saved but never read by anything.
+- **Not built:** live presence, page URL and visitor details, human takeover, resolve and archive, escalation to the Responsible queue, out-of-office replies, and a hosted widget.
+
+### Journey position
+
+```
+Settings drawer ─▶ Requirement mapping ─▶ Test visitor ─┬▶ Contact (find or create)
+                                                         ├▶ Stage prompt reply ─▶ Website inbox
+                                                         └▶ Activity and Process call log
+```
 
 ## 2. Feature Requests
 
-### F-1: Inbound Web Widget Live Thread Aggregation & Visitor Session Presence
+### F-1: Website threads in the inbox
+
 #### 1. What it does
-Aggregates live chat sessions initiated by website visitors into an omnichannel inbox stream. Tracks visitor online presence, active page URL, geographic IP snippet, and session duration. Live updates alert staff when visitors enter or leave the site widget.
+Priya sees website visitor threads in the inbox. Only one sample visitor thread is stored. The header shows Bot Active, Assigned or a dead Unassigned button. The composer has no gear, so a website thread cannot be assigned or taken over.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: Live Session Card | UI Card | Renders visitor thread with browser indicator, current page URL, and duration | Real-time presence dot |
-| F-1.2: Visitor Metadata Panel | UI Panel | Surfaces visitor IP location, referrer URL, and pre-chat form submissions | Located in right sidebar |
-| F-1.3: Human Takeover Switch | Toggle | Allows human agent to pause AI Assistant and take manual control of conversation | Instant bot pause |
-| F-1.4: Resolve & Archive Session | Button | Closes finished visitor session and archives chat transcript | Preserved in history |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: Website thread list | List | Lists website threads with unread badge. Simulator runs add threads | ◐ Simulated | One sample thread is stored. No hosted widget feeds it |
+| F-1.2: Header state | Button | Bot Active, Assigned or Unassigned | ◐ Simulated | Unassigned does nothing and a paused bot cannot be resumed (G4-E-05) |
+| F-1.3: Composer | Composer | Text and a paperclip. The gear is removed | ● Works | Sending does not pause the bot |
+| F-1.4: Live session card and presence | Card | Show the visitor online, the page URL and duration | ○ Not built | (G4-WEB-01) |
+| F-1.5: Visitor details panel | Panel | IP location, referrer and form answers | ○ Not built | (G4-WEB-02) |
+| F-1.6: Human takeover | Toggle | A human reply pauses the AI | ○ Not built | (G4-WEB-03) |
+| F-1.7: Resolve and archive | Button | Close and archive a session | ○ Not built | The handler has no control (G4-E-06). Decision needed: D-140 |
 
 #### 3. Worked example
+Priya checks the website channel.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Visitor opens chat widget on `/services/orthopedics` | Visitor clicks launcher button on clinic site | **Thread appears in Website channel with live green dot and page label "Orthopedics"** |
-| 2 | Visitor types question about consultation pricing | Types: "How much is an initial consultation?" | **Message renders in real time; AI First Responder evaluates intent** |
-| 3 | Human coordinator intervenes | Coordinator clicks "Take Over Chat" | **Bot pauses; coordinator types direct reply to visitor** |
+| 1 | Website is chosen | Opens the visitor thread | **The stream and a composer without a gear are shown** |
+| 2 | She wants to take over | Clicks the header | **Nothing happens and the bot keeps replying** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Triage Coordinator | When website visitors ask questions on our clinic website, I want to see their active page and query in real time, so that I understand their clinical interest immediately. |
+| F-1-J1 | Care Coordinator | When visitors ask questions on our website, I want to see the page and the question as they chat, so that I understand their interest at once. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Given an active visitor session on the practice website, when the visitor sends a message, then it renders in the Website channel within 500ms. |
-| F-1-2 | Given a human agent sending a message, then the AI Assistant is automatically paused for that conversation session. |
+| F-1-1 | **Given** a website thread, **then** the composer has a paperclip and Send but no gear. |
+| F-1-2 | **Given** staff send a message, **then** the bot is not paused. |
+| F-1-3 | **Given** the header reads Unassigned, **when** it is clicked, **then** nothing happens. |
 
-### F-2: Process-Driven AI Assistant First Responder & Workflow Prompt Routing
+### F-2: Visitor chat answered from the mapped workflow stage
+
 #### 1. What it does
-Provides an intelligent AI First Responder that evaluates inbound messages and pre-chat requirement selections against each requirement's mapped **Process Entity**, **Workflow Name**, and **Stage**. When a visitor chooses a requirement or discusses that topic in chat, the AI maps the conversation to that workflow stage's configured prompt and instructions (such as `Appointment Flow → Booked`, `Billing & Invoicing → Draft`, `Insurance and Claims → Draft & Intake`, or `Client Intake → Initial Contact`), formulates a stage-aligned response, and offers interactive shortcut actions or smooth handoff to human coordinators.
+In the simulator a visitor chooses a requirement. The tool finds or creates a contact, loads the mapped workflow and stage, and replies with that stage's prompt. When the stage has an automation, its header and buttons are used instead. Both messages land in the Website inbox.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: Requirement-to-Workflow Stage Prompt Resolver | Logic | Reads the Process Entity, Workflow Name, and Stage mapped to the visitor's chosen requirement and loads that stage's workflow prompt | Exact stage prompt resolution |
-| F-2.2: Stage-Specific Response | Generator | Formulates a tailored response following the mapped workflow stage prompt and conversational context | Explains next steps clearly |
-| F-2.3: Interactive Action Card | UI Component | Renders clickable shortcut buttons when configured on the mapped stage (e.g. booking links, billing guidance, or intake actions) | One-tap workflow launch |
-| F-2.4: Escalation to Human Queue | Fallback | Escalates to Responsible Settings queue when the query cannot be resolved or the visitor requests a human agent | Notifies on-duty staff |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Stage prompt | Rule | Builds the prompt from the stage pitch, description or process description | ◐ Simulated | Simulator only |
+| F-2.2: Stage reply and buttons | Reply | Replies with the stage automation output when one fires, else the prompt | ◐ Simulated | Simulator only |
+| F-2.3: Workflow and stage label | Label | The Test Website Chat drawer labels each AI turn "Workflow Prompt: workflow · stage" | ◐ Simulated | |
+| F-2.4: Stage moves | Hand-off | A stage move updates the Process call log and Activity | ◐ Simulated | Creates a row if none exists. Shows in the Process List only (G4-WEB-28) |
+| F-2.5: Messages in the inbox | Hand-off | Both messages are pushed into the Website channel | ◐ Simulated | A placeholder phone is used when none is given (G4-E-23) |
+| F-2.6: Escalation to the Responsible queue | Fallback | Hand to staff on request or an unknown question | ○ Not built | (G4-WEB-08). Decision needed: D-133 |
+| F-2.7: Appointment from the chat | Hand-off | Create appointment records | ○ Not built | The widget creates no appointment |
 
 #### 3. Worked example
-| # | Situation | What the visitor does | Result |
-| :--- | :--- | :--- | :--- |
-| 1 | Visitor selects "Book an Appointment" (mapped to `Appointment` → `Appointment Flow` → `Booked`) | Submits pre-chat form and asks for availability | **AI maps the conversation to `Appointment Flow · Booked`, loads that stage's prompt, and replies with scheduling guidance** |
-| 2 | Visitor asks: "Can I pay my overdue bill here?" under "Billing & Invoices" (mapped to `Invoice` → `Billing & Invoicing` → `Draft`) | Sends billing question | **AI applies the `Billing & Invoicing · Draft` stage workflow prompt and responds with balance and payment guidance** |
-| 3 | Visitor asks about policy coverage under "Insurance & Coverage Inquiry" (mapped to `Insurance & Claims` → `Insurance and Claims` → `Draft & Intake`) | Sends coverage question | **AI responds using the `Insurance and Claims · Draft & Intake` stage prompt** |
-| 4 | Visitor types: "I need to speak with someone at reception" | Requests human help | **AI escalates the active thread to the assigned Responsible Settings team queue** |
+Priya runs a test visitor.
 
-#### 4. Jobs to be done
-| # | User | Job to be done |
-| :--- | :--- | :--- |
-| F-2-J1 | Website Visitor | When I choose a requirement and start chatting on the clinic website, I want instant, relevant answers aligned with that specific service workflow stage, so that I do not receive generic replies. |
-| F-2-J2 | Practice Administrator | When visitors select a pre-chat requirement, I want the AI to automatically load the prompt from the mapped workflow stage, so that each inquiry type follows the right conversational script. |
-
-#### 5. Acceptance criteria
-| # | Criteria |
-| :--- | :--- |
-| F-2-1 | Given a visitor selects a requirement mapped to a Process Entity, Workflow Name, and Stage, then the AI First Responder loads that stage's workflow prompt for the conversation. |
-| F-2-2 | Given a visitor tests the chat inside Website Widget Settings or the Website Bot Simulator, then the response header/context displays the active mapped Workflow Name and Stage. |
-| F-2-3 | Given an unrecognized inquiry or explicit escalation trigger, then the AI hands the conversation over to on-duty team members. |
-
-### F-3: Pre-Chat Intake Form, Requirement Workflow Mapping & Auto Create Contact (Contact Category)
-#### 1. What it does
-Gathers preliminary visitor details before starting a chat session. Includes a greeting message, toggleable visitor intake fields (`Full Name`, `Email Address`, `Phone Number`, `Requirement`), and **Requirement Options & Workflow Mapping**. For each requirement option visitors can pick, the administrator configures the **Requirement Option** label and maps it across three cascading dropdowns: **Process Entity** (`Processes`, `Appointment`, `Invoice`, `Insurance & Claims`, `Task`), **Workflow Name** (filtered by entity), and **Stage** (filtered by workflow), so the AI activates the exact stage workflow prompt when visitors discuss that requirement. Also includes an **Auto Create Contact** toggle: when enabled, administrators select the target **Contact Category** (`Lead`, `Client`, `Supplier`, `Vendor`, or custom contact categories) under which visitor records are automatically created, without enrolling the contact itself into a pipeline stage.
-
-#### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Greeting Message Input | Text Input | Configures customizable welcome text displayed on the pre-chat card | Multi-line greeting |
-| F-3.2: Contact Field Checkboxes | Checkboxes | Toggles collection of Visitor Full Name, Email Address, Phone Number, and Requirement | Requirement toggles options list |
-| F-3.3: Requirement Options & Workflow Mapping | Row Builder | For each requirement option, captures the Requirement label, **Process Entity**, **Workflow Name**, and **Stage** dropdowns | 3-step cascading mapping |
-| F-3.4: Cascading Entity → Workflow → Stage Filtering | Selection Rule | Selecting a Process Entity updates Workflow Name choices; selecting a Workflow Name updates Stage choices | Defaults cleanly on switch |
-| F-3.5: Auto Create Contact Toggle | Toggle | When ON, automatically creates a Contact record in Contacts upon visitor form submission | Preserves contact-only intake |
-| F-3.6: Contact Category Selector Dropdown | Dropdown | Selects the Contact Category (`Lead`, `Client`, `Supplier`, `Vendor`, or custom categories) for auto-created contacts | Replaces legacy Entity selector on contacts |
-
-#### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Admin maps "Book an Appointment" in Requirement Options | Selects Process Entity `Appointment`, Workflow Name `Appointment Flow`, and Stage `Booked` | **Requirement saves with complete Process Entity, Workflow Name, and Stage mapping** |
-| 2 | Admin changes Process Entity or Workflow Name on a requirement | Switches Process Entity to `Invoice` and selects `Billing & Invoicing` | **Stage dropdown refreshes automatically to list stages of `Billing & Invoicing` (`Draft`, `Payment recorded`, `Paid`, `Overdue`)** |
-| 3 | Admin enables Auto Create Contact | Turns Auto Create Contact toggle ON | **Contact Category dropdown appears listing `Lead`, `Client`, `Supplier`, `Vendor`, and custom contact categories (not Entity)** |
-| 4 | Admin chooses `Lead` and tests visitor submission | Enters "John Doe, john@example.com", picks "Book an Appointment", and submits | **Contact "John Doe" is created in Contacts under the `Lead` Contact Category while the AI conversation applies the `Appointment Flow · Booked` stage prompt** |
-| 5 | Admin turns Auto Create ON without picking a Contact Category, or leaves a requirement unmapped | Clicks Save Configuration | **Validation prevents saving and asks for a Contact Category or complete Requirement Process Entity, Workflow Name, and Stage mapping** |
+| 1 | Requirement "Book an Appointment" maps to Booked | Submits the test form as Sarah Johnson | **The reply uses the Booked stage prompt and is labelled with the workflow and stage** |
+| 2 | The visitor asks to speak to reception | Types the request | **No escalation happens** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Practice Manager | When visitors pick a pre-chat requirement, I want to map it across Process Entity, Workflow Name, and Stage, so that the AI responds with the exact stage workflow prompt for that topic. |
-| F-3-J2 | Front-Desk Lead | When auto-creating contacts from website chat visitors, I want to assign them to a Contact Category such as `Lead` or `Client` instead of a system entity, so that new website inquiries land in the right contact segment immediately. |
+| F-2-J1 | Patient | When I choose a requirement on the clinic site, I want an answer for that service, so that I do not get a generic reply. |
+| F-2-J2 | Practice Admin | When visitors pick a requirement, I want the mapped stage prompt used, so that each topic follows its script. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given the Requirement Options & Workflow Mapping list, each requirement displays a text label input plus cascading Process Entity, Workflow Name, and Stage dropdowns. |
-| F-3-2 | Given a Process Entity or Workflow Name change on a requirement row, then downstream Workflow Name and Stage dropdowns refresh immediately to match. |
-| F-3-3 | Given the Auto Create Contact toggle set to ON, then a **Contact Category** dropdown populated from configured Contact Categories (`Lead`, `Client`, `Supplier`, `Vendor`, plus custom categories) is displayed instead of an Entity dropdown. |
-| F-3-4 | Given form submission with Auto Create Contact ON, then the new Contact record is stored under the selected Contact Category while the AI conversation maps to the chosen requirement's Workflow Name and Stage prompt. |
+| F-2-1 | **Given** a requirement mapped to an entity, workflow and stage, **when** a simulated visitor chats, **then** the reply uses that stage's prompt or automation output. |
+| F-2-2 | **Given** a simulated visitor, **then** the contact is not enrolled in the process and no appointment is created. |
+| F-2-3 | **Given** a request for a human, **then** no escalation happens. |
 
-### F-4: Responsible Settings & Sequential Priority Queue Routing
+### F-3: Pre-chat form, requirement mapping and contacts
+
 #### 1. What it does
-Replaces legacy Queue & Routing with "Responsible Settings". Clinic administrators select team members from verified organization users and choose between three distribution modes: Simultaneous broadcast, Round-robin, and Sequential priority. When "Sequential priority" is active, a numbered drag-to-reorder priority list allows administrators to set the exact fallback order without confusing up/down arrow buttons. Working Hours settings (toggle, days, time ranges, timezone) reside exclusively within this card.
+In **Pre-chat form** Priya sets a greeting and ticks Name, Email, Phone and Requirement. Each requirement row has a label and three cascading pickers: **Process Entity** (Processes, Appointment, Invoice, Insurance & Claims, Task), **Workflow Name** and **Stage**. **Auto Create Contact** with a **Contact Category** decides whether a visitor becomes a contact.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-4.1: Responsible Members Multi-Select | Picker | Selects team members from the organization roster | No hardcoded sample users |
-| F-4.2: Distribution Mode Selector | Dropdown | 3 modes: Simultaneous broadcast, Round-robin, Sequential priority | Configures triage distribution |
-| F-4.3: Sequential Priority Reorder List | UI List | Drag-to-reorder numbered priority list (Priority 1, 2, 3...) | Up/down arrow buttons removed |
-| F-4.4: Priority Order Persistence | Data Logic | Saves exact member sequence order to backend configuration | Fallback escalation order |
-| F-4.5: Working Hours Configuration | Settings | Toggle, working days, time slot ranges, and clinic timezone | Embedded in Responsible card |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Greeting and field checkboxes | Fields | Greeting text and Name, Email, Phone, Requirement ticks | ● Works | |
+| F-3.2: Requirement mapping | Row builder | Label, Process Entity, Workflow Name, Stage | ● Works | |
+| F-3.3: Cascade and resets | Rule | A new entity resets workflow and stage to the first options. A new workflow resets the stage | ● Works | |
+| F-3.4: Save Configuration | Button | Checks every requirement is fully mapped and a category is chosen, then toasts | ◐ Simulated | Every edit already autosaved, so invalid mappings are stored and Cancel cannot undo anything (G4-E-20) |
+| F-3.5: Auto Create Contact and Contact Category | Toggle, dropdown | Category list comes from the contact categories store | ● Works | |
+| F-3.6: Contact when Auto Create is off | Rule | The simulator still creates a contact, category "Lead" | ◐ Simulated | (G4-E-21). Decision needed: D-22 |
+| F-3.7: Match an existing client | Rule | Matches by phone, email or name alone | ◐ Simulated | Name alone links a stranger to a record (G4-E-22). Decision needed: D-22 |
+| F-3.8: Placeholder phone | Rule | A placeholder number is saved when none is given | ◐ Simulated | (G4-E-23) |
 
 #### 3. Worked example
+Priya maps a requirement and tests it.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Admin selects "Sequential priority" mode | Chooses Sequential priority from distribution dropdown | **Numbered priority list appears with drag handles and remove trash icons** |
-| 2 | Admin reorders Dr. Mehta above Admin User | Drags Dr. Mehta to position #1 | **Dr. Mehta becomes Priority 1 (First Responder); Admin User shifts to Priority 2 (Fallback #1)** |
-| 3 | Inbound chat arrives during working hours | Visitor initiates live chat | **Chat alerts Dr. Mehta first; if unanswered in 30 seconds, falls through to Admin User** |
-| 4 | Visitor chats outside configured working hours | Visitor messages at 10:00 PM (Hours: 9AM-5PM) | **Out-of-office response triggers: "Our care team is currently offline. We will follow up in the morning."** |
+| 1 | A new requirement row | Picks Invoice, then Billing & Invoicing | **The Stage list refreshes with that workflow's stages** |
+| 2 | Auto Create is on with no category | Presses **Save Configuration** | **A message asks for a category. The earlier edits are already saved** |
+| 3 | Test visitor "Sarah Johnson" with a different email | Submits | **The chat attaches to the existing Sarah Johnson record** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-4-J1 | Clinic Administrator | When configuring sequential routing, I want to drag team members into priority order without cluttered up/down arrows, so that escalation hierarchy is simple to manage. |
-| F-4-J2 | Practice Manager | When visitors chat after clinic closing, I want working hours enforced inside Responsible Settings, so that realistic response expectations are set. |
+| F-3-J1 | Practice Manager | When visitors pick a requirement, I want to map it to an entity, workflow and stage, so that the reply matches the topic. |
+| F-3-J2 | Front-desk Staff | When a visitor is made a contact, I want a category such as Lead, so that website inquiries land in the right segment. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-4-1 | Given "Sequential priority" mode, then a numbered drag-to-reorder list is displayed with up and down arrows removed. |
-| F-4-2 | Given working hours enabled, when a visitor chats outside open hours, then the configured out-of-office message is returned. |
+| F-3-1 | **Given** a requirement row, **when** the entity changes, **then** workflow and stage reset to the first options. |
+| F-3-2 | **Given** Auto Create Contact is on with no category, **when** Save Configuration is pressed, **then** saving is refused. Earlier edits stay saved. |
+| F-3-3 | **Given** Auto Create Contact is off, **when** the simulator runs, **then** a contact is still created as Lead. |
+| F-3-4 | **Given** a visitor name equal to an existing client, **then** the chat is linked to that client. |
 
-### F-5: Website Topbar Controls & Scoped Composer Actions
+### F-4: First responder and responsible settings
+
 #### 1. What it does
-Configures topbar and composer actions strictly tailored for Website chat. The topbar includes the "Website Widget Settings" cog button (opening the 5-section settings drawer) and the "Test Widget Chat" button (opening the interactive simulator drawer). The "New Group" button is strictly hidden. Inside the chat composer, the "Message Actions & Settings" cog button is strictly removed.
+**First Responder** is an AI Assistant or Human Agent choice. **Responsible Settings** has working hours with a branch picker, a member list, three distribution modes and an agent display option. Sequential mode shows a drag-to-reorder list labelled "Priority 1 (First Responder)" and "Fallback #n". All of it is saved and none of it is applied to any conversation.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-5.1: Widget Settings Cog Button | Button | Topbar button launching the Website Widget Settings drawer | 36x36px icon button |
-| F-5.2: Test Widget Chat Trigger | Button | Topbar button opening the Test Website Chat simulator drawer | Simulates visitor experience |
-| F-5.3: New Group Button Removal | Policy | Strictly hides "New Group" button on Website channel | Group creation exclusive to Companion |
-| F-5.4: Composer Message Actions Removal | Policy | Removes the gear cog button from the message text composer | Website channel specific |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-4.1: First Responder radio | Radio | AI Assistant or Human Agent | ◐ Simulated | Saved, never read. Decision needed: D-133 |
+| F-4.2: Responsible members | Picker | Chosen from the organisation's team roster | ● Works | |
+| F-4.3: Distribution mode | Dropdown | Simultaneous broadcast, Round-robin, Sequential priority | ◐ Simulated | Saved, never read |
+| F-4.4: Priority list | Drag list | Drag to reorder, no arrows, order saved | ● Works | Order is never used for routing |
+| F-4.5: Working hours | Toggle, branch | A branch picker with a read-only schedule synced from Org Data | ◐ Simulated | Never read. Decision needed: D-143 |
+| F-4.6: Agent display | Option | User, custom or hide, with custom profiles | ◐ Simulated | Saved, never read |
+| F-4.7: Out-of-office reply, routing and 30 second fall-through | Rule | Reply after hours and move down the list | ○ Not built | Stored, never read (G4-WEB-21). Decision needed: D-133 |
+| F-4.8: Custom days, times and timezone | Settings | Editable hours | ○ Not built | Decision needed: D-143 |
 
 #### 3. Worked example
+Priya sets up the priority order.
+
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Staff inspects Website channel topbar | Filters to Website channel | **Topbar displays Widget Settings cog and Test Chat button; "New Group" button is absent** |
-| 2 | Staff opens chat thread with website visitor | Views composer input box | **Composer features attachment paperclip and send button; Message Actions cog is removed** |
-| 3 | Staff clicks Widget Settings in topbar | Clicks settings cog | **Website Widget Settings drawer slides open with 5 structured sections** |
+| 1 | Sequential priority is chosen | Drags Dr. Anita Rao to the top | **She becomes Priority 1 (First Responder) and the order is saved** |
+| 2 | A visitor chats | Sends a message | **No one is alerted. The order is not used** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-5-J1 | Clinical Coordinator | When triaging website chats, I want a clean composer without extraneous setting icons, so that messaging is streamlined and uncluttered. |
+| F-4-J1 | Practice Admin | When setting escalation order, I want to drag people into priority, so that the hierarchy is simple to manage. |
+| F-4-J2 | Practice Manager | When visitors chat after closing, I want working hours applied, so that expectations are realistic. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-5-1 | Given the Website channel view, then the topbar contains the Widget Settings button and Test Chat button, and excludes New Group. |
-| F-5-2 | Given any active thread in Website channel, then the chat composer does not render the Message Actions & Settings cog button. |
+| F-4-1 | **Given** Sequential priority, **then** a numbered drag list is shown with no arrows and its order is saved. |
+| F-4-2 | **Given** working hours are on and a visitor chats after hours, **then** no out-of-office reply is sent. |
+
+### F-5: Design, embed code and top bar
+
+#### 1. What it does
+The first section sets theme colour and mode, bot name, a remove signature option and one of six positions. The last section shows a copyable script snippet. In the top bar there is the settings cog and no New Group. The **Test Widget Chat** button of the earlier PRD does not exist: the simulator opens from the "(dev)" link and the in-drawer test form.
+
+#### 2. What it includes
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-5.1: Settings cog | Button | Opens **Website Widget Settings** | ● Works | |
+| F-5.2: Design and position | Fields | Theme colour and mode, bot name, remove signature, six position presets | ● Works | |
+| F-5.3: Embed code | Snippet | A copyable script | ◐ Simulated | No hosted widget is traced |
+| F-5.4: Test Widget Chat | Button | Top bar button for the simulator | ○ Not built | Only a "(dev)" link and the in-drawer form. Decision needed: D-143 |
+| F-5.5: Test Website Chat drawer | Drawer | Runs the visitor simulator | ◐ Simulated | See F-2 |
+| F-5.6: New Group hidden | Rule | No New Group on Website | ● Works | |
+
+#### 3. Worked example
+Priya changes the look.
+
+| # | Situation | What the user does | Result |
+| :--- | :--- | :--- | :--- |
+| 1 | Drawer is open | Changes the bot name and picks a bottom left position | **The values are saved as she edits** |
+| 2 | She looks for Test Widget Chat | Checks the top bar | **Only the settings cog is there** |
+
+#### 4. Jobs to be done
+| # | User | Job to be done |
+| :--- | :--- | :--- |
+| F-5-J1 | Practice Admin | When the widget goes on our site, I want to set its look and copy its code, so that it matches our brand. |
+
+#### 5. Acceptance criteria
+| # | Criteria |
+| :--- | :--- |
+| F-5-1 | **Given** the Website channel, **then** the top bar has the settings cog and no New Group or Test Widget Chat button. |
+| F-5-2 | **Given** the settings drawer, **then** it has five sections: design, pre-chat form, first responder, responsible settings and embed code. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Inbound Web Widget Live Thread Aggregation | F-1.1 Session Card, F-1.2 Visitor Metadata, F-1.3 Human Takeover, F-1.4 Resolve Session | Real-time website visitor thread tracking with active page presence and manual agent takeover. |
-| F-2 | Process-Driven AI Assistant First Responder | F-2.1 Stage Prompt Resolver, F-2.2 Stage Response, F-2.3 Action Cards, F-2.4 Queue Escalation | AI engine resolving each requirement's mapped Process Entity, Workflow Name, and Stage prompt during visitor chat. |
-| F-3 | Pre-Chat Intake Form, Workflow Mapping & Contact Category | F-3.1 Greeting Message, F-3.2 Field Checkboxes, F-3.3 Entity / Workflow / Stage Mapping, F-3.4 Cascading Filtering, F-3.5 Auto Create Toggle, F-3.6 Contact Category Selector | Welcome greeting, cascading requirement mapping (Process Entity, Workflow Name, Stage), and Contact Category auto-creation. |
-| F-4 | Responsible Settings & Sequential Priority Queue | F-4.1 Member Multi-Select, F-4.2 Distribution Selector, F-4.3 Drag Reorder List, F-4.4 Persistence, F-4.5 Working Hours | Responsible team routing with drag-to-reorder sequential priority (no arrow buttons) and embedded working hours. |
-| F-5 | Website Topbar Controls & Scoped Composer | F-5.1 Widget Settings Cog, F-5.2 Test Chat Button, F-5.3 Group Button Removal, F-5.4 Composer Scoping | Topbar drawer triggers and clean composer stripping New Group and Message Actions buttons. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | Website threads | F-1.1 – F-1.7 | ◐ / ● / ○ | One sample thread; no presence, takeover or resolve. |
+| F-2 | Answer from mapped stage | F-2.1 – F-2.7 | ◐ / ○ | Simulator only; no escalation or appointment. |
+| F-3 | Pre-chat form and contacts | F-3.1 – F-3.8 | ● / ◐ | Mapping works; matching is by name alone. |
+| F-4 | First responder and routing | F-4.1 – F-4.8 | ● / ◐ / ○ | Settings saved but never applied. |
+| F-5 | Design, embed and top bar | F-5.1 – F-5.6 | ● / ◐ / ○ | Design saves; no Test Widget Chat button. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | Triage Coordinator | When website visitors ask questions on our clinic website, I want to see their active page and query in real time, so that I understand their clinical interest immediately. | F-1 |
-| 2 | Website Visitor | When I choose a requirement and start chatting on the clinic website, I want instant, relevant answers aligned with that specific service workflow stage, so that I do not receive generic replies. | F-2 |
-| 3 | Practice Administrator | When visitors select a pre-chat requirement, I want the AI to automatically load the prompt from the mapped workflow stage, so that each inquiry type follows the right conversational script. | F-2 |
-| 4 | Practice Manager | When visitors pick a pre-chat requirement, I want to map it across Process Entity, Workflow Name, and Stage, so that the AI responds with the exact stage workflow prompt for that topic. | F-3 |
-| 5 | Front-Desk Lead | When auto-creating contacts from website chat visitors, I want to assign them to a Contact Category such as `Lead` or `Client` instead of a system entity, so that new website inquiries land in the right contact segment immediately. | F-3 |
-| 6 | Clinic Administrator | When configuring sequential routing, I want to drag team members into priority order without cluttered up/down arrows, so that escalation hierarchy is simple to manage. | F-4 |
-| 7 | Practice Manager | When visitors chat after clinic closing, I want working hours enforced inside Responsible Settings, so that realistic response expectations are set. | F-4 |
-| 8 | Clinical Coordinator | When triaging website chats, I want a clean composer without extraneous setting icons, so that messaging is streamlined and uncluttered. | F-5 |
+| 1 | Care Coordinator | See the visitor's page and question as they chat | F-1 |
+| 2 | Patient | Get an answer for the service I chose | F-2 |
+| 3 | Practice Admin | Have the mapped stage prompt used | F-2 |
+| 4 | Practice Manager | Map a requirement to entity, workflow and stage | F-3 |
+| 5 | Front-desk Staff | Put new website contacts in a category | F-3 |
+| 6 | Practice Admin | Set escalation order by dragging | F-4 |
+| 7 | Practice Manager | Apply working hours after closing | F-4 |
+| 8 | Practice Admin | Set the widget look and copy its code | F-5 |
 
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Any signed-in user | Read website threads, open and change widget settings, run the simulator | Nothing |
+| Signed-out visitor | Nothing (sent to sign-in) | Everything |
+
+The earlier PRD named triage staff, front desk and administrators and did not say who edits widget settings. Decision needed: D-18.
+
+## 5. Metrics and definitions
+
+The unread badge is the only figure here. It counts unread inbound messages on the thread and clears on open. No other metric is shown.
+
+## 6. Cross-module journeys this module appears in
+
+| Journey | Step | What happens as built |
+| :--- | :--- | :--- |
+| Web form → Client → Process → Task (and website chat widget → Client → Process) | Visitor sends the first message | Only the simulator exists. A client is matched by phone, email or name alone. A contact is created even when Auto Create is off, with a placeholder phone and a `CL-SIM-<time>` id. |
+| | Requirement to workflow and stage | The mapped stage sets the reply and the activity label. The contact is not enrolled in the process. |
+| | The bot moves the visitor to a new stage | The test drawer creates or updates a Process call-log row that shows in the Process List only. |
+| | Widget conversation to an appointment | Not connected. No appointment is created. |
+| | Visitor chat to inbox | Messages appear in the Website channel. |
+| | Escalation and out-of-hours routing | Not connected. Settings are stored but never read. |
+
+Full journey: see Journeys page.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-140 | Where does Resolve live and does status apply to every channel? | F-1.7 |
+| D-133 | What is the runtime for first responder, transfer phrases, routing modes and out-of-office text? | F-2.6, F-4.1, F-4.7 |
+| D-22 | What single rule matches a visitor to a client, and what happens when Auto Create Contact is off? | F-3.6, F-3.7 |
+| D-143 | Are working hours branch-synced and read-only or custom, and where does Test Widget Chat live? | F-4.5, F-4.8, F-5.4 |
+| D-18 | Which roles may edit Website settings? | Roles |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-12 | Added Process Entity, Workflow Name and Stage mapping and Contact Category. |
+| 2026-11-10 | First version. |
