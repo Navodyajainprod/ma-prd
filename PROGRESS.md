@@ -19,7 +19,7 @@ _(append one line per ambiguous choice)_
 | Group | File | Status |
 | :--- | :--- | :--- |
 | P2 Pilot | `content/client/scribe.md` | done |
-| P2 Pilot | `content/client/invoices.md` | todo |
+| P2 Pilot | `content/client/invoices.md` | done |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/ambient-presence.md` | todo |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/aria-stage-speech.md` | todo |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/kiosk-shell.md` | todo |

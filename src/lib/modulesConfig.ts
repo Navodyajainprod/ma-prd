@@ -52,6 +52,40 @@ export const PRODUCTS: ProductConfig[] = [
   },
 ];
 
+// Tabs of the shared "Reference" module (the same pages appear under every product)
+const REFERENCE_TABS: SubModuleDefinition[] = [
+  {
+    id: "journeys",
+    name: "Journeys",
+    channel: "journeys",
+    description: "The four end-to-end journeys as built, step by step, with every hand-off between modules.",
+  },
+  {
+    id: "roles-and-access",
+    name: "Roles and access",
+    channel: "roles-and-access",
+    description: "Which roles exist, how the active role is set, and what each screen checks, as built.",
+  },
+  {
+    id: "glossary",
+    name: "Glossary and naming",
+    channel: "glossary",
+    description: "Names as shown on screen today, where the screens and the old PRD disagree, and the decisions pending.",
+  },
+  {
+    id: "open-decisions",
+    name: "Open decisions",
+    channel: "open-decisions",
+    description: "Every open product decision grouped by theme, P0 first, with the PRD pages each one affects.",
+  },
+  {
+    id: "build-status",
+    name: "Build status board",
+    channel: "build-status",
+    description: "Every PRD page with its count of Works, Simulated and Not built rows.",
+  },
+];
+
 export const ALL_MODULES: ModuleDefinition[] = [
   // ── Client Modules ──
   {
@@ -635,6 +669,21 @@ export const ALL_MODULES: ModuleDefinition[] = [
       ],
     },
   },
+
+  // ── Reference (shared across all four products) ──
+  {
+    id: "reference",
+    name: "Reference",
+    category: "REFERENCE",
+    description: "Journeys, roles and access, naming, open decisions and the build status board for the whole prototype.",
+    availableIn: { client: true, admin: true, companion: true, "ai-receptionist": true },
+    submodulesByProduct: {
+      client: REFERENCE_TABS,
+      admin: REFERENCE_TABS,
+      companion: REFERENCE_TABS,
+      "ai-receptionist": REFERENCE_TABS,
+    },
+  },
 ];
 
 export function getModulesForProduct(product: ProductId): ModuleDefinition[] {
@@ -644,7 +693,7 @@ export function getModulesForProduct(product: ProductId): ModuleDefinition[] {
       const subs = mod.submodulesByProduct?.[product];
       let cat = mod.category;
       if (product === "ai-receptionist") {
-        cat = mod.id === "settings" ? "KIOSK SETTINGS" : "AI RECEPTIONIST KIOSK";
+        cat = mod.id === "reference" ? mod.category : mod.id === "settings" ? "KIOSK SETTINGS" : "AI RECEPTIONIST KIOSK";
       }
       return {
         ...mod,

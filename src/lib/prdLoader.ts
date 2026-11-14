@@ -188,6 +188,13 @@ function parseChangeLog(markdown: string): ChangeLogRow[] {
 }
 
 export function getPrdPath(product: string, moduleName: string, channelName?: string): string | null {
+  // The "reference" module is shared by all four products: its pages live once in content/reference/
+  if (moduleName === "reference") {
+    if (!channelName) return null;
+    const refPath = path.join(process.cwd(), "content", "reference", `${channelName}.md`);
+    return fs.existsSync(refPath) ? refPath : null;
+  }
+
   // If specific channel / tab is requested (e.g. whatsapp, calendar, fields, scheduled)
   if (channelName) {
     const channelPaths = [
