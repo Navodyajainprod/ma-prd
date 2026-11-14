@@ -61,8 +61,8 @@ _(append one line per ambiguous choice)_
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/clients.md` | todo |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/overview.md` | todo |
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/reports.md` | todo |
-| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/services.md` | todo |
-| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/claims.md` | todo |
+| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/services.md` | done |
+| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/claims.md` | done |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/workflows.md` | todo |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/automation.md` | todo |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/web-forms.md` | todo |
