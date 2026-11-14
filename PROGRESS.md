@@ -48,10 +48,10 @@ _(append one line per ambiguous choice)_
 | G2 Chats | `content/client/chat/website.md` | todo |
 | G2 Chats | `content/client/chat/companion.md` | todo |
 | G2 Chats | `content/companion/chat/chat.md` | todo |
-| G3 Tasks | `content/client/tasks/my-tasks.md` | todo |
-| G3 Tasks | `content/client/tasks/tasks-by-me.md` | todo |
-| G3 Tasks | `content/admin/tasks.md` | todo |
-| G3 Tasks | `content/companion/tasks.md` | todo |
+| G3 Tasks | `content/client/tasks/my-tasks.md` | done |
+| G3 Tasks | `content/client/tasks/tasks-by-me.md` | done |
+| G3 Tasks | `content/admin/tasks.md` | done |
+| G3 Tasks | `content/companion/tasks.md` | done |
 | G4 Appointments | `content/client/appointments/availability.md` | todo |
 | G4 Appointments | `content/client/appointments/calendar.md` | todo |
 | G4 Appointments | `content/client/appointments/list.md` | todo |

@@ -1,174 +1,264 @@
 ---
-title: "Patient My Tasks, Clinical Protocols & Live Sync"
+title: "Patient My Tasks, Care Protocols and Live Sync"
 product: "companion"
 module: "tasks"
+route: "/patient/tasks and /patient/tasks/:taskId"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-12"
-last_updated: "2026-11-12"
+last_updated: "2026-11-14"
 ---
 
-| Product | Companion (Patient Mobile & Web Portal) |
-| :--- | :--- |
-| Module | Care Plan - My Tasks (`/patient/tasks` & `/patient/tasks/:taskId`) |
+| Product | COMPANION |
+| Module | TASKS |
+| Route | `/patient/tasks` and `/patient/tasks/:taskId` |
 | Status | In Review |
+| Build status | Partly simulated |
 | Created | 2026-11-12 |
-| Last updated | 2026-11-12 |
+| Last updated | 2026-11-14 |
+
+## At a glance
+
+| | |
+| :--- | :--- |
+| **What it is** | A patient task list with Action Needed and Done counts, and a detail screen where the patient checks off numbered deliverables with images, video, files, links and instruction blocks. |
+| **Who uses it** | Patient. The clinic's Care Coordinator creates the tasks. |
+| **Where you start it** | **Tasks** in the portal drawer, the recent tasks card on Today, a **Task Assigned** chat message, or a direct link. |
+| **Where the result goes** | The same task record the clinic reads in Tasks by me. A completion raises a notice in the shared bell. |
+| **How real is it** | 0 features work, 4 are partly simulated, 0 are not built. See the legend below. |
+
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client | Care Team Assignment & Live Completion Sync | Whenever clinicians assign a task to a **Client Contact** in **Tasks by me**, it appears immediately inside **My Tasks**; checking off deliverables updates clinic progress trackers live and auto-completes the task when finished. | [View in Client Tasks by me](/client/tasks/tasks-by-me) |
-| Companion | Care Chat Task Notifications | When coordinators use **Share -> Client Portal**, a `Task Assigned` card with stage, deadline, and direct portal link arrives straight inside the patient's Companion Chat conversation. | [View in Companion Chat](/companion/chat/chat) |
-| Companion | Today's Agenda & Intake Forms Coordination | Keeps prescribed pre-visit checklists, HIPAA consent steps, and post-consult routines aligned alongside upcoming appointments and forms. | [View in Companion Today](/companion/today) |
-| Admin | Corporate Task Firewall | Corporate and multi-org administrative tasks stay strictly hidden from the patient portal—never appearing in lists and blocking direct URL access safely. | [View in Admin](/admin/tasks) |
+| Client (Tasks by me) | Assignment and live completion | A task made for a **Client Contact** shows in the patient's list. The patient's check-offs and the auto-completion are written to the same browser store the clinic reads. The clinic picks patients from a static catalog. | [View Tasks by me](/client/tasks/tasks-by-me) |
+| Companion (Chat) | Task Assigned message | **Share** then **Client Portal** posts a plain text message "Task Assigned" with title, stage, deadline and a link. It is text, not a card. | [View Companion Chat](/companion/chat/chat) |
+| Companion (Today) | Recent tasks | Today shows the three most recent tasks with the same visibility rules. | [View Today](/companion/today) |
+| Admin | Corporate task firewall | Admin tasks are left out of the list and a direct link shows **Task Not Available**. Sharing an Admin task to the Client Portal can still put it in a chat. | [View Admin Tasks](/admin/tasks) |
+| Client (Workflows) | Tasks from automation | Not connected. No automation or form creates a patient task, and the refill-to-task idea in Pharmacy is not built. | [View Pharmacy](/companion/pharmacy) |
 
 ## 1. Module Summary
-- The **Patient My Tasks, Clinical Protocols & Live Sync** module gives patients a calm, mobile-friendly **My Tasks** center (`/patient/tasks`) to review care-team instructions, read rich multimedia guides, check off prescribed deliverables step by step, and stay synchronized with their care team without exposed internal clinic jargon.
-- Every item completion updates the care team's Client Portal console in real time, while internal clinic task codes (`TSK-*`), internal brackets, workflow stage controls, and corporate Admin tasks stay cleanly stripped or blocked from patient view.
+
+### The story in one minute
+
+Sarah Johnson opens **Tasks** in her portal the evening before her cataract surgery. The header shows **Action Needed** and **Done** counts, and the **Action Needed** tab is selected. A row reads "Complete Intake Medical History", with a ring at 2/3 and a due date. Titles carry no `TSK-` code and no bracket tags. She taps the row. The detail screen shows "Assigned by your clinical care team" and three numbered items. She plays the fasting video under item 3, reads the instruction block and presses **Mark as done**. The ring fills, a toast appears and the task becomes Completed. Priya Nair, the Care Coordinator, sees the same task finished on her side.
+
+### What is real and what is not
+
+- **Real in the prototype:** the list with counts, tabs and search, the clean titles, the detail screen with Mark as done and Undo, the rich resource cards, the live sync with the clinic (one shared browser store) and the lock screen.
+- **Simulated:** which tasks a patient sees (a name-contains match, and portal tasks with no named patient show for everyone), the notice to the clinic (a shared bell with no recipient), and link and file addresses that are not checked.
+- **Not built:** a real per-patient identity check, a Task Assigned card in chat, tasks created from refills or automation, and a loading or error state.
+
+### Journey position
+
+```
+Staff creates task ─▶ Patient list ─▶ Detail ─▶ Mark as done ─▶ Task Completed ─▶ Clinic Tasks by me
+Staff Share ─▶ Chat text "Task Assigned" ─▶ Patient list
+```
 
 ## 2. Feature Requests
 
-### F-1: Patient **My Tasks** Hub, Summary Counters & Search (`/patient/tasks`)
+### F-1: Task list, counts and search
+
 #### 1. What it does
-Displays all portal-scoped and patient-assigned tasks personalized to the active patient profile, organized for fast daily check-ins:
-- **Live Status Pills:** Header displays instant counts for **`Action Needed`** (blue clock pill) and **`Done`** (emerald check pill).
-- **Three Filter Tabs + Instant Search:** Switches cleanly between **`Action Needed (N)`** (default), **`Completed (N)`**, and **`All Tasks (N)`**, paired with a live **`Search deliverables...`** input matching cleaned task titles, descriptions, and individual deliverable titles.
-- **Clean Patient-Friendly Rows:** Each row displays a circular completion ring (`X/Y done`), optional Important star, sanitized title (automatically stripping internal `[bracket]` tags and `TSK-*` tracking codes), due date (`Calendar` label), and crisp `Action Needed` / `Completed` status pill. When no items match, shows a warm **`"All Caught Up!"`** (or search reset) empty card.
+Sarah opens **Tasks** and sees two counts, **Action Needed** and **Done**. Three tabs, **Action Needed (N)**, **Completed (N)** and **All Tasks (N)**, sit above a **Search deliverables...** box. Each row has a ring (X/Y done), an Important star, a cleaned title, a due date and a status pill. With nothing to show the screen says "All Caught Up!". Today also shows her three most recent tasks.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: `Action Needed` & `Done` Summary Pills | Status Header | Summarizes remaining actionable deliverables vs completed tasks at a glance | Updates live as items are checked off |
-| F-1.2: Tab Switcher & Deliverables Search | Filter Controls | Switches across `Action Needed`, `Completed`, and `All Tasks` and filters across task + item text | Hides technical workflow/stage clutter |
-| F-1.3: Clean Title Sanitization | Patient Copy Hygiene | Strips `[admin]` brackets and `TSK-###:` codes automatically from patient-facing headlines | Keeps language welcoming and human |
-| F-1.4: Progress Ring Row Cards | Visual Tracker | Shows `X/Y done` ring, due date, and priority star per assigned care task | Tapping opens `/patient/tasks/:taskId` |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: Action Needed and Done counts | Metric | Count of tasks by the patient's own completed deliverables | ● Works | Updates as items are checked |
+| F-1.2: Tabs and search | Filter | Action Needed (default), Completed, All Tasks, with search over cleaned title, description and deliverable titles | ● Works | |
+| F-1.3: Title cleaning | Rule | Drops a leading `[tag]` and a `TSK-123:` prefix | ● Works | |
+| F-1.4: Row card | Row | Ring, star, due date and status pill. Tapping opens `/patient/tasks/:taskId` | ● Works | |
+| F-1.5: Empty states | State | "All Caught Up!" or "No matching tasks found" | ● Works | |
+| F-1.6: Which tasks a patient sees | Rule | Never Admin tasks. Portal-scope or client-contact tasks assigned by id, by a name that contains the patient's name, in the assignee lists, or portal tasks with no named person | ◐ Simulated | A short name such as "Ann" matches "Joanna". Portal tasks with no named patient show for everyone (G12-E-36). Decision needed: D-106 |
+| F-1.7: Recent tasks on Today | Card | The three most recent tasks with progress | ● Works | Same rules as this list |
+| F-1.8: Loading and error states | State | None exist | ○ Not built | Tasks are stored in the browser |
 
 #### 3. Worked example
-| # | Situation | What the patient does | Result |
+Sarah prepares for her visit.
+
+| # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Sarah opens My Tasks before her appointment | Views `Action Needed (2)` pill, scans `Complete Intake Medical History & HIPAA Consent` (`2/3 done`), and taps the row | **Opens the task deliverable page cleanly without exposing internal `TSK-104` tracking codes** |
+| 1 | List opens | Reads the header | **Action Needed shows 2 and Done shows 1** |
+| 2 | She wants the intake task | Types "history" in search | **Only matching tasks remain, titles without TSK codes** |
+| 3 | She finishes everything | Opens the list | **The Action Needed tab shows "All Caught Up!"** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Outpatient Patient | When preparing for a clinic visit or recovery routine, I want a clean list showing only what still needs my action vs what I already finished. |
+| F-1-J1 | Patient | When I prepare for a visit, I want a clean list of what still needs my action, so that I do not miss a step. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Internal prefixes (`TSK-###:` and `[...]`) are stripped cleanly from all titles in `/patient/tasks` and `/patient/tasks/:taskId`. |
-| F-1-2 | Filtering between `Action Needed`, `Completed`, and `All Tasks` immediately updates the displayed rows to match the patient's own deliverable completion state. |
+| F-1-1 | **Given** a task title with `TSK-123:` or a `[tag]` prefix, **then** the portal shows the title without it. |
+| F-1-2 | **Given** a tab choice, **then** the rows match the patient's own completion state. |
+| F-1-3 | **Given** a patient named "Ann", **then** a task assigned to a name containing "ann" is also shown to her. |
+| F-1-4 | **Given** a portal task with no named patient, **then** every patient sees it. |
 
----
+### F-2: Task detail and live sync
 
-### F-2: Deliverable Execution Screen & Live Clinic Sync (`/patient/tasks/:taskId`)
 #### 1. What it does
-Tapping any task opens a focused single-column execution screen built around **Task Info** and numbered **Your Deliverables**:
-- **Task Info Card:** Shows **`Back to My Tasks`**, optional **`Priority Care`** star badge, sanitized title, `Assigned by your clinical care team • [Date]`, large circular progress ring, calm blue clinical summary box, due date, and exact **`X/Y items completed (Z%)`** progress text.
-- **Numbered Deliverable Cards (`Mark as done` / `Completed (Undo)`):** Lists each clinical step (`1`, `2`, `3` turning emerald `✓` on completion) with optional priority star, instructions, and a prominent **`Mark as done`** button. Checking off an item immediately triggers a confirmation toast, updates the progress ring in place, updates the clinician's **View Breakdown** inside Client Portal, and automatically transitions the overall clinical task to **`Completed`** (`"Task Completed"` notification) once all responsible assignees finish. Accidentally tapped items revert cleanly via **`Completed (Undo)`**.
+Sarah taps a row. The page shows **Back to My Tasks**, a **Priority Care** badge when the task is important, the title, "Assigned by your clinical care team • <date>", a progress ring and "X/Y items completed (Z%)". Numbered cards list the steps. **Mark as done** turns a card green and a toast appears. **Completed (Undo)** reverses it.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: Patient Progress Ring & Header | Status Card | Displays patient-specific `%` progress, due date, and `Priority Care` badge | Never exposes clinic internal workflow stages |
-| F-2.2: One-Tap **Mark as done / Undo** | Completion Control | Records per-patient item completion timestamp and toggles visual state cleanly | Syncs bi-directionally to Client Portal instantly |
-| F-2.3: Automatic Task Closure Handoff | Cross-Product Trigger | Marks the shared care task Completed and alerts the clinician when the patient checks off their final deliverable | Reopens cleanly if patient taps `Undo` |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Header and progress | Display | Badge, title, assigned-by line, ring and progress text. No clinic stage shows | ● Works | |
+| F-2.2: Mark as done and Undo | Toggle | Records this patient's completion and time per item, with a toast | ● Works | |
+| F-2.3: Auto-close and reopen | Rule | When all responsible people are done the task is Completed. Undo reopens it | ● Works | |
+| F-2.4: Sync to the clinic | Hand-off | The clinic's table and breakdown read the same record | ● Works | One browser store, so it works in one browser only |
+| F-2.5: Notice to the clinic | Notice | A "Task Completed" notice is raised | ◐ Simulated | It has no recipient and goes to the shared bell (G5-E-29). Decision needed: D-107 |
 
 #### 3. Worked example
-| # | Situation | What the patient does | Result |
+Sarah finishes the third item.
+
+| # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient finishes the third item (`E-sign HIPAA disclosure agreement`) in their onboarding task | Taps **`Mark as done`** on Item 3 | **Progress ring fills to `100%` (`3/3 items completed`), badge turns `Completed`, and clinician's Client Tasks dashboard marks Sarah `Done` + completes the task** |
+| 1 | Two of three done | Presses **Mark as done** on item 3 | **The ring shows 100 percent, 3/3 items completed, and the task is Completed** |
+| 2 | She tapped by mistake | Presses **Completed (Undo)** | **The item reopens and the task returns to Action Needed** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Patient at Home | When I finish each step my doctor requested, I want one tap to check it off—and undo if tapped by mistake—knowing my care team sees it immediately. |
+| F-2-J1 | Patient | When I finish a step my doctor asked for, I want one tap to check it off and undo it, so that my care team sees it. |
+| F-2-J2 | Care Coordinator | After I assign a task to a patient, I want to see their progress, so that I know whether to follow up. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Tapping **`Mark as done`** updates `X/Y items completed (%)` immediately and synchronizes completion state to Client Portal's Task Detail breakdown. |
-| F-2-2 | Tapping **`Completed (Undo)`** reverses item completion cleanly and restores the task to `Action Needed`. |
+| F-2-1 | **Given** a task detail, **when** Mark as done is pressed, **then** X/Y and the percent update at once and the clinic side reads the new state. |
+| F-2-2 | **Given** all responsible people are done, **then** the task is Completed. **When** Undo is pressed, **then** it returns to Action Needed. |
 
----
+### F-3: Rich resources in each step
 
-### F-3: Rich Multimedia Clinical Resources & Downloads
 #### 1. What it does
-Clinician-authored **Task Studio** deliverables render natively inside each patient card so patients never have to hunt across emails or apps for supporting guides:
-- **Images:** Displays high-resolution diagrams, device setup photos, or exercise guides cleanly inside rounded cards.
-- **Videos:** Embedded inline video player with full playback controls for physiotherapy routines or inhaler demonstrations.
-- **Downloadable Files:** Displays attachment card with filename and file size (`Download Document`) for one-tap PDF/consent downloads.
-- **External URLs:** Highlighted link pills opening trusted educational portals or external questionnaires in a safe new tab.
-- **Clinical Instructions & Protocol (`HTML` Block):** Renders formatted prep checklists (such as fasting rules, medication hold windows, or pre-op steps) inside a cleanly framed **`Clinical Instructions & Protocol`** box.
+Clinic-authored deliverables render in the patient's card. Sarah sees images, plays video with controls, downloads a file, opens a link and reads a framed **Clinical Instructions & Protocol** block.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Inline Photo & Video Cards | Visual Guidance | Displays clinical diagrams and embedded instructional videos directly below task steps | Supports playback controls without leaving app |
-| F-3.2: Safe Document Download & Links | File & URL Delivery | Provides direct file downloads (showing size/name) and external educational links | Eliminates scattered attachments |
-| F-3.3: Framed Protocol HTML Sheet | Rich Prep Instructions | Displays formatted clinical protocol HTML safely inside an isolated scrollable panel | Keeps formatting legible on mobile & web |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Image and video | Display | Inline image and a player with controls | ● Works | |
+| F-3.2: File download and link | Display | A file card with name and size, and a link opening in a new tab | ◐ Simulated | Link and file addresses are not checked to be web addresses (G12-E-37) |
+| F-3.3: Instruction block | Display | Formatted HTML in a framed, scrollable box | ● Works | |
 
 #### 3. Worked example
-| # | Situation | What the patient does | Result |
+Sarah follows a recovery routine.
+
+| # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Physical therapy recovery task includes an exercise clip and fasting prep checklist | Taps play on the inline video inside Item 1 and reads the **`Clinical Instructions & Protocol`** block below Item 2 | **Patient follows visual exercise technique and formatted prep checklist right inside the task card** |
+| 1 | Item 1 has a video | Plays it in the card | **It plays inline** |
+| 2 | Item 2 has a protocol | Reads the box | **A framed checklist shows** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Post-Op Patient | When instructions require exercises or PDF handouts, I want videos, documents, and checklists right inside each step so I don't search through old emails. |
+| F-3-J1 | Patient | When a step needs a video or handout, I want it inside the step, so that I do not search my email. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Every Task Studio resource type (`image`, `video`, `url`, `file`, `html`) authored in Client Portal renders cleanly inside the matching deliverable card in `/patient/tasks/:taskId`. |
+| F-3-1 | **Given** a step authored with image, video, file, link or HTML, **then** the matching card renders in the detail screen. |
+| F-3-2 | **Given** a link address that is not http or https, **then** it is still placed in the link. |
 
----
+### F-4: Privacy scoping and lock screen
 
-### F-4: Strict Patient Privacy Scoping & Corporate Admin Firewall
 #### 1. What it does
-Enforces strict patient-level authorization before rendering any task list or detail page:
-- **Admin Scope Lockout:** Tasks created in **Admin (`/admin/tasks`)** never appear in `/patient/tasks` lists under any filter.
-- **Cross-Patient Isolation:** Displays only tasks targeted to the Patient Portal or explicitly assigned to the signed-in patient's ID/name (`assignee`, multi-assignee list, or responsible people)—preventing any patient from viewing another patient's tasks or internal clinic-staff tasks.
-- **Direct URL Lock Screen:** If a user opens a restricted, Admin-only, missing, or another patient's task ID directly via `/patient/tasks/:taskId`, Companion displays a safe **`Task Not Available`** lock screen (`Lock` icon + permission note) with a clear **`Return to My Tasks`** button.
+The portal keeps Admin tasks out of the list. A direct link to a missing, Admin or unmatched task shows **Task Not Available** with a lock icon and **Return to My Tasks**. The screen shows no task content.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-4.1: Admin Scope Exclusion | Hard Firewall | Blocks all corporate administrative tasks from patient queries and detail pages | Protects clinic billing, audit, and staffing memos |
-| F-4.2: Active Patient Match Guard | Identity Filter | Verifies signed-in patient matches the task's contact target or portal visibility before display | Prevents cross-patient data leakage |
-| F-4.3: `"Task Not Available"` Recovery View | Safe Fallback | Replaces unauthorized detail links with a lock screen and `Return to My Tasks` CTA | Never leaks partial task titles or descriptions |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-4.1: Admin exclusion | Rule | Admin tasks never appear in the list or the detail | ● Works | The Admin Share drawer can still post one into a chat (G5-E-26) |
+| F-4.2: Patient match guard | Rule | Matches the signed-in patient by id or name contains | ◐ Simulated | Loose name match. The "no active patient" denial can never trigger because a visitor with no session becomes the first client (G12-E-36, unverified) |
+| F-4.3: Task Not Available | State | Lock screen for missing, Admin or unmatched tasks | ● Works | |
+| F-4.4: Tasks from refills | Hand-off | A refill request creates a task for the prescriber | ○ Not built | Described in the Pharmacy PRD, nothing exists (G12-I-109) |
 
 #### 3. Worked example
-| # | Situation | What happens | Result |
+A patient opens an Admin task link.
+
+| # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | User navigates to `/patient/tasks/tsk-002` (an Admin credentialing audit) or another patient's task URL | Authorization guard checks scope (`admin`) and patient identity match | **Blocked immediately; displays `"Task Not Available"` lock card with `"Return to My Tasks"` action** |
+| 1 | Link to an Admin task | Opens it | **Task Not Available and Return to My Tasks. No title shows** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-4-J1 | Patient Privacy & Trust Lead | When patients open deep links from notifications or bookmarks, I want strict scoping checks so internal admin tasks or other patients' records are never accessible. |
+| F-4-J1 | Patient | When I open a task link from a message, I want to see only my own tasks, so that my care stays private. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-4-1 | Navigating to any Admin-scoped task, internal staff task, or another patient's task ID at `/patient/tasks/:taskId` MUST render `"Task Not Available"` with zero leaked task content. |
-
----
+| F-4-1 | **Given** an Admin-scope task, **then** it is not listed and its link shows Task Not Available. |
+| F-4-2 | **Given** a task whose name contains the patient's name, **then** it is treated as theirs. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Patient **My Tasks** Hub & Search | F-1.1 to F-1.4 | Shows `Action Needed` vs `Completed` counters, progress rings, search, and clean sanitized titles. |
-| F-2 | Deliverable Execution & Live Clinic Sync | F-2.1 to F-2.3 | Lets patients toggle `Mark as done` / `Undo` per item and syncs progress + closure to Client Portal. |
-| F-3 | Rich Multimedia Clinical Resources | F-3.1 to F-3.3 | Renders inline photos, videos, external URLs, file downloads, and framed HTML protocols. |
-| F-4 | Privacy Scoping & Admin Firewall | F-4.1 to F-4.3 | Restricts access strictly to the signed-in patient's portal tasks and blocks Admin/internal items cleanly. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | Task list, counts and search | F-1.1 – F-1.8 | ● / ◐ / ○ | List works; visibility uses a loose name match. |
+| F-2 | Task detail and live sync | F-2.1 – F-2.5 | ● / ◐ | Check-off and sync work; notice has no recipient. |
+| F-3 | Rich resources in each step | F-3.1 – F-3.3 | ● / ◐ | Resources render; links unchecked. |
+| F-4 | Privacy scoping and lock screen | F-4.1 – F-4.4 | ● / ◐ / ○ | Admin firewall works; patient match is loose. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | Outpatient / Post-Op Patient | Track action-needed steps, follow videos/protocols, and check off completed care tasks smoothly. | F-1, F-2, F-3 |
-| 2 | Patient Privacy & Trust Lead | Guarantee patients see only their own care deliverables with zero Admin or cross-patient leaks. | F-4 |
+| 1 | Patient | See what still needs my action | F-1 |
+| 2 | Patient | Check off a step and undo it | F-2 |
+| 3 | Care Coordinator | See a patient's progress | F-2 |
+| 4 | Patient | See a video or handout inside the step | F-3 |
+| 5 | Patient | See only my own tasks | F-4 |
+
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Patient (signed in to the portal) | See tasks that match by id or name, check off items | Admin tasks, tasks that do not match |
+| Another patient with a similar name | See a task whose name contains theirs | Nothing further |
+| Signed-out visitor | Treated as the first client in the list (unverified, G12-E-01) | Nothing |
+
+The earlier PRD promises "zero leaked task content" and "cross-patient isolation". The prototype does not enforce a real identity. Decision needed: D-106.
+
+## 5. Metrics and definitions
+
+| Metric | Where | Formula as built |
+| :--- | :--- | :--- |
+| Action Needed and Done | List header | Count of tasks by the patient's own completed deliverables compared with all deliverables |
+| Row ring (X/Y done) | List | Deliverables this patient checked out of all deliverables |
+| X/Y items completed (Z%) | Detail | The same ratio, with the percent |
+
+## 6. Cross-module journeys this module appears in
+
+| Journey | Step | What happens as built |
+| :--- | :--- | :--- |
+| Patient portal ↔ Appointments / Invoices | Staff creates a task for a client contact | Reaches the list by id or name contains. Portal tasks with no named patient show for everyone. |
+| | Patient completes a task | Auto-completes the task and raises a notice in the shared bell. |
+| | Staff shares a task to the Client Portal | A plain text message with a link, not a card. |
+| Web form → Client → Process → Task | Task for staff | Not connected. No automation creates a task. |
+
+Full journey: see Journeys page.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-106 | May a portal task with no named patient show for everyone, and is Admin task sharing to patients disabled? | F-1.6, F-4.1, F-4.2 |
+| D-107 | Who receives each task notification, and should the chat notice be a card? | F-2.5 |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-12 | First version. |
