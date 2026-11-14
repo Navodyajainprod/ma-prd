@@ -63,10 +63,10 @@ _(append one line per ambiguous choice)_
 | G5 Call Logs, Process, Clients, Overview, Reports | `content/client/reports.md` | done |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/services.md` | done |
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/claims.md` | done |
-| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/workflows.md` | todo |
-| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/automation.md` | todo |
-| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/web-forms.md` | todo |
-| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/knowledge-base.md` | todo |
+| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/workflows.md` | done |
+| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/automation.md` | done |
+| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/web-forms.md` | done |
+| G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/knowledge-base.md` | done |
 | G7 Client Settings | `content/client/settings/audit-logs.md` | done |
 | G7 Client Settings | `content/client/settings/billing.md` | done |
 | G7 Client Settings | `content/client/settings/custom-fields.md` | todo |
