@@ -1,24 +1,27 @@
 ---
-title: "WhatsApp Messaging, 24-Hour Service Window & Meta HSM Templates"
+title: "WhatsApp Messaging, Workflow Allocation & 24-Hour Service Window"
 product: "Client"
 module: "chat"
 channel: "whatsapp"
 status: "In Review"
 created_date: "2026-11-10"
-last_updated: "2026-11-10"
+last_updated: "2026-11-14"
 ---
 
 | Product | Client |
 | Module | Chats & Care Groups - WhatsApp Channel (`/chats?channel=whatsapp`) |
 | Status | In Review |
 | Created | 2026-11-10 |
-| Last updated | 2026-11-10 |
+| Last updated | 2026-11-14 |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Companion | Direct Patient Outreach via WhatsApp | Outbound clinical notifications (appointment reminders, lab availability alerts) dispatched to the patient's mobile number via WhatsApp appear seamlessly in their thread history without requiring them to install the Companion portal. | [View in Companion](/companion/chat) |
+| Client (Settings > Integrations) | Meta WhatsApp Embedded Signup | Practice admins add clinic WhatsApp numbers through Meta's official Embedded Signup onboarding flow. Registered numbers are stored in the practice phone pool and made available for workflow allocation. | [View Integrations](/client/settings/integrations) |
+| Client (Workflows / Process) | Number allocation & AI prompt routing | Numbers added in Integrations are allocated to workflows. **Cardinality rule:** One workflow can have multiple WhatsApp numbers, but no single number can belong to more than one workflow. When a stage triggers an outbound message to a client ("Reach out to client"), the message dispatches from the allocated number. When an inbound message arrives at that number, the conversational AI executes the specific prompt and knowledge base configured for that workflow. | [View Workflows](/client/workflows) |
+| Client (Chats Inbox) | Multi-clinic triage & number switcher | Staff monitor live threads across clinic lines using the topbar number switcher, handle manual bot takeover, enforce 24-hour service window compliance, and dispatch approved Meta HSM templates. | [View Chats Inbox](/client/chat/chat) |
+| Client (Clients) | Activity timeline write-back | All inbound patient messages, automated AI chatbot turns, staff replies, and template dispatches are recorded on the client's Activity timeline with WhatsApp badges. | [View Clients](/client/clients) |
 
 ## 1. Module Summary
 - The WhatsApp channel within Client Chats provides a verified healthcare communication interface connected to the Meta WhatsApp Business Cloud API. It enables clinical care teams and practice staff to manage real-time patient conversations, triage inbound inquiries, switch between multiple clinic phone numbers, and dispatch broadcast notifications.
@@ -160,18 +163,27 @@ Configures the channel-specific topbar controls for WhatsApp. The topbar include
 
 ### F-5: Workflow-Driven AI Chatbot Binding per WhatsApp Number (Prompt & Knowledge Base Scoping)
 #### 1. What it does
-Binds each integration-configured WhatsApp Business phone number to a specific clinical or administrative workflow pipeline. The automated AI chatbot answering on each WhatsApp number dynamically inherits and adheres to the **AI Prompt** (persona, instructions, clinical boundaries, and intake scripts) and the **Knowledge Base (KB)** (protocol documents, triage guides, service pricing, and FAQs) configured on its attached workflow.
+In **Settings > Integrations**, practice admins add clinic WhatsApp numbers through Meta's Embedded Signup flow. Once connected, these numbers become available in **Workflows** (`/process` → Chatbot Channel Settings).
+
+Each workflow can be allocated one or more WhatsApp numbers, but **strict cardinality is enforced: one workflow can have multiple WhatsApp numbers, but no single phone number can belong to more than one workflow**.
+
+This powers two-way automated clinical routing:
+1. **Outbound Stage Triggers ("Client reach out to us / Reach out to client")**: When an automation stage triggers an outbound message to a client, the message dispatches directly from the workflow's allocated WhatsApp number(s).
+2. **Inbound Stage Ingestion & AI Prompt Execution**: When a patient sends an inbound WhatsApp message to that number, it routes to that workflow, and the conversational AI chatbot answering on that number dynamically inherits and adheres to the **AI Prompt** (persona, instructions, clinical boundaries, and intake scripts) and the **Knowledge Base (KB)** (protocol documents, triage guides, service pricing, and FAQs) configured on that specific workflow.
 
 This guarantees that a clinic running multiple distinct service lines on different WhatsApp numbers automatically isolates AI behavior: inquiries to a dedicated dental line follow dental prompts and dental knowledge articles, while inquiries to an urgent care or cardiology line follow their respective clinical guidelines without cross-contamination.
 
 #### 2. What it includes
 | Item | Type | What it does | Notes |
 | :--- | :--- | :--- | :--- |
-| F-5.1: Number-to-Workflow Routing Resolver | System Service | Maps incoming WhatsApp phone numbers to the target workflow ID and initial entry stage (`useStageNumberRouting`) | Configured via Settings > Integrations and Workflow Chatbot Drawer |
-| F-5.2: Workflow AI Prompt Adherence | LLM Runtime | Injects the attached workflow and stage's AI Prompt as the chatbot's system instruction | Sets conversation style, intake questions, tone, and guardrails |
-| F-5.3: Scoped Knowledge Base RAG Retrieval | Context Engine | Restricts AI vector retrieval and reference lookups exclusively to the Knowledge Base sources linked to the attached workflow | Prevents leakage of unrelated clinic data across different numbers |
-| F-5.4: In-Chat Stage Progression & Automations | State Machine | Matches patient responses against workflow `inchat` triggers and intent steps (e.g. moving patient to "Needs Assessment" or "Booked") | Evaluates trigger conditions in real time |
-| F-5.5: Human Handover & Bot Pause | Control Toggle | Pauses the AI chatbot and tags the thread as "Assigned: <Staff Name>" whenever an escalation condition triggers or staff sends a manual reply | Preserves clinical oversight |
+| F-5.1: Embedded Signup & Number Availability | Integration | Numbers added via Meta Embedded Signup in Settings > Integrations become available in Workflow Chatbot Channel Settings | Centralized practice number pool |
+| F-5.2: Multi-Number Workflow Allocation (1:N Rule) | Configuration | Allows allocating multiple numbers to one workflow; strictly forbids assigning one number to multiple workflows | Prevents inbound collision across workflows |
+| F-5.3: Outbound Stage Dispatch | Execution | Automatically sends stage outreach ("Reach out to client") from the allocated workflow number | Dispatched via Meta WhatsApp Cloud API |
+| F-5.4: Inbound Number-to-Workflow Routing Resolver | System Service | Maps incoming WhatsApp phone numbers to the target workflow ID and initial entry stage (`useStageNumberRouting`) | Direct deterministic 1:1 number lookup |
+| F-5.5: Workflow AI Prompt Adherence | LLM Runtime | Injects the attached workflow and stage's AI Prompt as the chatbot's system instruction | Sets conversation style, intake questions, tone, and guardrails |
+| F-5.6: Scoped Knowledge Base RAG Retrieval | Context Engine | Restricts AI vector retrieval and reference lookups exclusively to the Knowledge Base sources linked to the attached workflow | Prevents leakage of unrelated clinic data across different numbers |
+| F-5.7: In-Chat Stage Progression & Automations | State Machine | Matches patient responses against workflow `inchat` triggers and intent steps (e.g. moving patient to "Needs Assessment" or "Booked") | Evaluates trigger conditions in real time |
+| F-5.8: Human Handover & Bot Pause | Control Toggle | Pauses the AI chatbot and tags the thread as "Assigned: <Staff Name>" whenever an escalation condition triggers or staff sends a manual reply | Preserves clinical oversight |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
@@ -189,10 +201,13 @@ This guarantees that a clinic running multiple distinct service lines on differe
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-5-1 | Given a WhatsApp number attached to Workflow X, when an inbound message arrives, then the AI chatbot uses Workflow X's AI Prompt as its system instructions. |
-| F-5-2 | Given a query requiring clinic information, then the chatbot retrieves context strictly from the Knowledge Base sources attached to Workflow X. |
-| F-5-3 | Inbound messages to a WhatsApp number attached to Workflow Y must never retrieve or reference knowledge sources exclusively scoped to Workflow X. |
-| F-5-4 | When an in-chat automation matches a patient response, the system updates the client's workflow stage in real time. |
+| F-5-1 | Given WhatsApp numbers connected via Meta Embedded Signup in Settings > Integrations, they are available to be allocated in Workflow Chatbot Channel Settings. |
+| F-5-2 | Given a workflow, it can be allocated multiple WhatsApp numbers; however, no single phone number can belong to more than one workflow. |
+| F-5-3 | Given an outbound workflow stage trigger ("Reach out to client"), the message is dispatched from the workflow's allocated WhatsApp number. |
+| F-5-4 | Given an inbound message arriving at an allocated WhatsApp number, the AI chatbot executes using that workflow's specific AI Prompt as its system instructions. |
+| F-5-5 | Given a query requiring clinic information, the chatbot retrieves context strictly from Knowledge Base sources attached to that workflow. |
+| F-5-6 | Inbound messages to a WhatsApp number attached to Workflow Y must never retrieve or reference knowledge sources exclusively scoped to Workflow X. |
+| F-5-7 | When an in-chat automation matches a patient response, the system updates the client's workflow stage in real time. |
 
 ## 3. Comprehensive Summary
 
