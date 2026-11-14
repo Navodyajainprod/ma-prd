@@ -52,7 +52,7 @@ function renderStatusCell(cell: string): React.ReactNode {
   const badges: React.ReactNode[] = [];
   let m: RegExpExecArray | null;
   while ((m = re.exec(cell)) !== null) {
-    badges.push(<StatusBadge key={badges.length} mark={m[1]} text={m[2].trim()} />);
+    badges.push(<StatusBadge key={badges.length} mark={m[1]} text={m[2].replace(/^[\s/\u00b7,]+|[\s/\u00b7,]+$/g, "")} />);
   }
   return badges.length > 0 ? badges : formatInlineMarkdown(cell);
 }
@@ -65,13 +65,13 @@ function StatusLegend() {
     >
       <span className="font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Legend</span>
       <span className="inline-flex items-center gap-1.5">
-        <StatusBadge mark={"\u25CF"} /> built and runs as described
+        <StatusBadge mark={"\u25CF"} /> behaves as described in the prototype
       </span>
       <span className="inline-flex items-center gap-1.5">
-        <StatusBadge mark={"\u25D0"} /> on screen, but mock, hardcoded or only partly working
+        <StatusBadge mark={"\u25D0"} /> looks live on screen but uses preset or placeholder data, or only shows a confirmation
       </span>
       <span className="inline-flex items-center gap-1.5">
-        <StatusBadge mark={"\u25CB"} /> not in the prototype, or not reachable from the UI
+        <StatusBadge mark={"\u25CB"} /> described so the intent is not lost; nothing happens in the prototype
       </span>
     </div>
   );
@@ -79,8 +79,16 @@ function StatusLegend() {
 
 function BuildStatusBadge({ value }: { value: string }) {
   const key = value.trim().toLowerCase();
-  if (key === "works") return <StatusBadge mark={"\u25CF"} text="Works" />;
+  if (key === "not-built" || key.includes("not built")) {
+    return <StatusBadge mark={"\u25CB"} text={key === "not-built" ? "Not built" : value.trim()} />;
+  }
+  if (key === "works" || key.startsWith("works")) {
+    return <StatusBadge mark={"\u25CF"} text={key === "works" ? "Works" : value.trim()} />;
+  }
   if (key === "partial") return <StatusBadge mark={"\u25D0"} text="Partly built" />;
+  if (key.includes("partly") || key.includes("simulated")) {
+    return <StatusBadge mark={"\u25D0"} text={value.trim()} />;
+  }
   if (key === "simulated") return <StatusBadge mark={"\u25D0"} text="Simulated" />;
   if (key === "not-built") return <StatusBadge mark={"\u25CB"} text="Not built" />;
   return (
@@ -122,6 +130,26 @@ function MarkdownBlock({
       /^\|\s*:?---+\s*\|\s*:?---+\s*\|/i.test(trimmed)
     ) {
       i++;
+      continue;
+    }
+
+    // 1b. Fenced code block (used for one-line journey diagrams)
+    if (trimmed.startsWith("```")) {
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
+        codeLines.push(lines[i].replace(/\r$/, ""));
+        i++;
+      }
+      i++; // closing fence
+      renderedElements.push(
+        <pre
+          key={`pre-${i}`}
+          className="my-3 p-4 overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/60 text-[12px] leading-relaxed font-mono text-slate-800 dark:text-zinc-200"
+        >
+          {codeLines.join("\n")}
+        </pre>
+      );
       continue;
     }
 
@@ -565,7 +593,7 @@ export default function PrdRenderer({
           </h2>
           <StatusLegend />
           <MarkdownBlock
-            content={prd.atAGlanceRaw
+            content={prd.atAGlanceRaw.split("**Build-status legend")[0]
               .split("\n")
               .filter((l) => !/\u25CF[^\n]*\u25D0[^\n]*\u25CB/.test(l))
               .join("\n")}
