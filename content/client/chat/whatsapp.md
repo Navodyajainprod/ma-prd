@@ -156,6 +156,44 @@ Configures the channel-specific topbar controls for WhatsApp. The topbar include
 | F-4-1 | Given the WhatsApp channel view, then the "New Group" button is not rendered in the topbar. |
 | F-4-2 | Given the WhatsApp channel view, then the topbar contains the Phone Switcher and Templates action button. |
 
+---
+
+### F-5: Workflow-Driven AI Chatbot Binding per WhatsApp Number (Prompt & Knowledge Base Scoping)
+#### 1. What it does
+Binds each integration-configured WhatsApp Business phone number to a specific clinical or administrative workflow pipeline. The automated AI chatbot answering on each WhatsApp number dynamically inherits and adheres to the **AI Prompt** (persona, instructions, clinical boundaries, and intake scripts) and the **Knowledge Base (KB)** (protocol documents, triage guides, service pricing, and FAQs) configured on its attached workflow.
+
+This guarantees that a clinic running multiple distinct service lines on different WhatsApp numbers automatically isolates AI behavior: inquiries to a dedicated dental line follow dental prompts and dental knowledge articles, while inquiries to an urgent care or cardiology line follow their respective clinical guidelines without cross-contamination.
+
+#### 2. What it includes
+| Item | Type | What it does | Notes |
+| :--- | :--- | :--- | :--- |
+| F-5.1: Number-to-Workflow Routing Resolver | System Service | Maps incoming WhatsApp phone numbers to the target workflow ID and initial entry stage (`useStageNumberRouting`) | Configured via Settings > Integrations and Workflow Chatbot Drawer |
+| F-5.2: Workflow AI Prompt Adherence | LLM Runtime | Injects the attached workflow and stage's AI Prompt as the chatbot's system instruction | Sets conversation style, intake questions, tone, and guardrails |
+| F-5.3: Scoped Knowledge Base RAG Retrieval | Context Engine | Restricts AI vector retrieval and reference lookups exclusively to the Knowledge Base sources linked to the attached workflow | Prevents leakage of unrelated clinic data across different numbers |
+| F-5.4: In-Chat Stage Progression & Automations | State Machine | Matches patient responses against workflow `inchat` triggers and intent steps (e.g. moving patient to "Needs Assessment" or "Booked") | Evaluates trigger conditions in real time |
+| F-5.5: Human Handover & Bot Pause | Control Toggle | Pauses the AI chatbot and tags the thread as "Assigned: <Staff Name>" whenever an escalation condition triggers or staff sends a manual reply | Preserves clinical oversight |
+
+#### 3. Worked example
+| # | Situation | What the user does | Result |
+| :--- | :--- | :--- | :--- |
+| 1 | Patient messages the Pediatrics WhatsApp line (+1-555-0111) | Sends message: "What should I do if my 3-year-old has a 101F fever?" | **Chatbot routes through Pediatrics Triage Workflow; loads pediatric triage prompt and references the 'Pediatric Fever Management Protocol' from the attached KB to provide verified guidance.** |
+| 2 | Same patient messages the Cosmetic Dermatology line (+1-555-0222) | Sends message: "How much is a chemical peel consultation?" | **Chatbot routes through Dermatology Workflow; uses derm intake prompt and Dermatology Fee Schedule KB, answering with pricing and pre-care instructions.** |
+| 3 | Patient requests to speak with a human on WhatsApp | Sends message: "I want to talk to an assistant please" | **In-chat escalation trigger fires; AI bot pauses, and thread is flagged as unassigned/assigned to coordinator in the unified inbox.** |
+
+#### 4. Jobs to be done
+| # | User | Job to be done |
+| :--- | :--- | :--- |
+| F-5-J1 | Practice Administrator | When configuring multiple WhatsApp business numbers for different departments, I want each number's AI bot to follow the prompt and Knowledge Base of its attached workflow, so that patients receive specialized, accurate guidance. |
+| F-5-J2 | Clinical Lead | When designing specialty care pathways, I want the WhatsApp bot to reference only our approved departmental protocols, so that medical disclaimers and clinical instructions are strictly adhered to. |
+
+#### 5. Acceptance criteria
+| # | Criteria |
+| :--- | :--- |
+| F-5-1 | Given a WhatsApp number attached to Workflow X, when an inbound message arrives, then the AI chatbot uses Workflow X's AI Prompt as its system instructions. |
+| F-5-2 | Given a query requiring clinic information, then the chatbot retrieves context strictly from the Knowledge Base sources attached to Workflow X. |
+| F-5-3 | Inbound messages to a WhatsApp number attached to Workflow Y must never retrieve or reference knowledge sources exclusively scoped to Workflow X. |
+| F-5-4 | When an in-chat automation matches a patient response, the system updates the client's workflow stage in real time. |
+
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
@@ -165,6 +203,7 @@ Configures the channel-specific topbar controls for WhatsApp. The topbar include
 | F-2 | Meta 24-Hour Service Window Tracker & Policy | F-2.1 Countdown Timer, F-2.2 Expiration Banner, F-2.3 Freeform Lock, F-2.4 Window Re-activation | Strict customer service window monitoring with composer locking and automated re-opening. |
 | F-3 | Pre-Approved HSM WhatsApp Template Selection | F-3.1 Template Drawer, F-3.2 Variable Form, F-3.3 Live Preview, F-3.4 Quick Reply Buttons | Meta-compliant template catalog with patient chart variable auto-population and preview. |
 | F-4 | WhatsApp Topbar Controls & Scoped Action Scoping | F-4.1 Topbar Switcher, F-4.2 Template CTA, F-4.3 Group Button Removal, F-4.4 Message Actions | Focused WhatsApp topbar hiding New Group and exposing templates and phone switchers. |
+| F-5 | Workflow-Driven AI Chatbot Binding per WhatsApp Number | F-5.1 Routing Resolver, F-5.2 Prompt Adherence, F-5.3 Scoped KB Retrieval, F-5.4 Stage Progression, F-5.5 Human Handover | Each WhatsApp number's AI chatbot follows the specific system prompt and Knowledge Base of its attached workflow pipeline. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
@@ -176,4 +215,6 @@ Configures the channel-specific topbar controls for WhatsApp. The topbar include
 | 5 | Medical Assistant | When reaching out after hours or outside the 24h window, I want to send pre-approved reminders with dynamic patient fields, so that outreach is instant and personalized. | F-3 |
 | 6 | Practice Manager | When standardizing clinical communication, I want approved templates with locked wording, so that medical disclaimers are uniformly followed. | F-3 |
 | 7 | Clinical Coordinator | When triaging WhatsApp chats, I want a focused topbar with template shortcuts and phone switchers, so that I don't see irrelevant controls. | F-4 |
+| 8 | Practice Administrator | When configuring multiple WhatsApp business numbers, I want each number's AI bot to follow the prompt and Knowledge Base of its attached workflow. | F-5 |
+| 9 | Clinical Lead | When designing specialty care pathways, I want the WhatsApp bot to reference only our approved departmental protocols without cross-department data leakage. | F-5 |
 
