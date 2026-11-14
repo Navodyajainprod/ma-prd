@@ -10,6 +10,11 @@ Build check: run `scripts/sync-mirror.ps1` (in the session scratchpad) then `npm
 
 _(append one line per ambiguous choice)_
 
+- `build_status` override: a page whose central behaviour is simulated or not built cannot be `Works` (identity-biometrics set to `Partly simulated` although 80% of rows are ●).
+- Roles sections cite the decision that fits the module (for example D-15 money actions, D-41/D-46/D-35 kiosk), not D-14 (clinical/Scribe).
+- Persona mapping: Nurse, Medical Assistant, Privacy/Compliance Officer, Clinic Auditor map to the nearest standard persona (Care Coordinator or Practice Admin); no new roles.
+- The story cast (Dr. Anita Rao, Meera Iyer, Priya Nair, Daniel Brooks, Asha Verma, Rohan Mehta, Sarah Johnson, Leo Martin) is a narrative device, not a claim about the prototype.
+
 - Super Admin screens: the 16 screens are written following the grouping proposed in analysis section D of module 13 (analytics pages in one file, billing/orders/subscriptions in one file, other screens one file each), not 16 separate files.
 - `build_status` values: Works / Partly simulated / Simulated / Not built (as in the sample). The renderer accepts the older codes too.
 - Status of an unmounted-but-built component is `○ Not built` (for example the claim builder, G7-C-28).
@@ -20,15 +25,15 @@ _(append one line per ambiguous choice)_
 | :--- | :--- | :--- |
 | P2 Pilot | `content/client/scribe.md` | done |
 | P2 Pilot | `content/client/invoices.md` | done |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/ambient-presence.md` | todo |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/aria-stage-speech.md` | todo |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/kiosk-shell.md` | todo |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/ambient-presence.md` | done |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/aria-stage-speech.md` | done |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/avatar/kiosk-shell.md` | done |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/billing/invoices.md` | done |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/billing/qr-pay.md` | done |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/checkin/identity-biometrics.md` | todo |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/checkin/phone-otp.md` | todo |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/checkin/scheduled.md` | todo |
-| G1 AI Receptionist kiosk | `content/ai-receptionist/checkin/walk-in.md` | todo |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/checkin/identity-biometrics.md` | done |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/checkin/phone-otp.md` | done |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/checkin/scheduled.md` | done |
+| G1 AI Receptionist kiosk | `content/ai-receptionist/checkin/walk-in.md` | done |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/directions/departments.md` | done |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/directions/rooms.md` | done |
 | G1 AI Receptionist kiosk | `content/ai-receptionist/my-visit/biometric-consent.md` | done |
