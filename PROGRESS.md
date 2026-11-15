@@ -121,11 +121,11 @@ _(append one line per ambiguous choice)_
 
 | Group | File | Screen | Source | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| 4a | `content/client/appointments/booking.md` | appointments / booking | analysis 06 D.4 | todo |
-| 4a | `content/client/processes/detail-drawer.md` | processes / detail-drawer | analysis 05 D.3 | todo |
-| 4a | `content/client/settings/numbers.md` | settings / numbers | analysis 10 D.9 | todo |
-| 4a | `content/client/settings/notifications.md` | settings / notifications | analysis 10 D.10 | todo |
-| 4a | `content/companion/access.md` | companion / access | analysis 12 D0 | todo |
+| 4a | `content/client/appointments/booking.md` | appointments / booking | analysis 06 D.4 | done |
+| 4a | `content/client/processes/detail-drawer.md` | processes / detail-drawer | analysis 05 D.3 | done |
+| 4a | `content/client/settings/numbers.md` | settings / numbers | analysis 10 D.9 | done |
+| 4a | `content/client/settings/notifications.md` | settings / notifications | analysis 10 D.10 | done |
+| 4a | `content/companion/access.md` | companion / access | analysis 12 D0 | done |
 | 4b | `content/client/auth/access.md` | auth / access | analysis 14 D1 | todo |
 | 4b | `content/client/auth/onboarding.md` | auth / onboarding | analysis 14 D2 | todo |
 | 4b | `content/client/auth/pricing-payment.md` | auth / pricing-payment | analysis 14 D3 | todo |
