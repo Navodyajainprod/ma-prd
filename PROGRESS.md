@@ -92,20 +92,20 @@ _(append one line per ambiguous choice)_
 | G8 Companion remaining | `content/companion/forms.md` | todo |
 | G8 Companion remaining | `content/companion/billing.md` | todo |
 | G8 Companion remaining | `content/companion/pharmacy.md` | todo |
-| G9 Admin remaining | `content/admin/ai-voices-models.md` | todo |
+| G9 Admin remaining | `content/admin/ai-voices-models.md` | done |
 | G9 Admin remaining | `content/admin/custom-fields/fields.md` | todo |
 | G9 Admin remaining | `content/admin/custom-fields/sections.md` | todo |
 | G9 Admin remaining | `content/admin/document-templates.md` | todo |
 | G9 Admin remaining | `content/admin/industry-category/categories.md` | todo |
 | G9 Admin remaining | `content/admin/industry-category/industries.md` | todo |
-| G9 Admin remaining | `content/admin/organizations.md` | todo |
+| G9 Admin remaining | `content/admin/organizations.md` | done |
 | G9 Admin remaining | `content/admin/plans/actions.md` | todo |
 | G9 Admin remaining | `content/admin/plans/categories.md` | todo |
 | G9 Admin remaining | `content/admin/plans/plans.md` | todo |
 | G9 Admin remaining | `content/admin/plans/pricing.md` | todo |
-| G9 Admin remaining | `content/admin/roles.md` | todo |
-| G9 Admin remaining | `content/admin/sidebar-config.md` | todo |
-| G9 Admin remaining | `content/admin/users.md` | todo |
+| G9 Admin remaining | `content/admin/roles.md` | done |
+| G9 Admin remaining | `content/admin/sidebar-config.md` | done |
+| G9 Admin remaining | `content/admin/users.md` | done |
 
 ## Drift pass (after Phase 3, before Phase 6)
 
@@ -114,11 +114,34 @@ _(append one line per ambiguous choice)_
 | Scribe popup | `content/client/scribe.md` | todo |
 | Integrations Field Mapping | `content/client/settings/integrations.md` | done |
 | Tasks UI | `content/client/tasks/my-tasks.md`, `tasks-by-me.md`, `content/admin/tasks.md`, `content/companion/tasks.md` | todo |
-| Organization availability | `content/admin/organizations.md`, `content/client/settings/organization.md` | todo |
+| Organization availability | `content/admin/organizations.md`, `content/client/settings/organization.md` | done |
 
 ## Phase 4: new files for built screens with no PRD
 
-_(file list is added when Phase 4 starts)_
+| Group | File | Screen | Source | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| 4a | `content/client/appointments/booking.md` | appointments / booking | analysis 06 D.4 | todo |
+| 4a | `content/client/processes/detail-drawer.md` | processes / detail-drawer | analysis 05 D.3 | todo |
+| 4a | `content/client/settings/numbers.md` | settings / numbers | analysis 10 D.9 | todo |
+| 4a | `content/client/settings/notifications.md` | settings / notifications | analysis 10 D.10 | todo |
+| 4a | `content/companion/access.md` | companion / access | analysis 12 D0 | todo |
+| 4b | `content/client/auth/access.md` | auth / access | analysis 14 D1 | todo |
+| 4b | `content/client/auth/onboarding.md` | auth / onboarding | analysis 14 D2 | todo |
+| 4b | `content/client/auth/pricing-payment.md` | auth / pricing-payment | analysis 14 D3 | todo |
+| 4b | `content/client/account/profile.md` | account / profile | analysis 14 D4 | todo |
+| 4b | `content/client/account/refer-and-earn.md` | account / refer-and-earn | analysis 14 D5 | todo |
+| 4b | `content/client/help/guide.md` | help / guide | analysis 14 D6 | todo |
+| 4d | `content/admin/products-services.md` | Product / Services | analysis 13 C.16 | todo |
+| 4d | `content/admin/admin-workflows.md` | Workflows (admin) | analysis 13 C.17 | todo |
+| 4d | `content/admin/automations.md` | Automations (admin) | analysis 13 C.18 | todo |
+| 4d | `content/admin/form-templates.md` | Forms (admin) | analysis 13 C.19 | todo |
+| 4d | `content/admin/admin-knowledge-base.md` | Knowledge Base (admin) | analysis 13 C.20 | todo |
+| 4e | `content/admin/workspace-billing.md` | Workspace Billing, Orders, Subscriptions | analysis 13 C.21 to C.23 | todo |
+| 4e | `content/admin/product-analytics.md` | Analytics: Overview, Voice Calls, Org Usage, Process Movement, Revenue | analysis 13 C.24 to C.28 | todo |
+| 4e | `content/admin/telephony.md` | Telephony | analysis 13 C.29 | todo |
+| 4e | `content/admin/audit-logs.md` | Audit Logs (admin) | analysis 13 C.30 | todo |
+
+After the files exist, add their entries to `src/lib/modulesConfig.ts` (tabs `booking`, `detail-drawer`, `numbers`, `notifications`; new client modules `auth`, `account`, `help`; companion module `access`; admin modules `products-services`, `admin-workflows`, `automations`, `form-templates`, `admin-knowledge-base`, `workspace-billing`, `product-analytics`, `telephony`, `audit-logs`). The admin ids are distinct from client/companion ids (`workflows`, `forms`, `knowledge-base`, `billing` already exist) so sidebar names stay correct. The analysis row C.31 (admin shell, cross-cutting) has no page of its own; it is covered by the Reference page Roles and access and by section 4 of each admin page.
 
 ## Phase 5: Reference module
 
