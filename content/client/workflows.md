@@ -25,7 +25,7 @@ last_updated: "2026-11-14"
 | **Who uses it** | Care Coordinator (designs stages and automations). Practice Admin (same screens). No role is checked: any signed-in user can edit AI prompts, delete stages and delete automations. |
 | **Where you start it** | **Workflows** in the sidebar (`/process`, under CUSTOMIZATIONS), the workflow gear on an invoice, or the add-knowledge button on a process. |
 | **Where the result goes** | The Process Kanban and List pages (stages), appointment, invoice and claim stage names, the shared automation store (so stage automations also appear on `/automation`), and the Knowledge Base scope picker. |
-| **How real is it** | 0 features work, 6 are partly simulated, 0 are not built. The Portal and Reception settings are read by the patient portal and the kiosk. The Calling and Chatbot switches and settings are saved but nothing reads them. See the legend below. |
+| **How real is it** | 0 features work, 7 are partly simulated, 0 are not built. The Portal and Reception settings are read by the patient portal and the kiosk. The Calling and Chatbot switches and settings are saved but nothing reads them. See the legend below. |
 
 **Build-status legend used on every row of this PRD**
 
@@ -86,8 +86,8 @@ Priya opens `/process`. A top bar holds an entity dropdown that reads "<Entity> 
 #### 2. What it includes
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| F-1.1: Entity dropdown | Select | Processes, Appointments, Invoices, Insurance & Claims, Tasks, each with a count | ● Works | Claims are folded into Insurance. Tasks creates a default process on first visit. Decision needed: D-07 |
-| F-1.2: Add process | Modal | Name and description are both required, otherwise "Please fill all fields". The new process gets default stages and default AI settings | ● Works | |
+| F-1.1: Entity dropdown | Select | Processes, Appointments, Invoices, Insurance & Claims, Tasks, each with a count | ● Works | Claims are folded into Insurance and the Claims Management process is never shown (F-7.35). Tasks creates a default process on first visit. Decision needed: D-07 |
+| F-1.2: Add process | Modal | Name and description are both required, otherwise "Please fill all fields". The new process gets the default stages of its entity (see F-7) and default AI settings | ◐ Simulated | Clients and Insurance & Claim get three generic stages, not their own defaults (F-7.8, F-7.34) |
 | F-1.3: Add for Tasks | Button | No add button is shown for the Tasks entity | ○ Not built | Decision needed: D-07 |
 | F-1.4: Process list and search | List | Cards expand to stages and stages drag to reorder. Search placeholder "Search processes..." | ● Works | |
 | F-1.5: Active and Draft Processes presets | Chips | Show a count of processes with and without the draft flag | ◐ Simulated | Clicking only clears the search box and never filters (G8-E-05) |
@@ -138,7 +138,7 @@ Priya clicks a stage. A panel opens with two tabs, **General** and **Automations
 | F-2.5: AI prompt, greeting, objective, business information, languages | Form | Single or comprehensive prompt mode. Saved on the stage | ● Works | |
 | F-2.6: AI model, voice, speed, tone | Select | Saved on the stage | ● Works | |
 | F-2.7: Won and Lost stages, Connect Next Process Stage | Modal | Links a final stage to a stage of another process | ● Works | |
-| F-2.8: Required stages | Rule | A stage that fills a required category or is predefined cannot be deleted. The button is disabled with "Predefined stage cannot be deleted". A process keeps at least one stage | ● Works | |
+| F-2.8: Required stages | Rule | A stage that fills a required category, is flagged predefined or has a protected name cannot be deleted from the stage panel or the ribbon. The button is disabled with "Predefined stage cannot be deleted". A process keeps at least one stage. The required list differs per entity | ● Works | Full lists and messages are in F-7. The left list does not re-check (F-7.42) |
 | F-2.9: Delete stage from the stage panel | Modal | Asks for a replacement stage. Invoices, appointments and claims in the deleted stage move to it | ◐ Simulated | Clients in the stage are not moved (G8-E-03). Decision needed: D-32 |
 | F-2.10: Delete stage from the left list | Action | Removes the stage at once with only a toast | ◐ Simulated | No confirmation, no replacement and no required-stage check beyond hiding the button, so records are stranded (G8-E-03). Decision needed: D-32 |
 | F-2.11: Stage-move history with undo | Screen | The code and store exist | ○ Not built | The screen is never mounted (G8-E-12) |
@@ -384,6 +384,101 @@ Priya wants the pediatrics line to answer with the pediatrics prompt and documen
 | F-6-3 | **Given** two workflows with the same number, **then** no error shows. |
 | F-6-4 | **Given** the Test Process chat, **when** a number is registered against a stage, **then** the chat resolves that stage and replies from a simulation. |
 
+### F-7: Default and required stages per entity
+
+#### 1. What it does
+Every record type has its own starting set of stages. Daniel Brooks wants to know what he gets before he changes anything. For Appointments he finds the Appointment Flow with Booked, Reminder, Completed, Reschedule and No-show. For Invoices he finds Billing & Invoicing with Draft, Payment recorded, Paid and Overdue. For Tasks he finds three processes that all share Task Created, Task Completed and Task Overdue. Clients have no required stages at all. Some stages show a padlock and cannot be deleted. He can still rename, recolour and reorder them. When he adds his own stage, it is a plain In Progress, Won or Lost stage with no system category, so it can always be deleted. This feature lists every seeded process and stage and every rule behind them, as the prototype has them.
+
+#### 2. What it includes
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-7.1: Where default stages come from | Rule | Three sources. Seeded processes are created on first load of a non-fresh workspace, and an entity with no process gets its seeded one back. The Add button gives a new process the default stages of its entity. For Clients and for Insurance & Claim the Add button gives three generic stages: Stage 1, Stage 2, Stage 3 | ● Works | A fresh workspace starts with no processes at all |
+| F-7.2: Required stage categories per entity | Rule | Clients none. Appointments booked, rescheduled, completed, cancelled. Invoices draft, paid, void. Insurance draft, submitted, paid, failed. Claims draft, submitted, paid, denied. Tasks created, completed, overdue | ◐ Simulated | Two required categories have no seeded stage (F-7.14, F-7.23). Decision needed: D-68, D-114 |
+| F-7.3: Required and predefined | Rule | A stage is locked when it is flagged required, is flagged predefined, carries a fixed action, or has a protected name. Protected names are Booked, Reminder, Completed, Reschedule, No show, No-show, Draft, Payment recorded, Paid, Overdue, Stage 1, Stage 2 and Stage 3, and for tasks Task Created, Task Completed and Task Overdue. The name check is used for every entity | ● Works | A client stage you name Paid or Completed is locked too |
+| F-7.4: Clients have no required stages | Rule | The required list for clients is empty. The seeded client processes carry no required or predefined flag, so every seeded client stage can be deleted | ● Works | |
+| F-7.5: Clients, Patient Care Journey | Stage | A demo process shown in a non-fresh workspace. Stages in order: Client Checked In (initial), Book Appointment, Move to Pharmacy, Pay Bill, Payment Done (final, shown under Won). No fixed action | ● Works | The portal and kiosk switches are on for the first stage. See F-5 |
+| F-7.6: Clients, Client Intake | Stage | Initial Contact (initial), Contacted, Interested (final, Won), Not Interested (final, Lost, hands over to Client Reactivation at Outreach), Call Back Later (final, Lost). Each outcome stage carries an intent label | ● Works | Not required, so deletable |
+| F-7.7: Clients, Client Reactivation | Stage | Outreach (initial), Contacted, Reactivated (final), Call Back Later (final, Lost), Lost (final, Lost) | ● Works | Not required, so deletable |
+| F-7.8: Clients, Add Workflow | Stage | A new client process gets Stage 1 (In Progress, initial), Stage 2 (Won, final) and Stage 3 (Lost, final), each flagged predefined and required | ● Works | These three are locked even though the client required list is empty |
+| F-7.9: Appointments, Booked | Stage | Process Appointment Flow. Category booked, In Progress, initial, required and predefined. Carries the fixed action Book Appointment | ● Works | Read by the appointment drawer through the category |
+| F-7.10: Appointments, Reminder | Stage | Category reminder, In Progress, intermediate, flagged required and predefined. Carries a WhatsApp step Send Upcoming Reminder that is not fixed | ● Works | The category is not in the required list. The seeded flag keeps it locked. The WhatsApp step has no runner (G8-E-01) |
+| F-7.11: Appointments, Completed | Stage | Category completed, Won, final, required and predefined. Carries the fixed action Complete Appointment | ● Works | |
+| F-7.12: Appointments, Reschedule | Stage | Category rescheduled, shown in the Lost lane, final, required and predefined. Carries the fixed action Reschedule Appointment | ● Works | The stage is named Reschedule, the required category is rescheduled |
+| F-7.13: Appointments, No-show | Stage | Category no_show, Lost, final, flagged required and predefined. Carries the fixed action Mark No-Show. Named No-show in the seeded process and No show in a process added with the button | ● Works | The category is not in the required list. The seeded flag keeps it locked |
+| F-7.14: Appointments, Cancelled | Stage | Cancelled is a required category but no stage with it is seeded. The appointment drawer would treat a stage with this category as final | ○ Not built | Decision needed: D-114 |
+| F-7.15: Fixed action Book Appointment | Action | Locked step on Booked with a Fixed Action badge. It cannot be deleted or duplicated. No rule engine code runs this step key | ◐ Simulated | Appointment booking is treated as enabled whenever an appointment process exists. Decision needed: D-110 |
+| F-7.16: Fixed action Complete Appointment | Action | Locked step on Completed. No rule engine code runs this step key | ◐ Simulated | Decision needed: D-110 |
+| F-7.17: Fixed action Reschedule Appointment | Action | Locked step on Reschedule. No rule engine code runs this step key | ◐ Simulated | Decision needed: D-110 |
+| F-7.18: Fixed action Mark No-Show | Action | Locked step on No-show, described as recording the missed visit and triggering follow-up. No rule engine code runs this step key | ◐ Simulated | Decision needed: D-110, D-65 |
+| F-7.19: Invoices, Draft | Stage | Process Billing & Invoicing. Category draft, In Progress, initial, required and predefined. Carries the fixed action Create Draft Invoice | ● Works | Read by the invoice drawer and progress bar through the category |
+| F-7.20: Invoices, Payment recorded | Stage | Category payment_recorded, In Progress, intermediate, flagged required and predefined. Carries the fixed action Record Payment | ● Works | The category is not in the required list. The seeded flag keeps it locked |
+| F-7.21: Invoices, Paid | Stage | Category paid, Won, final, required and predefined. Carries the fixed action Mark Paid & Issue Receipt. Moving an invoice here sets its status to paid and stamps the paid date | ● Works | |
+| F-7.22: Invoices, Overdue | Stage | Category overdue, Lost, final, flagged required and predefined. Carries the fixed action Mark Overdue & Notice. Moving an invoice here sets its status to overdue | ● Works | The category is not in the required list. The seeded flag keeps it locked |
+| F-7.23: Invoices, Void | Stage | Void is a required category but no Void stage is seeded. The code maps a stage with the void category to the status void, yet the Create Stage dialog cannot set a category, so a Void stage cannot be made on this page | ○ Not built | Decision needed: D-68 |
+| F-7.24: Fixed action Create Draft Invoice | Action | Locked step on Draft. The rule engine has code for this step key, but it creates an invoice only for an appointment event, so a record entering Draft does nothing | ◐ Simulated | Decision needed: D-110 |
+| F-7.25: Fixed action Record Payment | Action | Locked step on Payment recorded. No rule engine code runs this step key | ◐ Simulated | Decision needed: D-110 |
+| F-7.26: Fixed action Mark Paid and Issue Receipt | Action | Locked step on Paid. No rule engine code runs this step key, so no receipt is issued by it | ◐ Simulated | Decision needed: D-110 |
+| F-7.27: Fixed action Mark Overdue and Notice | Action | Locked step on Overdue. No rule engine code runs this step key, so no notice is sent by it | ◐ Simulated | Decision needed: D-110 |
+| F-7.28: Insurance, Draft & Intake | Stage | Process Insurance and Claims, six stages. Category draft, In Progress, initial, required | ● Works | Read by the Claims page and claim progress bar |
+| F-7.29: Insurance, Coverage Verified | Stage | Category verified_coverage, In Progress, intermediate. Not required, so deletable | ● Works | |
+| F-7.30: Insurance, Submitted (837P) | Stage | Category submitted, In Progress, intermediate, required | ● Works | |
+| F-7.31: Insurance, Under Review | Stage | Category in_review, In Progress, intermediate. Not required, so deletable | ● Works | |
+| F-7.32: Insurance, Paid & Settled | Stage | Category paid, Won, final, required | ● Works | |
+| F-7.33: Insurance, Denied | Stage | Category failed, Lost, final, required. The name says Denied and the category says failed | ● Works | |
+| F-7.34: Insurance, Add Insurance & Claim Workflow | Stage | The Add button does not use the six insurance stages. It creates Stage 1, Stage 2 and Stage 3 (In Progress, Won, Lost), flagged predefined, with no category | ◐ Simulated | The new process has none of the insurance categories. Decision needed: D-07 |
+| F-7.35: Claims, Claims Management | Process | Defined in code with five stages: Draft, Submitted, In Review, Paid, Denied. It is removed from the saved list every time processes load, so it never appears on this page | ○ Not built | Claims share the Insurance entity. Decision needed: D-07 |
+| F-7.36: Tasks, Task Created | Stage | Processes Task Workflow, Compliance & Credentialing and Patient Care Follow-up, three stages each, no fixed actions. Category created, In Progress, initial, required and predefined | ● Works | Read by the Tasks page |
+| F-7.37: Tasks, Task Completed | Stage | Category completed, Won, final, required and predefined | ● Works | |
+| F-7.38: Tasks, Task Overdue | Stage | Category overdue, Lost, final, required and predefined | ● Works | The three task processes reuse the same stage ids |
+| F-7.39: Tasks, Add Workflow | Button | The code gives a new task process the three task stages, but no add button is shown for Tasks | ○ Not built | See F-1.3. Decision needed: D-07 |
+| F-7.40: Delete blocked, from the stage panel | Rule | The delete control on a locked stage is a disabled padlock with the hover text "Predefined stage cannot be deleted". Opening the delete dialog on one shows the title "Predefined Workflow Stage", the text "The stage "<name>" is a predefined system stage for <entity> workflows and cannot be deleted." and the line "You can rename, recolor, or reorder this stage at any time." The only button is **Close** | ● Works | |
+| F-7.41: Delete blocked, from the edit dialog | Rule | In the Edit Stage dialog a required stage shows a lock and the label "Required Stage" in place of **Delete**. A stage that is predefined but not required still shows **Delete**, and pressing it shows the toast "Predefined workflow stages cannot be deleted" | ● Works | |
+| F-7.42: Delete blocked, from the left list | Rule | The remove icon is hidden on a stage flagged required or predefined. The check is not run again when a stage is removed from the left list, so a stage with a protected name but no flag can still be removed there | ◐ Simulated | Decision needed: D-32 |
+| F-7.43: A process keeps one stage | Rule | Deleting the only stage of a process is refused with "A process must have at least one stage". This check runs before the locked-stage check | ● Works | The messages "Process has no stages" and "Stage not found" exist for broken data |
+| F-7.44: Delete replacement picker | Rule | An unlocked stage asks "Replacement stage for existing records:" with the other stages listed as name and category. Invoices, appointments and claims in it move to the choice. Clients do not move | ◐ Simulated | (G8-E-03). Decision needed: D-32 |
+| F-7.45: Create Stage dialog | Modal | **Create Stage** has Stage Name (required, "Please enter a stage name" when empty), Description and a row of preset colours. It has no category or position field | ● Works | The category comes from the lane where the plus was pressed |
+| F-7.46: Category of a custom stage | Rule | The plus in the In Progress lane makes an In Progress stage. The plus in the Won lane makes a Won stage (green by default). The plus in the Lost lane makes a Lost stage (red by default). A custom stage has a stage category but no system category, is not flagged required or predefined, and can always be deleted | ● Works | |
+| F-7.47: Position of a custom stage | Rule | An In Progress stage goes before the first Won or Lost stage. A Won stage goes before the first Lost or final stage. A Lost stage goes last. A plus on a stage inserts after that stage. A Lost stage is flagged final. A Won stage is positioned final but not flagged final | ◐ Simulated | Seeded Won stages are flagged final, custom ones are not |
+| F-7.48: Add an initial stage | Rule | The code can put a new stage first and mark it initial, but no button asks for it | ○ Not built | |
+| F-7.49: Add after from the left list | Action | The plus on a Won or Lost stage in the left list always creates a Lost stage, even after a Won stage | ◐ Simulated | |
+| F-7.50: Rename and recolour | Action | **Edit Stage** changes the name and colour (palette, an expand grid and a custom hex prompt). A rename keeps the system category and the locks | ● Works | Saved with "Stage updated successfully" |
+| F-7.51: Lost lane edit and final flag | Action | Editing a stage in the Lost lane opens the concluding-stage dialog instead. Saving the Edit Stage dialog sets the final flag and the stage position from its own final setting | ● Works | |
+| F-7.52: Reorder | Action | Stages drag to reorder in the ribbon and the left list, locked stages included. The lane a stage sits in follows its category, not its place in the list | ● Works | |
+| F-7.53: Saved processes are stamped on load | Rule | For every non-client process, each stage gets its system category from the seeded stage with the same id or category. It is flagged required when the category is in the entity's required list or the seeded stage was flagged. A stage with no match is flagged not required | ● Works | Stage 1 to 3 on an Insurance process lose the required flag but stay locked as predefined |
+| F-7.54: Outcome stages are re-categorised on load | Rule | A stage whose name contains lost, cancel, void, denied, not interested, call back or unqualified is set to Lost and final | ◐ Simulated | A stage named for example Cancelled becomes final whatever its position |
+| F-7.55: Missing seeded processes come back | Rule | If a workspace has no process for Appointments, Invoices, Insurance or Tasks, the seeded one is added again, and the three task processes are re-added if missing. Claims are not | ● Works | Deleting a process is not built (F-1.12) |
+| F-7.56: State, fresh workspace | State | A fresh workspace has no processes and none of these stages | ● Works | |
+| F-7.57: State, entity with no process | State | Pages that need a process for an entity with none fall back to the seeded one | ● Works | |
+
+#### 3. Worked example
+Daniel Brooks, the Billing Specialist, checks the invoice pathway before he changes it.
+
+| # | Situation | What the user does | Result |
+| :--- | :--- | :--- | :--- |
+| 1 | He wants to see the starting stages | Picks **Invoices** and opens Billing & Invoicing | **Draft, Payment recorded, Paid and Overdue, each with a padlock** |
+| 2 | He wants an invoice to be voided | Looks for a Void stage | **There is none. Void is a required category but no stage is seeded** |
+| 3 | He adds a stage called Sent after Draft | Presses the plus on Draft and creates it | **An In Progress stage with no system category. It can be deleted** |
+| 4 | He tries to remove Paid | Hovers the disabled padlock | **"Predefined stage cannot be deleted"** |
+| 5 | He adds an Insurance & Claim workflow | Presses the add button and saves | **The new process has Stage 1, Stage 2 and Stage 3, not the six insurance stages** |
+
+#### 4. Jobs to be done
+| # | User | Job to be done |
+| :--- | :--- | :--- |
+| F-7-J1 | Billing Specialist | When I open a record type for the first time, I want to see its default stages and which are locked, so that I know what I can change safely. |
+| F-7-J2 | Practice Admin | When I add a process, I want it to start with the stages of its record type, so that appointments, invoices and claims behave the same in every process. |
+
+#### 5. Acceptance criteria
+| # | Criteria |
+| :--- | :--- |
+| F-7-1 | **Given** a non-fresh workspace, **then** Appointments has Booked, Reminder, Completed, Reschedule and No-show, Invoices has Draft, Payment recorded, Paid and Overdue, Insurance has six stages, and each task process has Task Created, Task Completed and Task Overdue. |
+| F-7-2 | **Given** the Clients entity, **then** the seeded stages have no required or predefined flag and can be deleted. |
+| F-7-3 | **Given** a locked stage, **when** the user opens its delete control, **then** it is disabled with "Predefined stage cannot be deleted". |
+| F-7-4 | **Given** a process with one stage, **when** that stage is deleted, **then** "A process must have at least one stage" shows and nothing is removed. |
+| F-7-5 | **Given** the Invoices and Appointments processes, **then** no Void stage and no Cancelled stage exist, although both categories are required. |
+| F-7-6 | **Given** the Add button on Clients or on Insurance & Claim, **when** a process is saved, **then** it starts with Stage 1, Stage 2 and Stage 3. |
+| F-7-7 | **Given** a stage added from the Won lane, **then** it has no system category and can be deleted. |
+| F-7-8 | **Given** a fixed action step, **when** the stage is entered, **then** the rule engine does not run it, except that Create Draft Invoice acts only on appointment events. |
+
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
@@ -395,6 +490,7 @@ Priya wants the pediatrics line to answer with the pediatrics prompt and documen
 | F-4 | Flow canvas and steps | F-4.1 – F-4.28 | ● / ◐ / ○ | Canvas, triggers and five of sixteen nodes work; messaging, delay and create-record nodes do nothing. |
 | F-5 | Chatbot, Calling and Portal and Reception settings | F-5.1 – F-5.40 | ● / ◐ / ○ | Portal and Reception settings are read by the portal and kiosk; Calling and Chatbot settings are saved but read by nothing. |
 | F-6 | WhatsApp number to workflow chatbot routing | F-6.1 – F-6.10 | ● / ◐ / ○ | Numbers can be picked and saved; no routing, prompt or knowledge base scoping exists beyond a test chat. |
+| F-7 | Default and required stages per entity | F-7.1 – F-7.57 | ● / ◐ / ○ | Each entity seeds its own stages and required list; Void and Cancelled are required but not seeded; fixed actions are not run. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
@@ -408,6 +504,8 @@ Priya wants the pediatrics line to answer with the pediatrics prompt and documen
 | 7 | Care Coordinator | Write the guidance a patient sees in the portal and at the kiosk | F-5 |
 | 8 | Practice Admin | Tie each WhatsApp number to its own workflow | F-6 |
 | 9 | Practice Manager | Limit chatbot answers to the knowledge attached to the workflow | F-6 |
+| 10 | Billing Specialist | See the default stages of a record type and which are locked | F-7 |
+| 11 | Practice Admin | Start every new process with the stages of its record type | F-7 |
 
 ## 4. Roles and access (as built)
 
@@ -441,18 +539,22 @@ Full journey: see Journeys page.
 | :--- | :--- | :--- |
 | D-01 | Which name is canonical: Process, Workflows, Deals or Pipeline? | Naming note |
 | D-06 | Should every destructive action, including deleting a stage automation, ask for confirmation? | F-3.4 |
-| D-07 | Is Insurance and Claims one entity or two, and does Tasks get an Add Workflow button? | F-1.1, F-1.3 |
+| D-07 | Is Insurance and Claims one entity or two, and does Tasks get an Add Workflow button? | F-1.1, F-1.3, F-7.34, F-7.35, F-7.39 |
 | D-17 | Which roles may edit workflows, automations and forms? | F-1.14 |
-| D-32 | Can a process or stage be deleted once referenced, and must its clients move to a replacement stage? | F-1.12, F-2.9, F-2.10 |
+| D-32 | Can a process or stage be deleted once referenced, and must its clients move to a replacement stage? | F-1.12, F-2.9, F-2.10, F-7.42, F-7.44 |
 | D-61 | Which telephony model applies, are numbers admin-allocated, and how is a number assigned to a process (one number to one workflow or many)? | F-5.32, F-6.1, F-6.4 |
-| D-110 | Which steps must really execute (delay, SMS, WhatsApp, Email, webhook, assign human, create records, Create Task), and should the rest be hidden or marked not live? | F-3.6, F-4.5, F-4.6, F-4.8 – F-4.11, F-4.14 – F-4.16, F-4.18, F-4.19 |
+| D-110 | Which steps must really execute (delay, SMS, WhatsApp, Email, webhook, assign human, create records, Create Task), and should the rest be hidden or marked not live? | F-3.6, F-4.5, F-4.6, F-4.8 – F-4.11, F-4.14 – F-4.16, F-4.18, F-4.19, F-7.15 – F-7.18, F-7.24 – F-7.27 |
 | D-127 | Which AI channels read Knowledge Base sources (kiosk voice, phone agent, chatbots), and what reads the chatbot settings, AI prompt and scope? | F-5.3, F-5.8, F-5.9, F-5.31, F-6.6, F-6.7 |
 | D-113 | What should Temporary Disable do, and should check-in rules be allowed to exist? | F-1.8, F-3.7 |
+| D-68 | What is the invoice status vocabulary and mapping to stages, and should a Void stage be seeded by default? | F-7.2, F-7.23 |
+| D-114 | What is the canonical appointment status list, and should a default Cancelled stage exist? | F-7.2, F-7.14 |
+| D-65 | Does a no-show create a fee or touch the invoice? | F-7.18 |
 
 ## 8. Change log
 
 | Date | Change |
 | :--- | :--- |
+| 2026-11-14 | Added the default and required stages of every entity, as built. |
 | 2026-11-14 | Added the Chatbot, Calling and Portal and Reception settings in detail, as built. |
 | 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
 | 2026-11-10 | First version (generated stub). |

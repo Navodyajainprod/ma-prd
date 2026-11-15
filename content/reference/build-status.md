@@ -30,11 +30,11 @@ The page's overall build status is set by the page itself: **Works** if at least
 
 | Product | Pages | Features | Rows | ● Works | ◐ Simulated | ○ Not built | Share working |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Client | 43 | 165 | 1360 | 499 | 515 | 346 | 37% |
+| Client | 43 | 166 | 1417 | 535 | 531 | 351 | 38% |
 | Admin | 24 | 76 | 561 | 241 | 161 | 159 | 43% |
 | Companion | 9 | 29 | 186 | 70 | 61 | 55 | 38% |
 | AI Receptionist | 17 | 65 | 328 | 170 | 91 | 67 | 52% |
-| **All products** | 93 | 335 | 2435 | 980 | 828 | 627 | 40% |
+| **All products** | 93 | 336 | 2492 | 1016 | 844 | 632 | 41% |
 
 ## 3. Client
 
@@ -82,7 +82,7 @@ The page's overall build status is set by the page itself: **Works** if at least
 | My Tasks: Assigned Clinic and Admin Work Inbox | `client/tasks/my-tasks.md` | ◐ Partly simulated | 4 | 11 | 6 | 4 |
 | Tasks by me: Team Delegation, Patient Tasks and Sharing | `client/tasks/tasks-by-me.md` | ◐ Partly simulated | 4 | 15 | 16 | 4 |
 | Web Forms: Intake Forms, Sharing and Client Creation | `client/web-forms.md` | ◐ Partly simulated | 5 | 23 | 16 | 9 |
-| Workflows: Processes, Stages, AI Behaviour and Stage Automations | `client/workflows.md` | ◐ Partly simulated | 6 | 47 | 46 | 17 |
+| Workflows: Processes, Stages, AI Behaviour and Stage Automations | `client/workflows.md` | ◐ Partly simulated | 7 | 83 | 62 | 22 |
 
 ## 4. Admin
 
