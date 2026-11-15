@@ -21,7 +21,7 @@ last_updated: "2026-11-14"
 
 | | |
 | :--- | :--- |
-| **What it is** | The shared Tasks page in the admin shell. It lists only Admin-scope tasks and has the same two-step composer as the clinic, with industry and role scoping and no deadline or repeat. |
+| **What it is** | The shared Tasks page in the admin shell. It lists only Admin-scope tasks and has the same two-step composer as the clinic, with industry and role scoping, and no workflow pipeline, deadline or repeat. |
 | **Who uses it** | Platform Admin. No role is checked: any signed-in user can open `/admin/tasks` and create tasks. |
 | **Where you start it** | **Tasks** in the admin sidebar (`/admin/tasks`). |
 | **Where the result goes** | Only this page. Admin tasks are not delivered to clinic My Tasks, are hidden from the Companion task list, and are skipped by the overdue alert. |
@@ -40,7 +40,7 @@ last_updated: "2026-11-14"
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
 | Client (My Tasks) | Role-targeted delegation | Not connected. An Admin task aimed at a clinic role is saved but never appears in any clinic My Tasks, because clinic users never see Admin-scope tasks. | [View My Tasks](/client/tasks/my-tasks) |
-| Client (Tasks by me) | Same page, other scope | The clinic tab shares the page and the composer. It adds deadline and repeat, which Admin tasks omit. Tasks made there never appear here. | [View Tasks by me](/client/tasks/tasks-by-me) |
+| Client (Tasks by me) | Same page, other scope | The clinic tab shares the page and the composer. It adds the Workflow Pipeline, deadline and repeat, which Admin tasks omit. Tasks made there never appear here. | [View Tasks by me](/client/tasks/tasks-by-me) |
 | Companion | Patient firewall | Admin tasks are left out of every patient's list and a direct link shows **Task Not Available**. The Share drawer on an Admin task can still post it into a patient's chat. | [View Companion Tasks](/companion/tasks) |
 | Admin (Organizations) | Scope and organization | The ORGANIZATION column shows "Demo Mantra Care" for every Admin task. No organization is chosen in the composer. | [View Organizations](/admin/organizations) |
 | Admin (Roles, Industries) | Role catalog | The scope and role pickers use the industry role catalog and stored custom roles. | [View Roles](/admin/roles) |
@@ -49,11 +49,11 @@ last_updated: "2026-11-14"
 
 ### The story in one minute
 
-Leo Martin, a Platform Admin, opens **Tasks** in the admin shell. The subtitle reads "Corporate operational assignments, cross-organization delegation, and checklists". The table lists only Admin tasks, with **TASK ID**, **TASK NAME**, **SCOPE**, **ORGANIZATION**, **ROLE / RESPONSIBLE** and **CHECKLIST**. He presses **New Task** for a credentialing audit. He sets an industry scope, keeps the role **Lead Physician**, marks it important and adds observers. There is no deadline and no repeat. He builds two deliverables in Task Studio and saves. The task appears in his table. He expects clinic directors to find it in their inbox. It does not reach them. He also finds that any signed-in clinic user could have opened this page.
+Leo Martin, a Platform Admin, opens **Tasks** in the admin shell. The subtitle reads "Corporate operational assignments, cross-organization delegation, and checklists". The table lists only Admin tasks, with **TASK ID**, **TASK NAME**, **SCOPE**, **ORGANIZATION**, **ROLE / RESPONSIBLE** and **CHECKLIST**. He presses **New Task** for a credentialing audit. He sets an industry scope, keeps the role **Lead Physician**, marks it important and adds observers. There is no workflow to pick, no deadline and no repeat. He builds two deliverables in Task Studio and saves. The task appears in his table. He expects clinic directors to find it in their inbox. It does not reach them. He also finds that any signed-in clinic user could have opened this page.
 
 ### What is real and what is not
 
-- **Real in the prototype:** the Admin-only table, the Workflow switcher and search, the composer with industry scoping, the role picker, Task Studio and Preview, and the Companion and overdue exclusions.
+- **Real in the prototype:** the Admin-only table and search, the composer with industry scoping, the role picker, Task Studio and Task Preview, and the Companion and overdue exclusions.
 - **Simulated:** the ORGANIZATION column (a fixed name), Mark Completed (closes without deliverables), the creator detail page (unreachable) and the Share drawer (it can post an internal task into a patient chat).
 - **Not built:** delivery to clinic My Tasks, organization targeting, a STAGE column, a deadline, a role check on the page and a loading or error state.
 
@@ -70,14 +70,14 @@ Leo Martin, a Platform Admin, opens **Tasks** in the admin shell. The subtitle r
 ### F-1: Corporate tasks table
 
 #### 1. What it does
-Leo opens `/admin/tasks` and sees only Admin-scope tasks. A Workflow switcher, a search box and a **New Task** button sit above the table. The row menu holds **Edit Task**, **Mark Completed** and **Delete**. There is no **STAGE** column and no **DEADLINE** column.
+Leo opens `/admin/tasks` and sees only Admin-scope tasks. A search box and a **New Task** button sit above the table. There is no Workflow switcher in Admin. The row menu holds **Edit Task**, **Mark Completed** and **Delete**. There is no **STAGE** column and no **DEADLINE** column.
 
 #### 2. What it includes
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | F-1.1: Admin-only scope | Rule | Shows only Admin-scope tasks. Clinic and patient tasks are not listed | ● Works | |
 | F-1.2: Columns | Table | TASK ID, TASK NAME, SCOPE (scope name or industry list), ORGANIZATION, ROLE / RESPONSIBLE, CHECKLIST | ◐ Simulated | ORGANIZATION reads "Demo Mantra Care" for every task (G5-E-27). Decision needed: D-105 |
-| F-1.3: Workflow switcher and search | Controls | Filters by task workflow and searches the rows | ● Works | |
+| F-1.3: Search | Controls | Searches title, code, responsible, observers, workflow name and project. The Workflow switcher is not shown in Admin and every Admin task is listed | ● Works | The switcher was removed on 2026-11-13 |
 | F-1.4: Edit Task | Row action | Opens the composer pre-filled | ◐ Simulated | Saving clears every person's deliverable completion (G5-E-20) |
 | F-1.5: Mark Completed | Row action | Sets the task to Completed with a toast | ◐ Simulated | No deliverable is checked (G5-E-18). Decision needed: D-108 |
 | F-1.6: Delete | Row action | Browser confirm, then removes the task | ● Works | |
@@ -91,7 +91,7 @@ Leo reviews the credentialing checklist.
 
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Page opens | Picks **Compliance & Credentialing** in the switcher | **Only Admin tasks of that workflow are listed. No deadline or stage column shows** |
+| 1 | Page opens | Types "audit" in the search box | **Only Admin tasks matching it are listed. There is no workflow switcher, and no deadline or stage column shows** |
 | 2 | He reads the row | Looks at ORGANIZATION | **It reads Demo Mantra Care, whatever the intended organization** |
 
 #### 4. Jobs to be done
@@ -109,18 +109,19 @@ Leo reviews the credentialing checklist.
 ### F-2: Admin task composer
 
 #### 1. What it does
-**New Task** opens two steps. **Configure** takes a title, description, a **Workflow Pipeline**, **Admin Control** scoping rules and **Target roles**. It also takes **Mark as Important** and **Observers**. Deadline, time and repeat are hidden. **Task Studio** builds the deliverables and has a **Preview**. The task is saved with no deadline and no recurrence.
+**New Task** opens two steps. **Configure** takes a title, description, **Admin Control** scoping rules and **Task Responsible**, where **Assign to Role(s)** picks the target roles. Under **Task Parameters** it takes **Mark as Important** and **Observers**. The Workflow Pipeline, deadline, time and repeat are hidden. **Task Studio** builds the deliverables and has a **Task Preview**. The task is saved with no deadline and no recurrence.
 
 #### 2. What it includes
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | F-2.1: Industry scoping | Rules | Scope by industry category and related criteria | ◐ Simulated | The scope is stored and shown in the table. It routes nothing (G5-M-02) |
-| F-2.2: Target roles | Picker | Lists roles of the scoped industries plus stored custom roles, or all roles when unscoped. **Lead Physician** is pre-selected | ◐ Simulated | Saved on the task but no clinic user receives it (G5-M-02). Decision needed: D-105 |
+| F-2.2: Target roles | Picker | Under **Assign to Role(s)**, a dropdown lists roles of the scoped industries plus stored custom roles, or all roles when unscoped. A **Filtered by Scope** badge shows the active industries. Chosen roles appear as chips. **Lead Physician** is pre-selected and the last role cannot be removed | ◐ Simulated | Saved on the task but no clinic user receives it (G5-M-02). Decision needed: D-105 |
 | F-2.3: Organization targeting | Field | Pick the organizations that get the task | ○ Not built | The composer never captures an organization (G5-E-27). Decision needed: D-105 |
-| F-2.4: Important and Observers | Toggle, list | Priority flag and observers | ● Works | |
+| F-2.4: Important and Observers | Toggle, picker | **Mark as Important** is a single toggle row. **Observers** picks team members or contacts by role or category, with a searchable multi-select | ● Works | |
 | F-2.5: Scheduling | Fields | Deadline, target time and repeat | ○ Not built | Deliberately hidden. The task has no deadline or recurrence |
-| F-2.6: Task Studio and Preview | Builder | Same item types, 1MB file limit and http or https check as the clinic composer. Preview has test check-offs | ● Works | At least one item is required |
+| F-2.6: Task Studio and Task Preview | Builder | Same item types, **Add Deliverable**, 1MB file limit and http or https check as the clinic composer. Task Preview has test check-offs and shows no workflow or stage chip and no due or repeat chip | ● Works | At least one item is required |
 | F-2.7: Task code | Rule | `TSK-` plus task count plus 101 | ◐ Simulated | A code can repeat after a delete (G5-E-23) |
+| F-2.8: Workflow Pipeline | Rule | The selector is not shown and Next does not ask for one. The task is still saved with the page's default workflow and its first stage, which no Admin screen displays | ● Works | Hidden on 2026-11-13. Clinic tasks still require it |
 
 #### 3. Worked example
 Leo rolls out a credentialing checklist.
@@ -139,7 +140,7 @@ Leo rolls out a credentialing checklist.
 | # | Criteria |
 | :--- | :--- |
 | F-2-1 | **Given** a Healthcare scope, **then** the role list is limited to that industry's roles. **When** the scope is cleared, **then** all roles show. |
-| F-2-2 | **Given** admin mode, **then** Deadline, Target Time and Repeat are not shown and the saved task has no deadline or recurrence. |
+| F-2-2 | **Given** admin mode, **then** Workflow Pipeline, Deadline, Target Time and Repeat are not shown, **Next** does not ask for a workflow, and the saved task has no deadline or recurrence. |
 | F-2-3 | **Given** Task Studio, **when** there is no item or a URL is not http or https, **then** the task is not saved. |
 
 ### F-3: Task detail and sharing
@@ -213,7 +214,7 @@ A patient opens an Admin task link.
 | ID | Feature | Sub-features | Build status | One-line summary |
 | :--- | :--- | :--- | :--- | :--- |
 | F-1 | Corporate tasks table | F-1.1 – F-1.10 | ● / ◐ / ○ | Admin-only list works; organization is fixed text; no role check. |
-| F-2 | Admin task composer | F-2.1 – F-2.7 | ● / ◐ / ○ | Scoping and roles are saved but route nowhere. |
+| F-2 | Admin task composer | F-2.1 – F-2.8 | ● / ◐ / ○ | Scoping and roles are saved but route nowhere. |
 | F-3 | Task detail and sharing | F-3.1 – F-3.5 | ● / ◐ | Detail is unreachable; share can leak. |
 | F-4 | Boundaries with clinic and patient | F-4.1 – F-4.4 | ● / ○ | Patient firewall works; clinic delivery does not. |
 
@@ -266,5 +267,6 @@ Full journey: see Journeys page.
 
 | Date | Change |
 | :--- | :--- |
+| 2026-11-14 | Updated to the task UI changed on 2026-11-13 and 2026-11-14 (workflow pipeline and Workflow switcher removed in Admin, role picker under Task Responsible). |
 | 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
 | 2026-11-12 | First version. |

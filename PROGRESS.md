@@ -113,7 +113,7 @@ _(append one line per ambiguous choice)_
 | :--- | :--- | :--- |
 | Scribe popup | `content/client/scribe.md` | done |
 | Integrations Field Mapping | `content/client/settings/integrations.md` | done (covered in the rewrite from current code) |
-| Tasks UI | `content/client/tasks/my-tasks.md`, `content/client/tasks/tasks-by-me.md`, `content/admin/tasks.md`, `content/companion/tasks.md` | todo |
+| Tasks UI | `content/client/tasks/my-tasks.md`, `content/client/tasks/tasks-by-me.md`, `content/admin/tasks.md`, `content/companion/tasks.md` | done |
 | WhatsApp number allocation (user edit 221da33 / main 2656e8e: Embedded Signup, workflow-attached numbers; marks not yet checked in code) | `content/client/chat/whatsapp.md` | todo |
 | Organization availability (the changed drawer is used only by client Settings; admin Organizations is unchanged) | `content/client/settings/organization.md` | todo |
 

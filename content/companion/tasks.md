@@ -39,7 +39,7 @@ last_updated: "2026-11-14"
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client (Tasks by me) | Assignment and live completion | A task made for a **Client Contact** shows in the patient's list. The patient's check-offs and the auto-completion are written to the same browser store the clinic reads. The clinic picks patients from a static catalog. | [View Tasks by me](/client/tasks/tasks-by-me) |
+| Client (Tasks by me) | Assignment and live completion | A task made for **Contacts** shows in each chosen patient's list. Several contacts can be picked, and a Category with nobody ticked assigns every contact in it. The patient's check-offs and the auto-completion are written to the same browser store the clinic reads. The clinic picks patients from a static catalog. | [View Tasks by me](/client/tasks/tasks-by-me) |
 | Companion (Chat) | Task Assigned message | **Share** then **Client Portal** posts a plain text message "Task Assigned" with title, stage, deadline and a link. It is text, not a card. | [View Companion Chat](/companion/chat/chat) |
 | Companion (Today) | Recent tasks | Today shows the three most recent tasks with the same visibility rules. | [View Today](/companion/today) |
 | Admin | Corporate task firewall | Admin tasks are left out of the list and a direct link shows **Task Not Available**. Sharing an Admin task to the Client Portal can still put it in a chat. | [View Admin Tasks](/admin/tasks) |
@@ -260,5 +260,6 @@ Full journey: see Journeys page.
 
 | Date | Change |
 | :--- | :--- |
+| 2026-11-14 | Updated to the task UI changed on 2026-11-13 and 2026-11-14 (the contact picker now takes several contacts or a whole category). |
 | 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
 | 2026-11-12 | First version. |
