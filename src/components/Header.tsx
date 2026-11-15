@@ -59,22 +59,22 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full h-14 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-zinc-800 transition-colors">
-      <div className="w-full h-full px-4 sm:px-6 flex items-center justify-between gap-2 sm:gap-4">
+    <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-zinc-800 transition-colors">
+      <div className="w-full h-14 px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Mobile Trigger + Logo */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {onToggleMobileSidebar && (
             <button
               type="button"
               onClick={onToggleMobileSidebar}
-              className="md:hidden p-1.5 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white rounded-md hover:bg-slate-100 dark:hover:bg-zinc-800"
+              className="md:hidden p-1.5 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
               aria-label="Toggle navigation menu"
             >
               <Menu className="w-5 h-5" />
             </button>
           )}
 
-          <Link href={getProductLink(activeProduct || "client")} className="flex items-center gap-2.5 group">
+          <Link href={getProductLink(activeProduct || "client")} className="flex items-center gap-2 group">
             <div className="relative h-6 w-24 sm:w-28 md:w-32">
               <Image
                 src="/ma_logo.png"
@@ -84,14 +84,14 @@ export default function Header({
                 priority
               />
             </div>
-            <span className="hidden lg:inline-block text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400">
+            <span className="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400">
               PRD
             </span>
           </Link>
         </div>
 
         {/* Center: Product Switcher Links (Client | Admin | Companion | AI Receptionist) */}
-        <nav className="flex items-center gap-4 sm:gap-6 md:gap-8 h-full overflow-x-auto no-scrollbar shrink-0">
+        <nav className="hidden md:flex items-center gap-4 sm:gap-6 md:gap-8 h-full overflow-x-auto no-scrollbar shrink-0">
           {PRODUCTS.map((prod) => {
             const isActive = activeProduct === prod.id;
             const targetHref = activeModule ? `/${prod.id}/${activeModule}` : getProductLink(prod.id);
@@ -113,7 +113,7 @@ export default function Header({
         </nav>
 
         {/* Right: Inline Dropdown Search + Theme Toggle */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           <SearchDropdown />
 
           <Tooltip
@@ -135,6 +135,28 @@ export default function Header({
             </button>
           </Tooltip>
         </div>
+      </div>
+
+      {/* ── Mobile Product Pill Bar (md:hidden) Mintlify Style ── */}
+      <div className="md:hidden border-t border-slate-200/60 dark:border-zinc-800/70 bg-slate-50/70 dark:bg-zinc-950/60 px-3 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {PRODUCTS.map((prod) => {
+          const isActive = activeProduct === prod.id;
+          const targetHref = activeModule ? `/${prod.id}/${activeModule}` : getProductLink(prod.id);
+
+          return (
+            <Link
+              key={prod.id}
+              href={targetHref}
+              className={`px-3 py-1 text-xs rounded-full whitespace-nowrap transition-all flex items-center ${
+                isActive
+                  ? "bg-[#1456f0] text-white font-semibold shadow-xs"
+                  : "bg-white dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-zinc-800"
+              }`}
+            >
+              {prod.name}
+            </Link>
+          );
+        })}
       </div>
     </header>
   );

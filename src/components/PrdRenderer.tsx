@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Download, CheckCircle2, History } from "lucide-react";
+import { Download, CheckCircle2, History, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, List } from "lucide-react";
 import { PrdDocument } from "@/lib/prdLoader";
 import { downloadFile } from "@/lib/downloadUtils";
-import { ProductId, getProductLink } from "@/lib/modulesConfig";
+import { ProductId, getProductLink, getAdjacentPages } from "@/lib/modulesConfig";
 import ProductSwitchCtas from "./ProductSwitchCtas";
 
 interface PrdRendererProps {
@@ -176,9 +176,9 @@ function MarkdownBlock({
         renderedElements.push(
           <div
             key={`table-${i}`}
-            className="mt-2.5 mb-5 overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs"
+            className="mt-2.5 mb-5 overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs no-scrollbar sm:scrollbar-thin"
           >
-            <table className="w-full text-left text-xs sm:text-[13px] border-collapse">
+            <table className="w-full min-w-[540px] text-left text-xs sm:text-[13px] border-collapse">
               <thead>
                 <tr className="bg-slate-100/90 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800">
                   {headerRow.map((h, hIdx) => (
@@ -434,11 +434,108 @@ function formatInlineMarkdown(text: string): React.ReactNode {
   return parts;
 }
 
+function MobileTableOfContents({ prd }: { prd: PrdDocument }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const items: { id: string; label: string; level: number }[] = [];
+
+  if (prd.atAGlanceRaw) {
+    items.push({ id: "at-a-glance", label: "At a glance", level: 1 });
+  }
+  if (prd.crossProductSummaryRaw) {
+    items.push({ id: "cross-product-summary", label: "Cross-product Summary", level: 1 });
+  }
+
+  prd.sections.forEach((sec) => {
+    items.push({
+      id: sec.slug,
+      label: `${sec.number}. ${sec.title}`,
+      level: 1,
+    });
+
+    if (sec.number === 2 && sec.features) {
+      sec.features.forEach((feat) => {
+        items.push({
+          id: feat.slug,
+          label: `${feat.id}: ${feat.title}`,
+          level: 2,
+        });
+      });
+    }
+
+    if (sec.number === 3 && sec.subSections) {
+      sec.subSections.forEach((sub) => {
+        items.push({
+          id: sub.slug,
+          label: `${sub.number} ${sub.title}`,
+          level: 2,
+        });
+      });
+    }
+  });
+
+  if (items.length === 0) return null;
+
+  const handleJump = (id: string) => {
+    setIsOpen(false);
+    const el = document.getElementById(id);
+    if (el) {
+      const yOffset = -110;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <div className="xl:hidden w-full my-2">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/80 backdrop-blur-xs text-xs font-semibold text-slate-700 dark:text-zinc-300 shadow-2xs hover:bg-slate-50 dark:hover:bg-zinc-800/80 transition-all cursor-pointer"
+        aria-expanded={isOpen}
+      >
+        <div className="flex items-center gap-2">
+          <List className="w-4 h-4 text-[#1456f0] dark:text-blue-400" />
+          <span>On this page</span>
+          <span className="text-[10px] font-mono font-normal px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400">
+            {items.length} sections
+          </span>
+        </div>
+        {isOpen ? (
+          <ChevronUp className="w-4 h-4 text-slate-400" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-slate-400" />
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="mt-1.5 p-1.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0c0c0e] shadow-xl max-h-72 overflow-y-auto space-y-0.5 animate-in fade-in duration-150">
+          {items.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleJump(item.id)}
+              className={`w-full text-left py-1.5 px-2.5 rounded-lg text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                item.level === 1
+                  ? "font-semibold text-slate-800 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800/80"
+                  : "pl-5 font-normal text-slate-600 dark:text-zinc-400 hover:bg-slate-100/70 dark:hover:bg-zinc-800/60"
+              }`}
+            >
+              <span className="truncate">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PrdRenderer({
   prd,
   hasPrdInOtherProducts,
 }: PrdRendererProps) {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const adjacent = getAdjacentPages(prd.product, prd.module, prd.channel);
 
   // Revived Module/Channel-Level Markdown Download
   const handleDownloadModule = () => {
@@ -525,6 +622,9 @@ export default function PrdRenderer({
         hasPrdInProduct={hasPrdInOtherProducts}
       />
 
+      {/* ── Mobile & Tablet Table of Contents Dropdown (Mintlify style, xl:hidden) ── */}
+      <MobileTableOfContents prd={prd} />
+
       {/* ── How real it is: counts of Works / Simulated / Not built (from the Status columns) ── */}
       {prd.statusCounts.total > 0 && (
         <div className="flex flex-wrap items-center gap-1" aria-label="Build status counts">
@@ -535,8 +635,8 @@ export default function PrdRenderer({
       )}
 
       {/* ── Clean Metadata Table (Strictly NO "Item | Detail" text) ── */}
-      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs">
-        <table className="w-full text-left text-xs sm:text-[13px] border-collapse">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xs no-scrollbar sm:scrollbar-thin">
+        <table className="w-full min-w-[340px] sm:min-w-full text-left text-xs sm:text-[13px] border-collapse">
           <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80 bg-white dark:bg-[#0c0c0e]">
             <tr>
               <td className="py-2.5 px-3.5 font-medium text-slate-500 dark:text-zinc-400 w-36 bg-slate-50/70 dark:bg-zinc-900/40">Product</td>
@@ -640,6 +740,43 @@ export default function PrdRenderer({
           </section>
         ))}
       </div>
+
+      {/* ── Dual Prev / Next Page Navigation Cards (Mintlify SaaS style) ── */}
+      {(adjacent.prev || adjacent.next) && (
+        <div className="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 border-t border-slate-200/80 dark:border-zinc-800">
+          {adjacent.prev ? (
+            <Link
+              href={adjacent.prev.href}
+              className="group flex flex-col gap-1 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0c0c0e] hover:border-[#1456f0]/50 dark:hover:border-blue-500/50 hover:shadow-xs transition-all text-left"
+            >
+              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-500 group-hover:text-[#1456f0] dark:group-hover:text-blue-400 transition-colors">
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Previous</span>
+              </div>
+              <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors truncate">
+                {adjacent.prev.title}
+              </span>
+            </Link>
+          ) : (
+            <div className="hidden sm:block" />
+          )}
+
+          {adjacent.next && (
+            <Link
+              href={adjacent.next.href}
+              className="group flex flex-col items-end gap-1 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0c0c0e] hover:border-[#1456f0]/50 dark:hover:border-blue-500/50 hover:shadow-xs transition-all text-right sm:col-start-2"
+            >
+              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-500 group-hover:text-[#1456f0] dark:group-hover:text-blue-400 transition-colors">
+                <span>Next</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors truncate">
+                {adjacent.next.title}
+              </span>
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* Footer Audit Link to Date & Edit Logs in Sidebar */}
       <div className="pt-6 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400">

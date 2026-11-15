@@ -30,18 +30,19 @@ export default function PrdLayoutClient({
       {/* ── Main Layout Container ── */}
       <div className="flex-1 flex w-full relative">
         {/* Left Desktop Sidebar (Hidden on mobile) */}
-        <div className="hidden md:block sticky top-14 h-[calc(100vh-3.5rem)] shrink-0 z-30">
+        <div className="hidden md:block sticky top-14 h-[calc(100vh-3.5rem)] shrink-0 z-30 w-64">
           <Sidebar product={product} />
         </div>
 
         {/* Mobile Sidebar Slide-Over Drawer */}
         {isMobileSidebarOpen && (
-          <div className="fixed inset-0 z-50 flex md:hidden">
+          <div className="fixed inset-0 z-50 flex md:hidden animate-in fade-in duration-200">
             <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
               onClick={() => setIsMobileSidebarOpen(false)}
+              aria-label="Close sidebar overlay"
             />
-            <div className="relative w-64 bg-white dark:bg-[#0c0c0e] h-full shadow-2xl z-10">
+            <div className="relative w-[85vw] max-w-[320px] bg-white dark:bg-[#0c0c0e] h-full shadow-2xl z-10 flex flex-col border-r border-slate-200 dark:border-zinc-800 animate-in slide-in-from-left duration-200">
               <Sidebar product={product} onCloseMobile={() => setIsMobileSidebarOpen(false)} />
             </div>
           </div>

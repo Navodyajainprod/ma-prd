@@ -804,118 +804,229 @@ export default function SearchDropdown() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-40 sm:w-64 md:w-80">
-      {/* Search Input Bar */}
-      <div className="relative flex items-center">
-        <Search className="absolute left-2.5 w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 pointer-events-none" />
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onFocus={() => setIsOpen(true)}
-          onChange={(e) => {
-            setQuery(e.target.value);
+    <>
+      {/* ── Mobile Search Trigger Button (compact, fits in 56px navbar) ── */}
+      <div className="block sm:hidden">
+        <button
+          type="button"
+          onClick={() => {
             setIsOpen(true);
-            setSelectedIndex(0);
+            setTimeout(() => inputRef.current?.focus(), 50);
           }}
-          onKeyDown={handleKeyDown}
-          placeholder="Search PRDs..."
-          className="w-full pl-8 pr-12 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg hover:border-slate-300 dark:hover:border-zinc-700 focus:border-[#1456f0] focus:ring-1 focus:ring-[#1456f0] focus:outline-hidden transition-all shadow-2xs"
-          aria-label="Search PRDs"
-          aria-expanded={isOpen}
-        />
-        {query ? (
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              inputRef.current?.focus();
+          className="p-1.5 rounded-lg text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800/80 transition-colors border border-slate-200/60 dark:border-zinc-800"
+          aria-label="Search specifications"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* ── Desktop Inline Search Bar ── */}
+      <div ref={containerRef} className="relative hidden sm:block w-60 md:w-80">
+        <div className="relative flex items-center">
+          <Search className="absolute left-2.5 w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 pointer-events-none" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onFocus={() => setIsOpen(true)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setIsOpen(true);
+              setSelectedIndex(0);
             }}
-            className="absolute right-2 p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 rounded"
-            aria-label="Clear search"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        ) : (
-          <kbd className="absolute right-2 hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200/80 dark:border-zinc-700 pointer-events-none">
-            ⌘K
-          </kbd>
+            onKeyDown={handleKeyDown}
+            placeholder="Search specifications..."
+            className="w-full pl-8 pr-12 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg hover:border-slate-300 dark:hover:border-zinc-700 focus:border-[#1456f0] focus:ring-1 focus:ring-[#1456f0] focus:outline-hidden transition-all shadow-2xs"
+            aria-label="Search PRDs"
+            aria-expanded={isOpen}
+          />
+          {query ? (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                inputRef.current?.focus();
+              }}
+              className="absolute right-2 p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 rounded"
+              aria-label="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <kbd className="absolute right-2 text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200/80 dark:border-zinc-700 pointer-events-none">
+              ⌘K
+            </kbd>
+          )}
+        </div>
+
+        {/* Desktop Results Dropdown */}
+        {isOpen && (
+          <div className="absolute right-0 top-full mt-1.5 w-80 sm:w-96 max-h-[380px] bg-white dark:bg-[#0c0c0e] border border-slate-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-y-auto z-50 p-1.5 select-none animate-in fade-in zoom-in-95 duration-100">
+            <div className="px-2 py-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800/80 mb-1">
+              <span>{query ? "Search Results" : "Suggested Specifications"}</span>
+              <span>{filteredItems.length} found</span>
+            </div>
+
+            {filteredItems.length === 0 ? (
+              <div className="p-4 text-center text-xs text-slate-500 dark:text-zinc-400">
+                No matching specifications found for &quot;{query}&quot;
+              </div>
+            ) : (
+              <div className="space-y-0.5">
+                {filteredItems.map((item, idx) => {
+                  const isSelected = idx === selectedIndex;
+                  const badgeClass = PRODUCT_BADGE_STYLES[item.product] || "bg-slate-100 text-slate-700";
+
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleSelect(item)}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      className={`group flex items-start gap-2.5 p-2 rounded-lg text-left transition-colors cursor-pointer ${
+                        isSelected
+                          ? "bg-slate-100 dark:bg-zinc-800/80 text-slate-900 dark:text-white"
+                          : "text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900/60"
+                      }`}
+                    >
+                      <FileText
+                        className={`w-4 h-4 shrink-0 mt-0.5 ${
+                          isSelected
+                            ? "text-[#1456f0] dark:text-blue-400"
+                            : "text-slate-400 dark:text-zinc-500"
+                        }`}
+                      />
+
+                      <div className="flex-1 min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded border ${badgeClass}`}
+                          >
+                            {item.productLabel}
+                          </span>
+                          <span className="text-[11px] font-semibold truncate text-slate-900 dark:text-zinc-100">
+                            {item.title}
+                          </span>
+                        </div>
+
+                        <p className="text-[10px] text-slate-500 dark:text-zinc-400 truncate">
+                          <span className="font-medium text-slate-700 dark:text-zinc-300">
+                            {item.module}
+                          </span>
+                          {item.section && ` • ${item.section}`} — {item.subtitle}
+                        </p>
+                      </div>
+
+                      {isSelected && (
+                        <CornerDownLeft className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 shrink-0 mt-1" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="mt-1.5 pt-1.5 border-t border-slate-100 dark:border-zinc-800/80 px-2 py-0.5 flex items-center justify-between text-[10px] text-slate-400 dark:text-zinc-500">
+              <span>Use ↑↓ to navigate, Enter to select</span>
+              <span>ESC to close</span>
+            </div>
+          </div>
         )}
       </div>
 
-      {/* Results Dropdown Directly Underneath Input (No Modal, No Dark Overlay) */}
+      {/* ── Mobile Full-Screen Search Modal ── */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1.5 w-80 sm:w-96 max-h-[380px] bg-white dark:bg-[#0c0c0e] border border-slate-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-y-auto z-50 p-1.5 select-none animate-in fade-in zoom-in-95 duration-100">
-          <div className="px-2 py-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800/80 mb-1">
-            <span>{query ? "Search Results" : "Suggested Specifications"}</span>
-            <span>{filteredItems.length} found</span>
-          </div>
+        <div className="fixed inset-0 z-50 flex flex-col sm:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150"
+            onClick={() => setIsOpen(false)}
+          />
 
-          {filteredItems.length === 0 ? (
-            <div className="p-4 text-center text-xs text-slate-500 dark:text-zinc-400">
-              No matching specifications found for &quot;{query}&quot;
-            </div>
-          ) : (
-            <div className="space-y-0.5">
-              {filteredItems.map((item, idx) => {
-                const isSelected = idx === selectedIndex;
-                const badgeClass = PRODUCT_BADGE_STYLES[item.product] || "bg-slate-100 text-slate-700";
-
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => handleSelect(item)}
-                    onMouseEnter={() => setSelectedIndex(idx)}
-                    className={`group flex items-start gap-2.5 p-2 rounded-lg text-left transition-colors cursor-pointer ${
-                      isSelected
-                        ? "bg-slate-100 dark:bg-zinc-800/80 text-slate-900 dark:text-white"
-                        : "text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900/60"
-                    }`}
+          {/* Modal Container */}
+          <div className="relative w-full bg-white dark:bg-[#0c0c0e] border-b border-slate-200 dark:border-zinc-800 shadow-2xl p-3 flex flex-col max-h-[85vh] z-10 animate-in slide-in-from-top-4 duration-150">
+            {/* Input Row with Cancel Button */}
+            <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200 dark:border-zinc-800">
+              <div className="relative flex-1 flex items-center">
+                <Search className="absolute left-3 w-4 h-4 text-slate-400 dark:text-zinc-500 pointer-events-none" />
+                <input
+                  type="text"
+                  autoFocus
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setSelectedIndex(0);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Search specifications..."
+                  className="w-full pl-9 pr-9 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl focus:border-[#1456f0] focus:ring-1 focus:ring-[#1456f0] focus:outline-hidden"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    className="absolute right-2.5 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 rounded"
+                    aria-label="Clear search"
                   >
-                    <FileText
-                      className={`w-4 h-4 shrink-0 mt-0.5 ${
-                        isSelected
-                          ? "text-[#1456f0] dark:text-blue-400"
-                          : "text-slate-400 dark:text-zinc-500"
-                      }`}
-                    />
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
 
-                    <div className="flex-1 min-w-0 space-y-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded border ${badgeClass}`}
-                        >
-                          {item.productLabel}
-                        </span>
-                        <span className="text-[11px] font-semibold truncate text-slate-900 dark:text-zinc-100">
-                          {item.title}
-                        </span>
-                      </div>
-
-                      <p className="text-[10px] text-slate-500 dark:text-zinc-400 truncate">
-                        <span className="font-medium text-slate-700 dark:text-zinc-300">
-                          {item.module}
-                        </span>
-                        {item.section && ` • ${item.section}`} — {item.subtitle}
-                      </p>
-                    </div>
-
-                    {isSelected && (
-                      <CornerDownLeft className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 shrink-0 mt-1" />
-                    )}
-                  </div>
-                );
-              })}
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="px-2.5 py-2 text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
             </div>
-          )}
 
-          <div className="mt-1.5 pt-1.5 border-t border-slate-100 dark:border-zinc-800/80 px-2 py-0.5 flex items-center justify-between text-[10px] text-slate-400 dark:text-zinc-500">
-            <span>Use ↑↓ to navigate, Enter to select</span>
-            <span>ESC to close</span>
+            {/* Results List */}
+            <div className="flex-1 overflow-y-auto pt-2 space-y-1">
+              <div className="px-1 py-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                <span>{query ? "Search Results" : "Suggested Specifications"}</span>
+                <span>{filteredItems.length} found</span>
+              </div>
+
+              {filteredItems.length === 0 ? (
+                <div className="py-8 text-center text-xs text-slate-500 dark:text-zinc-400">
+                  No matching specifications found for &quot;{query}&quot;
+                </div>
+              ) : (
+                filteredItems.map((item, idx) => {
+                  const badgeClass = PRODUCT_BADGE_STYLES[item.product] || "bg-slate-100 text-slate-700";
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleSelect(item)}
+                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-900 active:bg-slate-200/70 dark:active:bg-zinc-800 transition-colors cursor-pointer"
+                    >
+                      <FileText className="w-4 h-4 text-slate-400 dark:text-zinc-500 shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span
+                            className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${badgeClass}`}
+                          >
+                            {item.productLabel}
+                          </span>
+                          <span className="text-xs font-semibold text-slate-900 dark:text-zinc-100">
+                            {item.title}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-zinc-400 line-clamp-1">
+                          <span className="font-medium text-slate-700 dark:text-zinc-300">{item.module}</span>
+                          {item.section && ` • ${item.section}`} — {item.subtitle}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

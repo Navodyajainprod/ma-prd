@@ -913,3 +913,50 @@ export function getProductLink(targetProductId: ProductId, currentModuleId?: str
   }
   return `/${targetProductId}/${firstMod.id}`;
 }
+
+export interface AdjacentPage {
+  title: string;
+  category: string;
+  href: string;
+}
+
+export function getAdjacentPages(
+  product: ProductId,
+  currentModuleId: string,
+  currentChannelId?: string
+): { prev: AdjacentPage | null; next: AdjacentPage | null } {
+  const modules = getModulesForProduct(product);
+  const flatPages: AdjacentPage[] = [];
+
+  modules.forEach((mod) => {
+    if (mod.submodules && mod.submodules.length > 0) {
+      mod.submodules.forEach((sub) => {
+        flatPages.push({
+          title: `${mod.name} — ${sub.name}`,
+          category: mod.category || "GENERAL",
+          href: `/${product}/${mod.id}/${sub.id}`,
+        });
+      });
+    } else {
+      flatPages.push({
+        title: mod.name,
+        category: mod.category || "GENERAL",
+        href: `/${product}/${mod.id}`,
+      });
+    }
+  });
+
+  const currentHref = currentChannelId
+    ? `/${product}/${currentModuleId}/${currentChannelId}`
+    : `/${product}/${currentModuleId}`;
+
+  const currentIndex = flatPages.findIndex((p) => p.href === currentHref);
+  if (currentIndex === -1) {
+    return { prev: null, next: null };
+  }
+
+  return {
+    prev: currentIndex > 0 ? flatPages[currentIndex - 1] : null,
+    next: currentIndex < flatPages.length - 1 ? flatPages[currentIndex + 1] : null,
+  };
+}

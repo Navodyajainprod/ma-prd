@@ -40,8 +40,9 @@ import {
   Navigation,
   Activity,
   Bot,
+  X,
 } from "lucide-react";
-import { getModulesForProduct, ProductId } from "@/lib/modulesConfig";
+import { getModulesForProduct, ProductId, PRODUCTS, getProductLink } from "@/lib/modulesConfig";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   chat: MessageSquare,
@@ -129,21 +130,60 @@ export default function Sidebar({ product, onCloseMobile }: SidebarProps) {
   }, [modules]);
 
   return (
-    <aside className="w-64 min-w-[256px] max-w-[256px] h-full flex flex-col bg-slate-50/70 dark:bg-[#0c0c0e] border-r border-slate-200/80 dark:border-zinc-800 select-none overflow-y-auto transition-colors">
-      {/* Product Banner */}
-      <div className="p-4 border-b border-slate-200/60 dark:border-zinc-800">
+    <aside className="w-full h-full flex flex-col bg-slate-50/70 dark:bg-[#0c0c0e] border-r border-slate-200/80 dark:border-zinc-800 select-none overflow-y-auto transition-colors">
+      {/* Product Banner & Mobile Close Button */}
+      <div className="p-3.5 sm:p-4 border-b border-slate-200/60 dark:border-zinc-800 shrink-0">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
-            {product.replace("-", " ").toUpperCase()} SPECIFICATION
-          </span>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
-            v1.0
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-zinc-300">
+              {product.replace("-", " ").toUpperCase()} SPECIFICATION
+            </span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
+              v1.0
+            </span>
+          </div>
+
+          {onCloseMobile && (
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              className="md:hidden p-1 text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white rounded-md hover:bg-slate-200/60 dark:hover:bg-zinc-800 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* In-Drawer Product Switcher (Mobile Only) */}
+      <div className="md:hidden px-3 pt-3 pb-2 border-b border-slate-200/60 dark:border-zinc-800/80">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-2 px-1">
+          Switch Product
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          {PRODUCTS.map((p) => {
+            const isCur = p.id === product;
+            return (
+              <Link
+                key={p.id}
+                href={getProductLink(p.id)}
+                onClick={onCloseMobile}
+                className={`px-2 py-1.5 text-[11px] rounded-lg font-medium text-center truncate transition-all ${
+                  isCur
+                    ? "bg-[#1456f0] text-white font-semibold shadow-xs"
+                    : "bg-white dark:bg-zinc-900 border border-slate-200/70 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                {p.name}
+              </Link>
+            );
+          })}
         </div>
       </div>
 
       {/* Navigation Sections */}
-      <nav className="flex-1 p-3 space-y-6">
+      <nav className="flex-1 p-3 space-y-5">
         {categories.map(([categoryTitle, categoryModules]) => (
           <div key={categoryTitle} className="space-y-1">
             <h3 className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
@@ -162,10 +202,10 @@ export default function Sidebar({ product, onCloseMobile }: SidebarProps) {
                     <div key={mod.id} className="space-y-0.5">
                       {/* Parent Item with Dropdown Toggle */}
                       <div
-                        className={`group flex items-center justify-between px-2 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                        className={`group flex items-center justify-between px-2.5 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
                           isParentActive
-                            ? "text-slate-900 dark:text-white font-semibold"
-                            : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                            ? "bg-blue-50/80 dark:bg-blue-950/40 text-[#1456f0] dark:text-blue-400 font-semibold shadow-2xs"
+                            : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-900/60"
                         }`}
                         onClick={(e) => toggleModuleExpand(mod.id, e)}
                       >
@@ -201,9 +241,9 @@ export default function Sidebar({ product, onCloseMobile }: SidebarProps) {
                         </button>
                       </div>
 
-                      {/* Dropdown Child Pages with Thin Accent Line */}
+                      {/* Dropdown Child Pages with Accent Line */}
                       {isExpanded && (
-                        <div className="pl-4 space-y-0.5 pt-0.5 border-l border-slate-200 dark:border-zinc-800/80 ml-3.5">
+                        <div className="pl-4 space-y-0.5 pt-0.5 border-l border-slate-200 dark:border-zinc-800/80 ml-4">
                           {mod.submodules.map((sub, sIdx) => {
                             const isSubActive =
                               isParentActive && (currentChannel === sub.id || (!segments[2] && sIdx === 0));
@@ -213,10 +253,10 @@ export default function Sidebar({ product, onCloseMobile }: SidebarProps) {
                                 key={sub.id}
                                 href={`/${product}/${mod.id}/${sub.id}`}
                                 onClick={onCloseMobile}
-                                className={`flex items-center justify-between py-1 text-xs transition-colors border-l-2 pl-2.5 ${
+                                className={`flex items-center justify-between py-1.5 px-2.5 rounded-md text-xs transition-colors ${
                                   isSubActive
-                                    ? "border-[#1456f0] text-[#1456f0] dark:text-blue-400 font-semibold"
-                                    : "border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200"
+                                    ? "bg-blue-50/80 dark:bg-blue-950/40 text-[#1456f0] dark:text-blue-400 font-semibold"
+                                    : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 hover:bg-slate-100/50 dark:hover:bg-zinc-900/40"
                                 }`}
                               >
                                 <span className="truncate">{sub.name}</span>
@@ -235,10 +275,10 @@ export default function Sidebar({ product, onCloseMobile }: SidebarProps) {
                     key={mod.id}
                     href={`/${product}/${mod.id}`}
                     onClick={onCloseMobile}
-                    className={`group flex items-center justify-between py-1.5 text-xs font-medium transition-colors border-l-2 pl-2 ${
+                    className={`group flex items-center justify-between px-2.5 py-2 text-xs font-medium rounded-lg transition-colors ${
                       isParentActive
-                        ? "border-[#1456f0] text-[#1456f0] dark:text-blue-400 font-semibold"
-                        : "border-transparent text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                        ? "bg-blue-50/80 dark:bg-blue-950/40 text-[#1456f0] dark:text-blue-400 font-semibold shadow-2xs"
+                        : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-900/60"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -266,10 +306,10 @@ export default function Sidebar({ product, onCloseMobile }: SidebarProps) {
           <Link
             href={`/${product}/logs`}
             onClick={onCloseMobile}
-            className={`group flex items-center justify-between py-1.5 text-xs font-medium transition-colors border-l-2 pl-2 ${
+            className={`group flex items-center justify-between px-2.5 py-2 text-xs font-medium rounded-lg transition-colors ${
               isLogsPage
-                ? "border-[#1456f0] text-[#1456f0] dark:text-blue-400 font-semibold"
-                : "border-transparent text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                ? "bg-blue-50/80 dark:bg-blue-950/40 text-[#1456f0] dark:text-blue-400 font-semibold shadow-2xs"
+                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-900/60"
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -287,7 +327,7 @@ export default function Sidebar({ product, onCloseMobile }: SidebarProps) {
       </nav>
 
       {/* Sidebar Footer */}
-      <div className="p-3 border-t border-slate-200/60 dark:border-zinc-800 text-[11px] text-slate-400 dark:text-zinc-500 flex items-center justify-between">
+      <div className="p-3 border-t border-slate-200/60 dark:border-zinc-800 text-[11px] text-slate-400 dark:text-zinc-500 flex items-center justify-between shrink-0">
         <span>MantraAssist</span>
         <span className="font-mono text-[10px]">Verified</span>
       </div>

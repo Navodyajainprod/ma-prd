@@ -55,3 +55,12 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(161, 161, 170, 0.45);
 }
+
+/* Hide scrollbar for smooth horizontal touch scrolling (Mintlify style) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
