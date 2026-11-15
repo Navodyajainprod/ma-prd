@@ -27,7 +27,7 @@ last_updated: "2026-11-14"
 | **Where you start it** | 1. **Settings > Integrations** (`/settings/integrations`) to onboard WhatsApp numbers via Meta Embedded Signup.<br>2. **Workflows** (`/process` → Chatbot Channel Settings) to allocate numbers and configure chatbot prompts.<br>3. **Chats** (`/chats?channel=whatsapp`) for live triage, thread management, and the template library. |
 | **Where the result goes** | Direct to patient mobile phones via WhatsApp PSTN, recorded in real time in the Chats inbox, and logged as an activity entry on the patient's **Client Profile Timeline**. |
 | **Cross-product scope** | **Client workspace only.** WhatsApp is direct, external clinic-to-patient mobile communication. It operates independently of the Companion patient portal. |
-| **How real is it** | 4 features work, 2 are partly simulated, 0 are not built. See the legend below. Number storage and UI allocation exist in the prototype; Meta API connectivity and outbound WhatsApp delivery are simulated. |
+| **How real is it** | 0 features work, 6 are partly simulated, 0 are not built. See the legend below. Number storage and the allocation picker exist in the prototype. Meta Embedded Signup cannot complete, no workflow routes or sends WhatsApp messages, the number switcher does not filter threads and the 24-hour window is always open. |
 
 **Build-status legend used on every row of this PRD**
 
@@ -41,9 +41,9 @@ last_updated: "2026-11-14"
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client (Settings > Integrations) | Meta WhatsApp Embedded Signup | Practice admins connect official WhatsApp Business Accounts (WABA) using Meta's Embedded Signup onboarding flow. Registered numbers are stored in the workspace phone pool. | [View Integrations](/client/settings/integrations) |
-| Client (Workflows / Process) | Number allocation & AI prompt routing | Workflows allocate active WhatsApp numbers. **Cardinality rule:** One workflow can have multiple WhatsApp numbers, but no single phone number can belong to more than one workflow. Outbound stages dispatch from the allocated number; inbound messages to that number invoke that workflow's specific prompt. | [View Workflows](/client/workflows) |
-| Client (Chats Inbox) | Omnichannel triage & number switcher | `/chats?channel=whatsapp` provides a unified inbox with a phone number switcher, unread badges, manual bot takeover, 24-hour window compliance, and template dispatch. | [View Chats Inbox](/client/chat/chat) |
+| Client (Settings > Integrations) | Meta WhatsApp Embedded Signup | Practice admins connect official WhatsApp Business Accounts (WABA) using Meta's Embedded Signup onboarding flow. Registered numbers are stored in the workspace phone pool. In the prototype a number is typed in and given a placeholder WABA id. Embedded Signup shows an error. | [View Integrations](/client/settings/integrations) |
+| Client (Workflows / Process) | Number allocation & AI prompt routing | Workflows allocate active WhatsApp numbers. **Cardinality rule:** One workflow can have multiple WhatsApp numbers, but no single phone number can belong to more than one workflow. The allocation is saved on the workflow, but nothing reads it: no stage sends from the number and no inbound message is routed by it. There is no exclusivity check and no per-workflow prompt or knowledge base in the drawer. | [View Workflows](/client/workflows) |
+| Client (Chats Inbox) | Omnichannel triage & number switcher | `/chats?channel=whatsapp` provides an inbox with a phone number switcher (it lists numbers but does not filter threads), unread badges, an Assign Responsible action, and template dispatch. The 24-hour window is always open. | [View Chats Inbox](/client/chat/chat) |
 | Client (Clients & Contacts) | Activity timeline write-back | Inbound messages, automated AI chatbot turns, staff replies, and template dispatches are recorded on the client's Activity timeline with WhatsApp badges. | [View Clients](/client/clients) |
 
 ## 1. Module Summary
@@ -58,11 +58,13 @@ When a patient reaches an automated outreach stage (e.g. "Reach out to client" f
 
 In the clinic, Care Coordinator Priya Nair opens **Chats** (`/chats?channel=whatsapp`). She uses the top-bar number switcher to filter threads by the Uptown line. Seeing Sarah's thread, she reviews the automated conversation, pauses the bot to step in personally, and sends a pre-approved Meta HSM template ("Appointment Follow-up") with full 24-hour customer care window compliance. Every exchange is automatically logged to Sarah's patient timeline.
 
+> **As built, 2026-11-14:** the story above is the intended flow. In the prototype Alexander types the numbers in, the allocation is saved but no workflow sends or routes anything, the switcher does not filter threads and the 24-hour window never closes. See the status marks below.
+
 ### What is real and what is not
 
-- **Real in the prototype:** Number persistence in the workspace store (`useWhatsAppNumbers`), workflow multi-select number allocation in Chatbot Channel Settings drawer (`ChatbotChannelDrawer.tsx`), thread list with unread counter, search, manual responsible staff assignment, template builder with live preview, and timeline activity write-back.
-- **Simulated:** Meta Embedded Signup uses a simulated OAuth callback. Actual WhatsApp Cloud API webhooks and carrier message delivery are mocked in local storage. The 24-hour service window is calculated but forced open for demonstration. Template approval requests are auto-approved instantly.
-- **Not built:** Server-side webhook receiver, carrier message delivery receipts (double blue checks), media attachments over 25MB, dynamic HSM template parameter validation against live patient chart variables.
+- **Real in the prototype:** Number persistence in the workspace store (`useWhatsAppNumbers`), the multi-select number picker in the Chatbot Channel Settings drawer (`ChatbotChannelDrawer.tsx`, saved on the workflow), thread list with unread counter, search, responsible staff assignment, template builder with live preview, template sending from a thread and timeline activity write-back.
+- **Simulated:** A number is added by typing it; it gets a placeholder WABA id. Two sample numbers are preloaded. Messages and threads live in local storage and nothing is delivered. The number switcher lists numbers but shows every thread. The 24-hour window is computed but forced open and shows 24 hours. Template approval requests are auto-approved instantly.
+- **Not built:** Meta Embedded Signup (the link needs the Facebook SDK, which is not loaded, and a backend that does not exist), exclusive allocation of a number to one workflow, per-workflow prompt and knowledge base in the drawer, outbound dispatch from a stage, inbound routing by number, any AI bot reply on WhatsApp, window expiry and the template prompt, server-side webhook receiver, delivery receipts, media attachments over 25MB, dynamic HSM template parameter validation against live patient chart variables.
 
 ### Journey position
 
@@ -92,15 +94,15 @@ In **Settings > Integrations** (`/settings/integrations`), the Practice Admin co
 #### 2. What it includes
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| F-1.1: Embedded Signup Trigger | Button | Launches Meta OAuth onboarding dialog ("Launch WhatsApp Onboarding") | ● Works | Opens Meta modal in client |
-| F-1.2: Number Registration | Data | Captures phone number, verified display name, and Meta Cloud API credentials | ● Works | Stored in `whatsappTemplateIntegrations` |
-| F-1.3: Number Inventory | List | Displays active WhatsApp numbers with provider status and phone IDs | ● Works | Consumed by `useWhatsAppNumbers` hook |
-| F-1.4: Disconnect / Reconnect | Action | Revokes Meta token and releases phone numbers from the workspace pool | ● Works | Confirmation modal with audit log |
+| F-1.1: Embedded Signup Trigger | Button | Launches Meta OAuth onboarding dialog ("Launch WhatsApp Onboarding") | ○ Not built | The WhatsApp Business connect window has a link, "Or connect via Meta Embedded Signup (requires setup)". It shows "Facebook SDK not loaded" because the SDK is not loaded. The Meta config id is a placeholder and the callback endpoint does not exist |
+| F-1.2: Number Registration | Data | Captures phone number, verified display name, and Meta Cloud API credentials | ◐ Simulated | **+ Add WhatsApp Number** takes only a typed number and gives it a placeholder WABA id. No verification and no Meta credentials. Stored in `whatsappTemplateIntegrations` |
+| F-1.3: Number Inventory | List | Displays active WhatsApp numbers with provider status and phone IDs | ● Works | Lists each number with its WABA id and a Disconnect button. Two sample numbers are preloaded when none are stored. Consumed by `useWhatsAppNumbers` hook |
+| F-1.4: Disconnect / Reconnect | Action | Revokes Meta token and releases phone numbers from the workspace pool | ◐ Simulated | Disconnect removes the number from the pool at once and shows a toast. There is no confirmation, no audit log and no Meta token to revoke. A workflow that used the number keeps it |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Setting up clinic communications | Opens Settings > Integrations, clicks **Launch WhatsApp Onboarding** | **Meta Embedded Signup completes; `+1 (555) 123-4567` is added to the clinic's number pool** |
+| 1 | Setting up clinic communications | Opens Settings > Integrations, clicks **Launch WhatsApp Onboarding** | **Intended. As built, the link shows "Facebook SDK not loaded". A number is added only through + Add WhatsApp Number** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
@@ -110,7 +112,7 @@ In **Settings > Integrations** (`/settings/integrations`), the Practice Admin co
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | **Given** Settings > Integrations, **when** the user completes Meta Embedded Signup, **then** the connected phone numbers appear in the workspace number inventory. |
+| F-1-1 | **Given** Settings > Integrations, **when** the user types a number in **+ Add WhatsApp Number**, **then** it appears in the workspace number inventory with a placeholder WABA id. Meta Embedded Signup does not complete. |
 | F-1-2 | **Given** registered numbers, **then** they are exposed to the workflow engine and chats module via `useWhatsAppNumbers`. |
 
 ---
@@ -127,15 +129,15 @@ In **Workflows** (`/process`), each clinical process can enable the WhatsApp cha
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | F-2.1: WhatsApp Channel Toggle | Toggle | Enables or disables automated WhatsApp handling on the workflow | ● Works | Persisted in workflow stage settings |
-| F-2.2: Channel Phone Numbers Multi-Select | Dropdown | Multi-select pills listing available numbers from Integrations | ● Works | Supports multiple numbers per workflow |
-| F-2.3: Exclusive Allocation Rule | Validation | Prevents a phone number from being assigned to more than one workflow | ● Works | Once assigned to Workflow A, the number is unavailable or reassigned from Workflow B |
-| F-2.4: Default Inbound Assignment | Setting | Defines primary fallback number for outbound stage triggers | ● Works | First allocated number acts as primary default |
+| F-2.2: Channel Phone Numbers Multi-Select | Dropdown | Multi-select pills listing available numbers from Integrations | ● Works | Supports multiple numbers per workflow. A number can also be added inside the dropdown, which adds it to the pool. The drawer opens per stage as well as per workflow |
+| F-2.3: Exclusive Allocation Rule | Validation | Prevents a phone number from being assigned to more than one workflow | ○ Not built | No check exists. The same number can be selected on any number of workflows. Decision needed: D-140 |
+| F-2.4: Default Inbound Assignment | Setting | Defines primary fallback number for outbound stage triggers | ◐ Simulated | The first selected number is stored as the primary. No stage trigger reads it. Decision needed: D-139 |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
 | 1 | Configuring Cataract Workflow | Toggles WhatsApp Channel ON, selects `+1 (555) 123-4567` and `+1 (555) 987-6543` | **Both numbers are allocated to the Cataract workflow** |
-| 2 | Configuring Dental Workflow | Opens Dental workflow Chatbot Settings | **The two cataract numbers cannot be chosen, or prompt a reassignment warning** |
+| 2 | Configuring Dental Workflow | Opens Dental workflow Chatbot Settings | **Intended. As built, the two cataract numbers can still be chosen and no warning shows** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
@@ -146,7 +148,7 @@ In **Workflows** (`/process`), each clinical process can enable the WhatsApp cha
 | # | Criteria |
 | :--- | :--- |
 | F-2-1 | **Given** a workflow's Chatbot Channel Settings, **when** WhatsApp is enabled, **then** the user can allocate one or more registered WhatsApp numbers. |
-| F-2-2 | **Given** a phone number already allocated to Workflow A, **then** it cannot simultaneously be active on Workflow B. |
+| F-2-2 | **Given** a phone number already allocated to Workflow A, **then** it can also be selected on Workflow B. No exclusivity rule is enforced. |
 
 ---
 
@@ -158,16 +160,16 @@ When a workflow stage triggers an outbound message to a client (e.g., "Client re
 #### 2. What it includes
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| F-3.1: Outbound Stage Dispatch | Action | Dispatches stage communication from the allocated WhatsApp number | ● Works | Uses the workflow's active number |
-| F-3.2: Inbound Number Routing | Router | Inbound webhook matches recipient phone number to its dedicated workflow | ● Works | Deterministic 1:1 number-to-workflow mapping |
-| F-3.3: Workflow Prompt Execution | AI Engine | Chatbot replies according to the workflow's prompt, clinical guidelines, and model | ● Works | Driven by `botModel`, system prompt, and stage KB |
-| F-3.4: Auto-Create Client on First Message | Rule | Optional setting in drawer to create patient record from WhatsApp sender ID | ● Works | `autoCreateClient` toggle in Chatbot drawer |
+| F-3.1: Outbound Stage Dispatch | Action | Dispatches stage communication from the allocated WhatsApp number | ○ Not built | No stage action sends a WhatsApp message and nothing reads the saved numbers. Decision needed: D-139 |
+| F-3.2: Inbound Number Routing | Router | Inbound webhook matches recipient phone number to its dedicated workflow | ○ Not built | No webhook and no routing by number. Decision needed: D-140 |
+| F-3.3: Workflow Prompt Execution | AI Engine | Chatbot replies according to the workflow's prompt, clinical guidelines, and model | ○ Not built | The drawer holds a bot model, a welcome message and an auto-create switch. It has no prompt and no knowledge base field, and no WhatsApp reply is generated |
+| F-3.4: Auto-Create Client on First Message | Rule | Optional setting in drawer to create patient record from WhatsApp sender ID | ◐ Simulated | `autoCreateClient` toggle is saved with the settings. No inbound message ever reaches it |
 
 #### 3. Worked example
 | # | Situation | What happens | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient reaches post-op stage | Stage trigger activates | **Outbound WhatsApp message is sent from the Cataract workflow's number** |
-| 2 | Sarah Johnson replies: "Can I shower after surgery?" | Message arrives on `+1 (555) 123-4567` | **Inbound routes to Cataract workflow; AI bot uses Cataract prompt and knowledge base to answer correctly** |
+| 1 | Patient reaches post-op stage | Stage trigger activates | **Intended. As built, no WhatsApp message is sent** |
+| 2 | Sarah Johnson replies: "Can I shower after surgery?" | Message arrives on `+1 (555) 123-4567` | **Intended. As built, nothing routes the message and no bot answers** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
@@ -177,8 +179,8 @@ When a workflow stage triggers an outbound message to a client (e.g., "Client re
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | **Given** an automated outbound stage, **then** the message is dispatched from the workflow's allocated WhatsApp number. |
-| F-3-2 | **Given** an inbound message to a clinic WhatsApp number, **then** it is handled by the workflow allocated to that number, using that workflow's prompt and model. |
+| F-3-1 | **Given** an automated outbound stage, **then** no WhatsApp message is dispatched from the allocated number. |
+| F-3-2 | **Given** an inbound message to a clinic WhatsApp number, **then** it is not routed to a workflow and no bot reply is generated. |
 
 ---
 
@@ -191,16 +193,16 @@ In **Chats** (`/chats?channel=whatsapp`), staff see live WhatsApp threads across
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | F-4.1: WhatsApp Thread List | List | Lists threads with patient name, phone, snippet, timestamp, unread badge | ● Works | Synced in local store |
-| F-4.2: Number Switcher | Dropdown | Filters the thread list by allocated clinic WhatsApp number | ● Works | Populated from `useWhatsAppNumbers` |
-| F-4.3: Unread Badges | Indicator | Numeric counter on unread incoming WhatsApp messages; clears on open | ● Works | |
-| F-4.4: Staff Bot Takeover | Action | Assigning a staff member or typing manually pauses automated bot replies | ● Works | Gear menu → **Assign Responsible** |
+| F-4.2: Number Switcher | Dropdown | Filters the thread list by allocated clinic WhatsApp number | ◐ Simulated | The dropdown lists the stored numbers and the numbers on sample threads, and shows the chosen one. The thread list ignores it and shows every thread. Populated from `useWhatsAppNumbers` |
+| F-4.3: Unread Badges | Indicator | Numeric counter on unread incoming WhatsApp messages; clears on open | ● Works | Clears when the thread is opened |
+| F-4.4: Staff Bot Takeover | Action | Assigning a staff member or typing manually pauses automated bot replies | ◐ Simulated | Gear menu → **Assign Responsible** sets the responsible person. No bot replies on WhatsApp threads, so nothing is paused. The Pause Care Bot item exists only on the Companion thread |
 | F-4.5: Search & Filter | Search | Searches patient names, phone numbers, and message content | ● Works | Real-time text search |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Coordinator Priya arrives for shift | Opens Chats, selects WhatsApp channel and filters by Downtown line | **Only threads belonging to the Downtown WhatsApp number are listed** |
-| 2 | Patient asks for human assistance | Priya types a message and assigns herself | **AI chatbot is paused on the thread; Priya handles the patient directly** |
+| 1 | Coordinator Priya arrives for shift | Opens Chats, selects WhatsApp channel and filters by Downtown line | **Intended. As built, the number is shown but every WhatsApp thread stays listed** |
+| 2 | Patient asks for human assistance | Priya types a message and assigns herself | **Priya is set as responsible. No bot was running on the thread** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
@@ -211,8 +213,8 @@ In **Chats** (`/chats?channel=whatsapp`), staff see live WhatsApp threads across
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-4-1 | **Given** `/chats?channel=whatsapp`, **when** a number is selected in the number switcher, **then** threads are filtered to that clinic line. |
-| F-4-2 | **Given** an active thread, **when** staff assign a team member or reply, **then** the AI bot is paused for that thread. |
+| F-4-1 | **Given** `/chats?channel=whatsapp`, **when** a number is selected in the number switcher, **then** the number is shown and the thread list does not change. |
+| F-4-2 | **Given** an active thread, **when** staff assign a team member, **then** that person is shown as responsible. No bot is paused. |
 
 ---
 
@@ -224,16 +226,16 @@ Under Meta policy, businesses can exchange freeform messages with patients only 
 #### 2. What it includes
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| F-5.1: 24h Window Calculation | Rule | Computes elapsed time since the latest inbound message timestamp | ◐ Simulated | Window forced open in prototype for demo (G4-W-06) |
-| F-5.2: Service Window Countdown | Indicator | Visual indicator above composer showing remaining time in the active window | ○ Not built | Target design |
+| F-5.1: 24h Window Calculation | Rule | Computes elapsed time since the latest inbound message timestamp | ◐ Simulated | The elapsed time is computed, but expiry is switched off in code: the window is always open and always reports 24 hours (G4-W-06) |
+| F-5.2: Service Window Countdown | Indicator | Visual indicator above composer showing remaining time in the active window | ◐ Simulated | The client Activity tab shows "Reply window: 24h 0m left", always the same value. Nothing shows above the Chats composer |
 | F-5.3: Window Expiry Notification | Banner | Informs staff when the 24h window has expired and prompts template usage | ○ Not built | Target design |
-| F-5.4: Automatic Window Reset | Rule | Patient reply immediately resets the 24-hour customer care timer | ● Works | Inbound message resets timer |
+| F-5.4: Automatic Window Reset | Rule | Patient reply immediately resets the 24-hour customer care timer | ◐ Simulated | The last inbound message is used for the calculation, but the window never expires, so a reset has no visible effect |
 
 #### 3. Worked example
 | # | Situation | What happens | Result |
 | :--- | :--- | :--- | :--- |
 | 1 | Patient replied 2 hours ago | Staff opens thread | **Window is active; freeform messaging and attachments permitted** |
-| 2 | Patient last replied 3 days ago | Staff attempts to message | **System prompts staff to send an approved HSM Template to reopen window** |
+| 2 | Patient last replied 3 days ago | Staff attempts to message | **Intended. As built, the freeform message is sent and no template prompt shows** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
@@ -243,8 +245,8 @@ Under Meta policy, businesses can exchange freeform messages with patients only 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-5-1 | **Given** an inbound message, **then** the 24-hour service window opens and permits freeform conversation. |
-| F-5-2 | **Given** an expired 24h window, **then** outbound communication must be an approved Meta HSM template. |
+| F-5-1 | **Given** any WhatsApp thread, **then** freeform messages are always allowed. |
+| F-5-2 | **Given** a thread whose last inbound message is days old, **then** freeform sending is still allowed and no template is required. A template can still be sent through **Share Template Message**. |
 
 ---
 
@@ -258,7 +260,7 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 | :--- | :--- | :--- | :--- | :--- |
 | F-6.1: Template Library Management | Table | Lists templates with category, language, approval status, and actions | ● Works | Stored in browser store |
 | F-6.2: Template Builder Drawer | Drawer | Visual builder with parameter mapping and real-time WhatsApp bubble preview | ● Works | |
-| F-6.3: Starter Templates | Catalog | Pre-built healthcare templates (Appointment Reminder, Lab Result Ready, Intake Form) | ● Works | One-click copy into clinic library |
+| F-6.3: Starter Templates | Catalog | Pre-built healthcare templates (Appointment Reminder, Lab Result Ready, Intake Form) | ○ Not built | No starter catalog with one-click copy was found. Three templates are preloaded in the library: Appointment Reminder, Booking Confirmation, Post-Consultation Feedback |
 | F-6.4: Request Meta Approval | Action | Submits template to Meta for category and content verification | ◐ Simulated | Auto-approved in prototype |
 | F-6.5: Share Template Message | Modal | Modal in chat composer allowing immediate template selection and dispatch | ● Works | Resolves variables or defaults to "there" |
 | F-6.6: Activity Write-back | Event | Sent template is automatically logged to the patient's Client Activity Timeline | ● Works | Logged with WhatsApp tag |
@@ -266,8 +268,8 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Window expired for Sarah Johnson | Staff clicks gear → **Share Template Message** → selects "Appointment Follow-up" | **Approved template dispatches to Sarah's WhatsApp; entry logs in Client Timeline** |
-| 2 | Sarah replies: "Yes, I will be there" | Sarah sends message | **24-hour service window is reopened; staff can converse freely** |
+| 1 | Staff wants to re-engage Sarah Johnson | Staff clicks gear → **Share Template Message** → selects "Appointment Follow-up" | **Approved template dispatches to Sarah's WhatsApp; entry logs in Client Timeline** |
+| 2 | Sarah replies: "Yes, I will be there" | Sarah sends message | **Staff can converse freely. The window was never closed in the prototype** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
@@ -288,12 +290,12 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 ### 3.1 Feature Request Summary
 | ID | Feature | Sub-features | Build status | One-line summary |
 | :--- | :--- | :--- | :--- | :--- |
-| F-1 | Number Onboarding (Integrations) | F-1.1 – F-1.4 | ● / ◐ | Meta Embedded Signup registers clinic WABA numbers into workspace pool. |
-| F-2 | Workflow Number Allocation | F-2.1 – F-2.4 | ● Works | Multi-select numbers per workflow; strict 1:N cardinality (no shared numbers across workflows). |
-| F-3 | Workflow Chatbot Execution | F-3.1 – F-3.4 | ● Works | Outbound stage dispatch & inbound routing to workflow-specific prompt and model. |
-| F-4 | WhatsApp Threads & Switcher | F-4.1 – F-4.5 | ● Works | Live threads, clinic line filtering, unread badges, manual bot takeover. |
-| F-5 | 24-Hour Service Window | F-5.1 – F-5.4 | ◐ / ○ | Meta 24h customer care compliance; freeform allowed within 24h, templates required outside. |
-| F-6 | Template Library & Sender | F-6.1 – F-6.6 | ● / ◐ | Builder, starter catalog, auto-approval, composer dispatch, timeline write-back. |
+| F-1 | Number Onboarding (Integrations) | F-1.1 – F-1.4 | ● / ◐ / ○ | Numbers are typed in with a placeholder WABA id. Embedded Signup does not work. |
+| F-2 | Workflow Number Allocation | F-2.1 – F-2.4 | ● / ◐ / ○ | Multi-select numbers per workflow is saved. The one-workflow-per-number rule is not enforced. |
+| F-3 | Workflow Chatbot Execution | F-3.1 – F-3.4 | ◐ / ○ | No outbound dispatch, inbound routing or prompt execution exists. |
+| F-4 | WhatsApp Threads & Switcher | F-4.1 – F-4.5 | ● / ◐ | Threads, unread badges and search work. The switcher does not filter and no bot is paused. |
+| F-5 | 24-Hour Service Window | F-5.1 – F-5.4 | ◐ / ○ | The window is computed but always open; no expiry banner. |
+| F-6 | Template Library & Sender | F-6.1 – F-6.6 | ● / ◐ / ○ | Builder, auto-approval, composer dispatch and timeline write-back work; no starter catalog. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
@@ -313,8 +315,8 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 
 | Who | Can do | Is blocked from |
 | :--- | :--- | :--- |
-| **System Admin / Practice Admin** | Onboard WABA numbers in Settings > Integrations, allocate numbers to workflows in Process, configure AI chatbot prompts, create and approve HSM templates. | Nothing |
-| **Care Coordinator / Clinical Staff** | Filter threads by clinic line in `/chats?channel=whatsapp`, reply to patients, pause bot and take over responsible assignment, dispatch approved templates. | Cannot disconnect Meta integrations or change workflow number routing |
+| **System Admin / Practice Admin** | Add numbers in Settings > Integrations, pick numbers per workflow in Process, set the bot model and welcome message, create and approve HSM templates. | Nothing |
+| **Care Coordinator / Clinical Staff** | Reply to patients in `/chats?channel=whatsapp`, assign a responsible person, dispatch approved templates. | Not blocked by any rule: only the System Admin role opens Settings and Process, but Chats has no finer control |
 | **Signed-out visitor** | Nothing (redirected to sign-in) | Everything |
 
 ---
@@ -323,10 +325,10 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 
 | Metric | Definition | Benchmark / Formula |
 | :--- | :--- | :--- |
-| **Active WhatsApp Lines** | Count of registered Meta Cloud API phone numbers currently allocated to workflows. | Integer count (1 workflow : N numbers). |
-| **24h Window Adherence** | Percentage of outbound communications sent within the active window or via approved templates. | Target: 100% compliance to avoid carrier blocking. |
-| **AI Bot Resolution Rate** | Percentage of inbound WhatsApp interactions resolved by the workflow AI bot without staff takeover. | Industry benchmark: >70%. |
-| **Template Delivery Rate** | Percentage of Meta HSM templates successfully delivered to patient handsets. | Target: >98%. |
+| **Active WhatsApp Lines** | Count of registered Meta Cloud API phone numbers currently allocated to workflows. | Not computed anywhere in the prototype. |
+| **24h Window Adherence** | Percentage of outbound communications sent within the active window or via approved templates. | Not computed. Target: 100% compliance to avoid carrier blocking. |
+| **AI Bot Resolution Rate** | Percentage of inbound WhatsApp interactions resolved by the workflow AI bot without staff takeover. | Not computed. Industry benchmark: >70%. |
+| **Template Delivery Rate** | Percentage of Meta HSM templates successfully delivered to patient handsets. | Not computed. Target: >98%. |
 
 ---
 
@@ -339,6 +341,8 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 | **Inbound Patient Inquiry** | Patient WhatsApp → Workflow Chatbot | Patient replies. System routes to the allocated workflow, and the AI chatbot responds following that workflow's specific prompt. |
 | **Live Staff Triage & Takeover** | Chats Console → Patient WhatsApp | Staff views thread in `/chats?channel=whatsapp`, filters by phone line, pauses bot, replies manually, or sends an approved HSM template. |
 | **Audit & Record Keeping** | WhatsApp Exchange → Client Profile | Every inbound message, bot turn, staff response, and template is archived to the patient's Client Activity Timeline. |
+
+> **As built:** the first four journeys below are intended flows. Only the staff triage in Chats and the timeline write-back run in the prototype, and neither uses the allocated numbers.
 
 > **Explicit Boundary Note:** WhatsApp operates exclusively within the **Client** workspace and patient mobile messaging network. The **Companion** patient portal does not receive or host WhatsApp messages.
 
@@ -359,5 +363,6 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 
 | Date | Change |
 | :--- | :--- |
+| 2026-11-14 | Updated to the prototype changes of 2026-11-13 and 2026-11-14 (status marks checked against the code: Embedded Signup, exclusive allocation, routing, prompt, number filter and the always-open 24-hour window downgraded). |
 | 2026-11-14 | **Major Architecture & Flow Correction:** Removed all incorrect references to Companion. Added the complete end-to-end WhatsApp integration flow: Meta Embedded Signup in Settings > Integrations, workflow allocation in Process (enforcing 1 workflow to multiple numbers, but no single number to multiple workflows), outbound stage dispatch, inbound routing to workflow-specific prompt, and live Chats console triage with 24h window compliance and HSM templates. |
 | 2026-11-10 | First version (generated stub). |

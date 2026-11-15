@@ -40,7 +40,7 @@ last_updated: "2026-11-14"
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client (Settings) | Locations, hours and closures | A member's hours are limited to the location's opening hours. A closed day cannot be switched on. | [View Organization Settings](/client/settings/organization) |
+| Client (Settings) | Locations, hours and closures | A member's hours are limited to the location's weekly hours, set per location on the Organization drawer Availability tab. A closed day cannot be switched on. The drawer no longer has a control to add location closures. | [View Organization Settings](/client/settings/organization) |
 | Client (Settings) | Team members | The member picker lists the team. | [View Team Settings](/client/settings/team) |
 | Companion | Provider slots | The portal's specialist slots use the same hours and days off. Service mode ignores provider hours by design. | [View Companion Appointments](/companion/appointments) |
 | Client (Appointments) | Booking drawer | In specialist mode, slots start from the provider's first shift for that location and step by the service duration. | [View Appointments List](/client/appointments/list) |
@@ -162,7 +162,7 @@ The earlier PRD promised buffers before and after a visit and slots that snap to
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | F-3.1: Slots step by service duration | Rule | Slots start at the shift start and step by the service duration | ● Works | Not fixed :00, :15, :30, :45 marks (G6-A-07). Decision needed: D-118 |
-| F-3.2: Location hours and closures | Rule | A location closure, or a day the location is closed, gives no slots and a reason | ● Works | (G6-A-12) |
+| F-3.2: Location hours and closures | Rule | A location closure, or a day the location is closed, gives no slots and a reason | ● Works | (G6-A-12). The Organization drawer no longer offers a way to add a location closure, so only closures saved earlier apply |
 | F-3.3: Pre-visit buffer | Dropdown | 0, 5, 10 or 15 minutes before a visit | ○ Not built | (G6-A-06). Decision needed: D-118 |
 | F-3.4: Post-visit buffer | Dropdown | 0, 5, 10, 15 or 30 minutes after a visit | ○ Not built | Back-to-back slots are generated (G6-A-06) |
 | F-3.5: Slot quantisation interval | Dropdown | Round slot starts to :00, :15, :30, :45 | ○ Not built | (G6-A-07) |
