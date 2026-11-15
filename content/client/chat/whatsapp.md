@@ -140,7 +140,7 @@ In **Workflows** (`/process`), each clinical process can enable the WhatsApp cha
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Clinical Ops Director | I want to dedicate specific phone numbers to specific clinical workflows, so that patient inquiries are routed to the correct clinical process without collision. |
+| F-2-J1 | Practice Manager | I want to dedicate specific phone numbers to specific clinical workflows, so that patient inquiries are routed to the correct clinical process without collision. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
@@ -238,7 +238,7 @@ Under Meta policy, businesses can exchange freeform messages with patients only 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-5-J1 | Compliance Admin | I want the system to observe Meta's 24-hour messaging window, so that our clinic avoids Meta Cloud API carrier blocks and penalties. |
+| F-5-J1 | Practice Admin | I want the system to observe Meta's 24-hour messaging window, so that our clinic avoids Meta Cloud API carrier blocks and penalties. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
@@ -299,11 +299,13 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
 | 1 | Practice Admin | Onboard verified clinic phone lines via Meta Embedded Signup | F-1 |
-| 2 | Clinical Ops Director | Allocate dedicated numbers to workflows with exclusive routing | F-2 |
+| 2 | Practice Manager | Allocate dedicated numbers to workflows with exclusive routing | F-2 |
 | 3 | Practice Manager | Ensure conversational AI follows workflow-specific clinical prompts | F-3 |
-| 4 | Care Coordinator | Filter chats by clinic number and take over from the bot when needed | F-4 |
-| 5 | Compliance Admin | Comply with Meta's 24-hour service window rules | F-5 |
-| 6 | Care Coordinator | Re-engage inactive patients using approved Meta HSM templates | F-6 |
+| 4 | Care Coordinator | Filter chats by clinic number | F-4 |
+| 5 | Care Coordinator | Take over from the bot when a patient needs complex triage | F-4 |
+| 6 | Practice Admin | Comply with Meta's 24-hour service window rules | F-5 |
+| 7 | Practice Manager | Maintain standardized approved WhatsApp templates | F-6 |
+| 8 | Care Coordinator | Re-engage inactive patients using approved Meta HSM templates | F-6 |
 
 ---
 

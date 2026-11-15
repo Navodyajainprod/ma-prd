@@ -249,7 +249,7 @@ function lintFile(file, decisionIds, stats) {
         feature.jobs.push(r.cells[0]);
         feature.jobUsers.push(r.cells[1]);
         if (!PERSONAS.includes(r.cells[1])) err(`persona "${r.cells[1]}" is not in the standard list`, r.line);
-        if (!/^.+, I want .+, so that .+$/.test(r.cells[2] || "")) err(`job must read "<When/During/After ...>, I want ..., so that ..."`, r.line);
+        if (!/^(.+, )?I want .+, so that .+$/.test(r.cells[2] || "")) err(`job must read "<When/During/After ...>, I want ..., so that ..."`, r.line);
       }
     }
     // acceptance criteria
