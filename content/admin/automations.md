@@ -99,14 +99,14 @@ Leo checks what is live.
 ### F-2: Create and manage a rule
 
 #### 1. What it does
-**New Rule** asks for a Rule Name, a description and a scope. The shared flow builder opens next. A rule that points at the wrong entity or that loops is rejected. A draft saves as Paused. Each row has a menu with **Configure Scope Rules**, **View / Edit** and **Delete**.
+**New Rule** asks for a Rule Name, a description and a scope. The shared flow builder opens next. A rule that points at the wrong entity or that loops is rejected. Save always writes the rule as Active: the Draft option is not reachable (same builder as the client Automation page). Each row has a menu with **Configure Scope Rules**, **View / Edit** and **Delete**.
 
 #### 2. What it includes
 | Item | Type | What it does (as built) | Status | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | F-2.1: New Rule modal | Modal | Rule Name is required (message "Please enter a rule name to continue."), Description, Scope, then the flow builder | ● Works | |
 | F-2.2: Target and loop checks | Rule | Rules with an invalid entity target or a loop are rejected | ● Works | |
-| F-2.3: Draft saves as Paused | Rule | A rule saved as a draft starts Paused | ● Works | |
+| F-2.3: Draft status | Rule | The earlier PRD said a draft starts Paused. The builder has a Draft option in code but no control opens it, and Save always writes Active, so editing a paused rule and saving makes it Active | ○ Not built | Same drawer as the client Automation page |
 | F-2.4: Toggle status | Action | Clicking the status switches Active and Paused | ● Works | No toast |
 | F-2.5: Delete | Row action | Asks "Delete rule" in a browser confirmation, then removes the rule | ● Works | |
 | F-2.6: Configure Scope Rules | Panel | Rule N with Industry Category, Industries and an optional Country. No rules means all tenants | ● Works | |

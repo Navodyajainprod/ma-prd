@@ -30,11 +30,11 @@ The page's overall build status is set by the page itself: **Works** if at least
 
 | Product | Pages | Features | Rows | ● Works | ◐ Simulated | ○ Not built | Share working |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Client | 43 | 160 | 1245 | 464 | 457 | 324 | 37% |
-| Admin | 24 | 76 | 561 | 242 | 161 | 158 | 43% |
+| Client | 43 | 165 | 1360 | 499 | 515 | 346 | 37% |
+| Admin | 24 | 76 | 561 | 241 | 161 | 159 | 43% |
 | Companion | 9 | 29 | 186 | 70 | 61 | 55 | 38% |
 | AI Receptionist | 17 | 65 | 328 | 170 | 91 | 67 | 52% |
-| **All products** | 93 | 330 | 2320 | 946 | 770 | 604 | 41% |
+| **All products** | 93 | 335 | 2435 | 980 | 828 | 627 | 40% |
 
 ## 3. Client
 
@@ -49,7 +49,7 @@ The page's overall build status is set by the page itself: **Works** if at least
 | Sign-in, Sign-up, Verification, Invite and Route Guards | `client/auth/access.md` | ◐ Partly simulated | 4 | 13 | 12 | 9 |
 | Practice Onboarding Wizard and Plan Recommendation | `client/auth/onboarding.md` | ◐ Partly simulated | 5 | 16 | 8 | 9 |
 | Public Pricing Page and Payment Screen | `client/auth/pricing-payment.md` | ◐ Partly simulated | 3 | 11 | 8 | 3 |
-| Automation: Event Rules Registry and Rule Builder | `client/automation.md` | ◐ Partly simulated | 3 | 14 | 8 | 6 |
+| Automation: Event Rules Registry and Rule Builder | `client/automation.md` | ◐ Partly simulated | 6 | 26 | 31 | 19 |
 | Call Logs, Telephony Hub & AI Transcription | `client/call-logs.md` | ◐ Simulated | 5 | 7 | 21 | 16 |
 | Chats: Inbox and Care Groups | `client/chat/chat.md` | ◐ Partly simulated | 5 | 14 | 15 | 14 |
 | Chats: Companion Channel | `client/chat/companion.md` | ◐ Partly simulated | 5 | 11 | 12 | 6 |
@@ -82,7 +82,7 @@ The page's overall build status is set by the page itself: **Works** if at least
 | My Tasks: Assigned Clinic and Admin Work Inbox | `client/tasks/my-tasks.md` | ◐ Partly simulated | 4 | 11 | 6 | 4 |
 | Tasks by me: Team Delegation, Patient Tasks and Sharing | `client/tasks/tasks-by-me.md` | ◐ Partly simulated | 4 | 15 | 16 | 4 |
 | Web Forms: Intake Forms, Sharing and Client Creation | `client/web-forms.md` | ◐ Partly simulated | 5 | 23 | 16 | 9 |
-| Workflows: Processes, Stages, AI Behaviour and Stage Automations | `client/workflows.md` | ◐ Partly simulated | 4 | 24 | 11 | 8 |
+| Workflows: Processes, Stages, AI Behaviour and Stage Automations | `client/workflows.md` | ◐ Partly simulated | 6 | 47 | 46 | 17 |
 
 ## 4. Admin
 
@@ -92,7 +92,7 @@ The page's overall build status is set by the page itself: **Works** if at least
 | Admin: Workflows | `admin/admin-workflows.md` | ◐ Partly simulated | 4 | 12 | 6 | 4 |
 | AI Voices and Models: Global Availability Switchboard | `admin/ai-voices-models.md` | ◐ Partly simulated | 2 | 8 | 2 | 7 |
 | Audit Logs: Platform Admin Activity | `admin/audit-logs.md` | ◐ Partly simulated | 3 | 8 | 6 | 5 |
-| Admin: Automations | `admin/automations.md` | ◐ Partly simulated | 3 | 11 | 3 | 2 |
+| Admin: Automations | `admin/automations.md` | ◐ Partly simulated | 3 | 10 | 3 | 3 |
 | Sections & Fields: Fields Tab (Global Custom Field Registry) | `admin/custom-fields/fields.md` | ◐ Partly simulated | 4 | 20 | 8 | 6 |
 | Sections & Fields: Sections Tab (Field Groups on Record Profiles) | `admin/custom-fields/sections.md` | ◐ Partly simulated | 3 | 11 | 3 | 7 |
 | Document Templates: Master Registry | `admin/document-templates.md` | ◐ Partly simulated | 4 | 15 | 8 | 7 |

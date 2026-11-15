@@ -209,3 +209,12 @@ _(append `hash message` after each commit)_
 | 28 | Organization drawer Save Changes throws (Organization) | `app/components/settings/OrganizationDetailDrawer.tsx:815` uses `selectedLocation`, declared nowhere | Pass |
 
 Result: 27 pass, 1 partial (fixed). Checks 12 and 23 were done by the page's own agent re-reading the code; the other 26 by the orchestrator. Two analysis claims were found wrong or out of date while checking: location delete does ask for confirmation (analysis said it did not), and a visitor with no session does not simply become the first client.
+
+## Content gap fixes after the first delivery (2026-11-15)
+
+- **Workflows chatbot settings** were one line (F-1.7). Cause: the analysis logged the Calling / Chatbot / Portal and Reception switches and dialogs as one row (G8-I-17) and my brief did not require one row per control or drawer field. Fixed: F-5 (40 rows) and F-6 (10 rows) in `client/workflows.md`, written from `Process.tsx`, `ChatbotChannelDrawer.tsx` and `useProcessStore.ts`.
+- **Automation nodes** were listed by name in one row. Fixed: every node and trigger documented in `client/automation.md` (76 rows). Finding: the 18-name step list in `AddAutomationDrawer.tsx` is not what the screen shows; the on-screen palette is `NODE_CATEGORIES` in `FlowBuilderTab.tsx` with 16 nodes. Send Payment and Send Invoice are not on it. Several old claims were wrong (condition gate never blocks, Field Update only adds an activity note, End Workflow does not stop later nodes, Draft is unreachable, only two of ten offered triggers are ever emitted).
+- `admin/automations.md` claimed "a draft saves as Paused"; corrected (same drawer, Save always writes Active).
+- `chat/whatsapp.md` section 7 reused decision ids D-135, D-136, D-139, D-140 for the user's questions, which the register defines differently; the questions are kept with a note naming the related register decision. D-140 needs its own id in `analysis/decisions.md`.
+- The analysis files still contain the wrong 18-node and Draft claims (analysis/modules/08); they were not edited.
+- Lesson for any future pass: ask for one row per control, drawer field and palette node; check the on-screen component, not a constant in code.
