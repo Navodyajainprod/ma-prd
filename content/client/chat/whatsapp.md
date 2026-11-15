@@ -352,10 +352,10 @@ Provides a library of pre-approved Meta HSM (Highly Structured Message) template
 
 | ID | Decision | Affects |
 | :--- | :--- | :--- |
-| D-139 | When multiple numbers are allocated to a single workflow, how should outbound stage messages select between them (e.g. round-robin, patient location match, or primary default line)? | F-2.4, F-3.1 |
-| D-140 | When reallocating a phone number from Workflow A to Workflow B, should existing open threads automatically migrate workflows or complete in their origin workflow? | F-2.3, F-3.2 |
+| D-139 | When multiple numbers are allocated to a single workflow, how should outbound stage messages select between them (e.g. round-robin, patient location match, or primary default line)? The register's D-139 covers whether the number selector is a list filter or an outbound sender, which this question extends. | F-2.4, F-3.1 |
+| D-140 | When reallocating a phone number from Workflow A to Workflow B, should existing open threads automatically migrate workflows or complete in their origin workflow? Not yet in the register: D-140 there covers thread status and ownership, so this question needs its own id. | F-2.3, F-3.2 |
 | D-135 | In production, should the 24-hour service window hard-lock the composer input or provide an override confirmation modal for emergency clinical dispatches? | F-5.2, F-5.4 |
-| D-136 | Will Meta HSM template variables support live chart dynamic resolvers (e.g. `{{patient.nextAppointmentDate}}`, `{{doctor.name}}`) directly from EHR stores? | F-6.5 |
+| D-136 | Will Meta HSM template variables support live chart dynamic resolvers (e.g. `{{patient.nextAppointmentDate}}`, `{{doctor.name}}`) directly from EHR stores? The register's D-136 covers template approval states and what happens when a variable has no value, which this question extends. | F-6.5 |
 
 ---
 
