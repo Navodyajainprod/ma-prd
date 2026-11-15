@@ -132,11 +132,11 @@ _(append one line per ambiguous choice)_
 | 4b | `content/client/account/profile.md` | account / profile | analysis 14 D4 | todo |
 | 4b | `content/client/account/refer-and-earn.md` | account / refer-and-earn | analysis 14 D5 | todo |
 | 4b | `content/client/help/guide.md` | help / guide | analysis 14 D6 | todo |
-| 4d | `content/admin/products-services.md` | Product / Services | analysis 13 C.16 | todo |
-| 4d | `content/admin/admin-workflows.md` | Workflows (admin) | analysis 13 C.17 | todo |
-| 4d | `content/admin/automations.md` | Automations (admin) | analysis 13 C.18 | todo |
-| 4d | `content/admin/form-templates.md` | Forms (admin) | analysis 13 C.19 | todo |
-| 4d | `content/admin/admin-knowledge-base.md` | Knowledge Base (admin) | analysis 13 C.20 | todo |
+| 4d | `content/admin/products-services.md` | Product / Services | analysis 13 C.16 | done |
+| 4d | `content/admin/admin-workflows.md` | Workflows (admin) | analysis 13 C.17 | done |
+| 4d | `content/admin/automations.md` | Automations (admin) | analysis 13 C.18 | done |
+| 4d | `content/admin/form-templates.md` | Forms (admin) | analysis 13 C.19 | done |
+| 4d | `content/admin/admin-knowledge-base.md` | Knowledge Base (admin) | analysis 13 C.20 | done |
 | 4e | `content/admin/workspace-billing.md` | Workspace Billing, Orders, Subscriptions | analysis 13 C.21 to C.23 | todo |
 | 4e | `content/admin/product-analytics.md` | Analytics: Overview, Voice Calls, Org Usage, Process Movement, Revenue | analysis 13 C.24 to C.28 | todo |
 | 4e | `content/admin/telephony.md` | Telephony | analysis 13 C.29 | todo |
