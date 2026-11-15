@@ -93,11 +93,11 @@ _(append one line per ambiguous choice)_
 | G8 Companion remaining | `content/companion/billing.md` | done |
 | G8 Companion remaining | `content/companion/pharmacy.md` | done |
 | G9 Admin remaining | `content/admin/ai-voices-models.md` | done |
-| G9 Admin remaining | `content/admin/custom-fields/fields.md` | todo |
-| G9 Admin remaining | `content/admin/custom-fields/sections.md` | todo |
+| G9 Admin remaining | `content/admin/custom-fields/fields.md` | done |
+| G9 Admin remaining | `content/admin/custom-fields/sections.md` | done |
 | G9 Admin remaining | `content/admin/document-templates.md` | todo |
-| G9 Admin remaining | `content/admin/industry-category/categories.md` | todo |
-| G9 Admin remaining | `content/admin/industry-category/industries.md` | todo |
+| G9 Admin remaining | `content/admin/industry-category/categories.md` | done |
+| G9 Admin remaining | `content/admin/industry-category/industries.md` | done |
 | G9 Admin remaining | `content/admin/organizations.md` | done |
 | G9 Admin remaining | `content/admin/plans/actions.md` | todo |
 | G9 Admin remaining | `content/admin/plans/categories.md` | todo |
@@ -112,9 +112,9 @@ _(append one line per ambiguous choice)_
 | Area | Files | Status |
 | :--- | :--- | :--- |
 | Scribe popup | `content/client/scribe.md` | todo |
-| Integrations Field Mapping | `content/client/settings/integrations.md` | done |
-| Tasks UI | `content/client/tasks/my-tasks.md`, `tasks-by-me.md`, `content/admin/tasks.md`, `content/companion/tasks.md` | todo |
-| Organization availability | `content/admin/organizations.md`, `content/client/settings/organization.md` | done |
+| Integrations Field Mapping | `content/client/settings/integrations.md` | done (covered in the rewrite from current code) |
+| Tasks UI | `content/client/tasks/my-tasks.md`, `content/client/tasks/tasks-by-me.md`, `content/admin/tasks.md`, `content/companion/tasks.md` | todo |
+| Organization availability (the changed drawer is used only by client Settings; admin Organizations is unchanged) | `content/client/settings/organization.md` | todo |
 
 ## Phase 4: new files for built screens with no PRD
 
