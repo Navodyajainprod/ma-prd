@@ -50,14 +50,14 @@ last_updated: "2026-11-14"
 
 ### The story in one minute
 
-Priya Nair opens **Webforms** and presses **New form**. She adds Short Text, Email, Phone and Signature fields and maps Email and Phone to the client fields. In the settings she turns on **Create Submitter as Client Profile** and picks a process and the initial stage, then presses **Publish**. She opens the form and copies the **Live link**. It points to a placeholder domain with nothing behind it. She shares the form with Sarah Johnson by SMS. A toast says "Ready to send via SMS" and no text goes out, but a "sent" row appears. Priya tests the form from the **Preview** tab as Sarah and submits. The page says "New client created". The client is in the list with the stage written as text. No task is made and nobody is told.
+Priya Nair opens **Webforms** and presses **New form**. She adds Short Text, Email, Phone and Signature fields and maps Email and Phone to the client fields. In the settings she turns on **Create Submitter as Client Profile** and picks a process and the initial stage, then presses **Publish**. She opens the form and copies the **Live link**. It points to a fixed external address (`app.myaifrontdesk.com`) and the prototype serves no public form page. She shares the form with Sarah Johnson by SMS. A toast says "Ready to send via SMS" and no text goes out, but a "sent" row appears. Priya tests the form from the **Preview** tab as Sarah and submits. The page says "New client created". The client is in the list with the stage written as text. No task is made and nobody is told.
 
 **Naming note:** the sidebar says "Webforms", the page title says "Web Forms", and the earlier PRD said "Webforms" and "patient". The product uses "client". Decision needed: D-01.
 
 ### What is real and what is not
 
 - **Real in the prototype:** the Submissions and Forms tabs, the form list with search, sort and enable switch, the 15-type field palette, mapping fields to client fields, draft and publish, existing-client matching by email or phone, the submission row and the client's Forms tab entry, and Form Flows.
-- **Simulated:** the dashboard figures are fixed numbers, the public link and embed point to a placeholder domain, sharing by SMS, WhatsApp and email only shows a toast while writing "sent" rows, Publish in the detail drawer is a toast, and the client is placed in a process by text only.
+- **Simulated:** the dashboard figures are fixed numbers, the public link and embed point to a fixed external address, sharing by SMS, WhatsApp and email only shows a toast while writing "sent" rows, Publish in the detail drawer is a toast, and the client is placed in a process by text only.
 - **Not built:** a hosted public form, required-field checks, conditional logic, a task or notification after a submit, an intake timeline event, a standalone form builder page, and any role control.
 
 ### Journey position
@@ -166,7 +166,7 @@ Priya builds an intake form.
 | F-3.2: Send by SMS, WhatsApp or Email | Channel | Shows "Ready to send via <channel>" | ◐ Simulated | Nothing is sent, yet "sent" rows are written (G8-E-20). Decision needed: D-112 |
 | F-3.3: Patient Companion App channel | Channel | Adds a pending form the patient sees in the portal | ● Works | A pending form appears whatever channel was picked (XM-07) |
 | F-3.4: Sent row and client Forms tab entry | Record | A "sent" row per recipient and a pending entry for clients | ◐ Simulated | Written even when nothing was sent (G8-E-20) |
-| F-3.5: Public link and iframe embed | Code | Link and snippet are shown and copyable, also for flows | ◐ Simulated | They point to a placeholder domain with nothing behind it (G8-E-18). Decision needed: D-112 |
+| F-3.5: Public link and iframe embed | Code | Link and snippet are shown and copyable, also for flows | ◐ Simulated | They point to a fixed external address (`app.myaifrontdesk.com/forms/...`). The prototype has no public form page (G8-E-18). Decision needed: D-112 |
 | F-3.6: Draft banner | State | "the link won't be publicly live until it's published" | ● Works | |
 | F-3.7: Hosted public form page | Page | A visitor opens the link and submits | ○ Not built | Nothing is served. The earlier PRD also promised an "SSL encrypted link" |
 | F-3.8: Patient fills and signs on a phone from an SMS link | Flow | Earlier PRD worked example | ○ Not built | No SMS is sent and no public page exists |
@@ -178,7 +178,7 @@ Priya sends the form to Sarah.
 | :--- | :--- | :--- | :--- |
 | 1 | Sarah is an existing client | Picks her, chooses **SMS** and sends | **"Ready to send via SMS". No text is sent** |
 | 2 | Priya checks Sarah's profile | Opens her Forms tab | **A pending entry is there** |
-| 3 | Priya copies the Live link | Opens it | **It goes to a placeholder domain with no form** |
+| 3 | Priya copies the Live link | Opens it | **It goes to a fixed external address. The prototype serves no public form** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
@@ -190,7 +190,7 @@ Priya sends the form to Sarah.
 | # | Criteria |
 | :--- | :--- |
 | F-3-1 | **Given** SMS, WhatsApp or Email is chosen, **when** Send is pressed, **then** a toast shows, "sent" rows are written and no message is delivered. |
-| F-3-2 | **Given** a live form, **then** its link and embed point to a placeholder domain that serves no form. |
+| F-3-2 | **Given** a live form, **then** its link and embed point to a fixed external address (`app.myaifrontdesk.com/forms/...`). The prototype serves no public form. |
 | F-3-3 | **Given** a draft form, **when** Share opens, **then** the draft banner shows. |
 
 ### F-4: Submit a form and create a client
@@ -250,7 +250,7 @@ A flow bundles several forms into an ordered set of steps. Priya names a flow, a
 | F-5.2: Steps with Required flag and reorder | List | Forms as ordered steps, drag to reorder | ● Works | |
 | F-5.3: Welcome and thank-you screens, preview, duplicate, enable | Controls | As named | ● Works | |
 | F-5.4: Confirm when adding to a flow with active clients | State | Asks for confirmation | ● Works | |
-| F-5.5: Flow link and embed code | Code | Shown and copyable | ◐ Simulated | Same placeholder domain (G8-E-18) |
+| F-5.5: Flow link and embed code | Code | Shown and copyable | ◐ Simulated | Same fixed external address (G8-E-18) |
 | F-5.6: Delete flow | Action | Removes the flow at once | ◐ Simulated | No confirmation (G8-E-24). Decision needed: D-06 |
 
 #### 3. Worked example
@@ -319,7 +319,7 @@ The earlier PRD names the Practice Coordinator and says nothing about access. A 
 
 | Journey | Step | What happens as built |
 | :--- | :--- | :--- |
-| **Web form** → Client → Process → Task | Visitor opens the public link | Not built. The link points to a placeholder domain. |
+| **Web form** → Client → Process → Task | Visitor opens the public link | Not built. The link points to a fixed external address (`app.myaifrontdesk.com`), which the prototype does not serve. |
 | | Submit creates or updates a client | Only from Preview or Test, and only with auto-create on. Match by email or phone. No required check. Session copy only. |
 | | Submission on the client profile | A Forms tab entry is added. No timeline event. |
 | | Client placed in a process and stage | Text on the client only. The Process boards never show it. |

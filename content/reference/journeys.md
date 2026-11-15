@@ -114,13 +114,13 @@ Web form / website chat -> Client -> Process (Kanban) -> Task
 
 ### The story
 
-Maria Lopez fills in the clinic's intake form. In the prototype the public link points to a placeholder domain with nothing behind it. Staff can submit only from the in-app Preview or Test page. If the option **Create submitter as client profile** is on, Maria becomes a client and her answers appear on the Forms tab. She does not appear on the Process board, and no task is created. The website chat widget is a simulator that creates a contact, shows a reply and files messages in the inbox.
+Maria Lopez fills in the clinic's intake form. In the prototype the public link points to a fixed external address (`app.myaifrontdesk.com`) and the prototype serves no public form page. Staff can submit only from the in-app Preview or Test page. If the option **Create submitter as client profile** is on, Maria becomes a client and her answers appear on the Forms tab. She does not appear on the Process board, and no task is created. The website chat widget is a simulator that creates a contact, shows a reply and files messages in the inbox.
 
 ### Hand-offs, web form
 
 | Step | From to To | Data passed | Status | What happens as built | PRD pages |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| 3.1 | Public form link to the form page | Field values | ○ Not built | The share link and embed code point to a placeholder domain. The only submit paths are the in-app Preview and Test pages. | [Web Forms](/client/web-forms) |
+| 3.1 | Public form link to the form page | Field values | ○ Not built | The share link and embed code point to a fixed external address (`app.myaifrontdesk.com`). The only submit paths are the in-app Preview and Test pages. | [Web Forms](/client/web-forms) |
 | 3.2 | Form submit to Clients | Email, phone, name, country, company, role, custom fields | ◐ Simulated | Matches by email or phone digits, exact. No required-field check, so a blank submit makes a client named New Contact. The page writes the client list to session storage while the directory reads the local copy first, so the new client may not show. Not confirmed at runtime (XM-04). The feature is off by default. | [Web Forms](/client/web-forms), [Clients](/client/clients) |
 | 3.3 | Same submit to the client Forms tab | Submission with all answers | ● Works | Same client id. No timeline event is written. | [Web Forms](/client/web-forms), [Clients](/client/clients) |
 | 3.4 | Same submit to a process and stage | Process name, stage name | ○ Not built | The client gets only a text stage. No process log row, deal card or event is written (XM-05). The Assign Process action on the client profile does write them. | [Web Forms](/client/web-forms), [Kanban](/client/processes/kanban) |
