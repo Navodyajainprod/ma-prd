@@ -276,7 +276,7 @@ The earlier PRD named Receptionist and Front Desk Staff and set no permissions. 
 | Journey | Step | What happens as built |
 | :--- | :--- | :--- |
 | Call → Receptionist → **Appointment** → Scribe → Invoice → Claim | Staff books with invoice option | One invoice per appointment. Price 150 and client "c-1" are fallbacks. |
-| | Staff opens AI Scribe from the appointment | Patient and process prefilled. The appointment is stored as a generic record id. |
+| | Staff opens AI Scribe from the appointment | Patient, appointment, date, attendee and process prefilled. The appointment is stored as a generic record id. |
 | | Scribe finishes in the drawer | The appointment's notes are replaced by the Scribe summary. |
 | | Calls tab | Shows two invented calls when the client has none. |
 | Kiosk check-in → **Appointment** → Billing | Check-in marks the appointment | Not delivered. No status change, even for kiosk-booked or staff-booked visits. |
