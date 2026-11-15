@@ -26,7 +26,7 @@ last_updated: "2026-11-14"
 | **Who uses it** | Practice Admin (sets the rules). Front-desk Staff and Patients meet the tokens. Only the SystemAdmin role passes the Settings guard. |
 | **Where you start it** | **Settings**, then the **AI Receptionist** tab at `/settings/reception`, then the **Queue & Onboarding Rules** section. |
 | **Where the result goes** | The saved configuration. The kiosk reads the onboarding default for walk-ins. The two sliders are saved but nothing reads them. |
-| **How real is it** | 0 features work, 4 are partly simulated, 0 are not built. See the legend below. |
+| **How real is it** | 0 features work, 5 are partly simulated, 0 are not built. See the legend below. |
 
 **Build-status legend used on every row of this PRD**
 

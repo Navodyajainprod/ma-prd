@@ -205,7 +205,7 @@ function lintFile(file, decisionIds, stats) {
     PARTS.forEach((p, idx) => {
       if (partTitles[idx] !== p) err(`F-${fh.n}: part ${idx + 1} must be "#### ${idx + 1}. ${p}"`, startLine);
     });
-    const feature = { n: fh.n, items: [], jobs: [], criteria: [], jobUsers: [] };
+    const feature = { n: fh.n, items: [], jobs: [], criteria: [], jobUsers: [], marks: [] };
     // tables inside the feature
     const ftables = parseTables(body).map((t) => ({ ...t, line: t.line + startLine - 1 }));
     // what it includes
@@ -229,6 +229,7 @@ function lintFile(file, decisionIds, stats) {
         if (!mark) err(`item ${c[0] ? c[0].split(":")[0] : "?"}: Status must be "● Works", "◐ Simulated" or "○ Not built"`, r.line);
         else {
           stats.rows[mark[1]]++;
+          feature.marks.push(mark[1]);
           stats.total++;
           if ((mark[1] === "●" && mark[2] !== "Works") || (mark[1] === "◐" && mark[2] !== "Simulated") || (mark[1] === "○" && mark[2] !== "Not built")) err("status mark and word disagree", r.line);
         }
@@ -275,6 +276,20 @@ function lintFile(file, decisionIds, stats) {
     stats.features++;
   });
   if (features.length === 0) err("no features found");
+
+  // "How real is it" counts must follow the rule: works = every row ●, not built = every row ○, else partly simulated
+  const real = text.match(/\| \*\*How real is it\*\* \| ([^|]+) \|/);
+  if (real && features.length) {
+    let w = 0, nb = 0, ps = 0;
+    for (const f of features) {
+      if (f.marks.length && f.marks.every((m) => m === "●")) w++;
+      else if (f.marks.length && f.marks.every((m) => m === "○")) nb++;
+      else ps++;
+    }
+    const m = real[1].match(/(\d+) features? works?, (\d+) (?:are|is) partly simulated, (\d+) (?:are|is) not built/);
+    if (!m) err('"How real is it" must read "N features work, N are partly simulated, N are not built."');
+    else if (+m[1] !== w || +m[2] !== ps || +m[3] !== nb) err(`"How real is it" says ${m[1]}/${m[2]}/${m[3]} (work/partly/not built) but the rows give ${w}/${ps}/${nb}`);
+  }
 
   // 3.1 and 3.2 roll-ups
   const sum1 = tables.find((t) => t.header.join("|") === SUMMARY_HEADER.join("|"));

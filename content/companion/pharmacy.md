@@ -25,7 +25,7 @@ last_updated: "2026-11-14"
 | **Who uses it** | Patient. Dr. Anita Rao is the prescriber the earlier PRD had in mind, but no prescription data is read. Nothing on `/patient` is protected (G12-E-01). |
 | **Where you start it** | The URL `/patient/pharmacy`. A "Move to Pharmacy" stage names this route, but nothing links to it in the screens checked. |
 | **Where the result goes** | **Proceed to Billing** sets the patient's stage to "Pay Bill" and opens Billing. |
-| **How real is it** | 0 features work, 1 is partly simulated, 1 is not built. See the legend below. |
+| **How real is it** | 0 features work, 2 are partly simulated, 0 are not built. See the legend below. |
 
 **Build-status legend used on every row of this PRD**
 

@@ -25,7 +25,7 @@ last_updated: "2026-11-14"
 | **Who uses it** | Physician (records and reviews). Billing staff (reuse the clinical text on invoices). No role is checked: any signed-in user can use it. |
 | **Where you start it** | The **Add Scribe** button on `/scribe`, or from Clients, Client Profile, Appointments, an appointment's details, the Process board, an invoice and the AI assistant capsule. |
 | **Where the result goes** | Client activity timeline, the patient's Documents, and (as text only) an invoice's notes. |
-| **How real is it** | 2 features work, 3 are partly simulated, 1 is not built. See the legend below. |
+| **How real is it** | 0 features work, 6 are partly simulated, 0 are not built. See the legend below. |
 
 **Build-status legend used on every row of this PRD**
 

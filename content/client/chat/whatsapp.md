@@ -27,7 +27,7 @@ last_updated: "2026-11-14"
 | **Where you start it** | 1. **Settings > Integrations** (`/settings/integrations`) to onboard WhatsApp numbers via Meta Embedded Signup.<br>2. **Workflows** (`/process` → Chatbot Channel Settings) to allocate numbers and configure chatbot prompts.<br>3. **Chats** (`/chats?channel=whatsapp`) for live triage, thread management, and the template library. |
 | **Where the result goes** | Direct to patient mobile phones via WhatsApp PSTN, recorded in real time in the Chats inbox, and logged as an activity entry on the patient's **Client Profile Timeline**. |
 | **Cross-product scope** | **Client workspace only.** WhatsApp is direct, external clinic-to-patient mobile communication. It operates independently of the Companion patient portal. |
-| **How real is it** | Number storage and UI allocation exist in prototype; Meta API connectivity and outbound WhatsApp delivery are simulated. |
+| **How real is it** | 4 features work, 2 are partly simulated, 0 are not built. See the legend below. Number storage and UI allocation exist in the prototype; Meta API connectivity and outbound WhatsApp delivery are simulated. |
 
 **Build-status legend used on every row of this PRD**
 
