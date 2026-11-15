@@ -19,6 +19,16 @@ _(append one line per ambiguous choice)_
 - `build_status` values: Works / Partly simulated / Simulated / Not built (as in the sample). The renderer accepts the older codes too.
 - Status of an unmounted-but-built component is `○ Not built` (for example the claim builder, G7-C-28).
 
+## Drift: things that changed after the analysis (read this before trusting the analysis files)
+
+- **The prototype changed on 2026-11-13 and 2026-11-14**, after the analysis was written (read-only check of `E:\mantra-assist` git log). Affected areas and commits:
+  - **AI Scribe popup** (`AIScribePopup.tsx`, `TranscriptDetailDrawer.tsx`, `AppointmentDetailDrawer.tsx`): confirm step removed, saves and closes with a toast, step 2 streamlined with a Save button, transcript detail became a slide-over drawer, appointment and contact prefilled (commits 346cd37, 333c04d, 2da69c8, 0327513). The golden sample `content/client/scribe.md` describes the older flow.
+  - **Integrations** (`IntegrationConfigDrawer.tsx`, `integrationsRegistry.ts`): new Field Mapping tab (13d3b22, 0c9e6ed, c77dce1). Affects `settings/integrations.md`.
+  - **Tasks** (`TaskQuickCreateDrawer.tsx` rewritten, `Tasks.tsx`): new task UI on 11-13, workflow pipeline hidden in admin and the All Workflows filter removed (1c870bd, b444132, fa5ead5). Affects the four tasks pages.
+  - **Organization availability** (`OrganizationDetailDrawer.tsx`, +1029 lines, a8d74f0). Affects admin `organizations.md` and possibly client `organization.md` and appointments availability.
+- **The user is editing PRD pages on `main` in parallel** (commits 886f345, a7bb61e, f77704e, 2656e8e): Scribe, WhatsApp, Workflows, Integrations, Tasks. Files changed on both `main` and this branch (merge will conflict): `content/client/scribe.md`, `content/client/chat/whatsapp.md` (the user already ported theirs onto this branch as 221da33), `content/client/settings/integrations.md`, `content/client/workflows.md`, `content/client/tasks/tasks-by-me.md`, `content/admin/tasks.md`. This branch is NOT merged with `main`.
+- **Plan:** finish the rollout from the analysis, then run a **drift pass**: for each area above, re-read the changed code and update the affected pages (code is the truth; the user's `main` edits are used as hints only, every fact is verified in code).
+
 ## Phases 2 and 3: rewrite existing files
 
 | Group | File | Status |
@@ -69,13 +79,13 @@ _(append one line per ambiguous choice)_
 | G6 Services, Claims, Workflows, Automation, Web Forms, Knowledge Base | `content/client/knowledge-base.md` | done |
 | G7 Client Settings | `content/client/settings/audit-logs.md` | done |
 | G7 Client Settings | `content/client/settings/billing.md` | done |
-| G7 Client Settings | `content/client/settings/custom-fields.md` | todo |
-| G7 Client Settings | `content/client/settings/integrations.md` | todo |
+| G7 Client Settings | `content/client/settings/custom-fields.md` | done |
+| G7 Client Settings | `content/client/settings/integrations.md` | done |
 | G7 Client Settings | `content/client/settings/organization.md` | done |
-| G7 Client Settings | `content/client/settings/reception.md` | todo |
+| G7 Client Settings | `content/client/settings/reception.md` | done |
 | G7 Client Settings | `content/client/settings/security.md` | done |
 | G7 Client Settings | `content/client/settings/team.md` | done |
-| G7 Client Settings | `content/client/settings/voices.md` | todo |
+| G7 Client Settings | `content/client/settings/voices.md` | done |
 | G8 Companion remaining | `content/companion/today.md` | todo |
 | G8 Companion remaining | `content/companion/appointments.md` | todo |
 | G8 Companion remaining | `content/companion/documents.md` | todo |
@@ -96,6 +106,15 @@ _(append one line per ambiguous choice)_
 | G9 Admin remaining | `content/admin/roles.md` | todo |
 | G9 Admin remaining | `content/admin/sidebar-config.md` | todo |
 | G9 Admin remaining | `content/admin/users.md` | todo |
+
+## Drift pass (after Phase 3, before Phase 6)
+
+| Area | Files | Status |
+| :--- | :--- | :--- |
+| Scribe popup | `content/client/scribe.md` | todo |
+| Integrations Field Mapping | `content/client/settings/integrations.md` | done |
+| Tasks UI | `content/client/tasks/my-tasks.md`, `tasks-by-me.md`, `content/admin/tasks.md`, `content/companion/tasks.md` | todo |
+| Organization availability | `content/admin/organizations.md`, `content/client/settings/organization.md` | todo |
 
 ## Phase 4: new files for built screens with no PRD
 
