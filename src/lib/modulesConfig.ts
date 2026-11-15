@@ -170,6 +170,12 @@ export const ALL_MODULES: ModuleDefinition[] = [
           channel: "list",
           description: "Filterable tabular workflow view with stage duration, responsible filters, and SLA indicators.",
         },
+        {
+          id: "detail-drawer",
+          name: "Process Detail Drawer",
+          channel: "detail-drawer",
+          description: "The detail drawer opened from the Process List: fields, stage moves, history and activity.",
+        },
       ],
     },
   },
@@ -221,6 +227,12 @@ export const ALL_MODULES: ModuleDefinition[] = [
           name: "Working Hours & Buffer",
           channel: "availability",
           description: "Weekly recurring availability rules, buffer intervals, and exception days-off.",
+        },
+        {
+          id: "booking",
+          name: "Booking Drawer & Lifecycle",
+          channel: "booking",
+          description: "Schedule Appointment drawer, rescheduling, cancelling, status changes and the detail drawer.",
         },
       ],
     },
@@ -349,6 +361,18 @@ export const ALL_MODULES: ModuleDefinition[] = [
           name: "AI Receptionist",
           channel: "reception",
           description: "Full-width horizontal clinic persona, kiosk features, queue & onboarding rules, multi-terminal launching, and unified clinic rooms (Products & Services + standalone).",
+        },
+        {
+          id: "numbers",
+          name: "Numbers",
+          channel: "numbers",
+          description: "Phone numbers, routing and the Add Number options.",
+        },
+        {
+          id: "notifications",
+          name: "Notifications",
+          channel: "notifications",
+          description: "Module switches, desktop push and channels.",
         },
       ],
       "ai-receptionist": [
@@ -668,6 +692,147 @@ export const ALL_MODULES: ModuleDefinition[] = [
         },
       ],
     },
+  },
+
+  // ── Pages for built screens that had no PRD (as-built rewrite) ──
+  {
+    id: "auth",
+    name: "Sign-in & Onboarding",
+    category: "GETTING STARTED",
+    description: "Sign-in, sign-up, invite, onboarding, pricing and payment, as built.",
+    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
+    submodulesByProduct: {
+      client: [
+        {
+          id: "access",
+          name: "Sign-in, Sign-up & Invite",
+          channel: "access",
+          description: "Login, verification, sign-up, invite acceptance and the route guards.",
+        },
+        {
+          id: "onboarding",
+          name: "Onboarding",
+          channel: "onboarding",
+          description: "The onboarding wizard and what its answers configure.",
+        },
+        {
+          id: "pricing-payment",
+          name: "Pricing & Payment",
+          channel: "pricing-payment",
+          description: "The public pricing page and the simulated payment step.",
+        },
+      ],
+    },
+  },
+  {
+    id: "account",
+    name: "Profile & Refer and Earn",
+    category: "GETTING STARTED",
+    description: "The profile page, notification redirect, 404 page and the Refer and Earn screen.",
+    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
+    submodulesByProduct: {
+      client: [
+        {
+          id: "profile",
+          name: "Profile",
+          channel: "profile",
+          description: "Profile, the notifications redirect and the not-found page.",
+        },
+        {
+          id: "refer-and-earn",
+          name: "Refer and Earn",
+          channel: "refer-and-earn",
+          description: "Referral totals and rows (hardcoded sample data).",
+        },
+      ],
+    },
+  },
+  {
+    id: "help",
+    name: "Guide",
+    category: "GETTING STARTED",
+    description: "The in-app guide pages.",
+    availableIn: { client: true, admin: false, companion: false, "ai-receptionist": false },
+    submodulesByProduct: {
+      client: [
+        {
+          id: "guide",
+          name: "Guide",
+          channel: "guide",
+          description: "The guide index and article pages.",
+        },
+      ],
+    },
+  },
+  {
+    id: "access",
+    name: "Sign-in & Profile",
+    category: "PATIENT COMPANION",
+    description: "Patient sign-in, registration step, session handling, shell and profile, as built.",
+    availableIn: { client: false, admin: false, companion: true, "ai-receptionist": false },
+  },
+  {
+    id: "products-services",
+    name: "Product / Services (Admin)",
+    category: "TEMPLATES & CONTENT",
+    description: "The Product / Services screen inside the admin shell.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "admin-workflows",
+    name: "Workflows (Admin)",
+    category: "TEMPLATES & CONTENT",
+    description: "The admin Workflows screen that edits tenants' workflows directly.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "automations",
+    name: "Automations (Admin)",
+    category: "TEMPLATES & CONTENT",
+    description: "The admin Automations screen and its shared rule store.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "form-templates",
+    name: "Form Templates (Admin)",
+    category: "TEMPLATES & CONTENT",
+    description: "The admin Forms screen and its shared web-forms store.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "admin-knowledge-base",
+    name: "Knowledge Base (Admin)",
+    category: "TEMPLATES & CONTENT",
+    description: "The admin Knowledge Base screen.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "workspace-billing",
+    name: "Workspace Billing, Orders & Subscriptions",
+    category: "COMMERCE & BILLING",
+    description: "Workspace billing, orders and subscriptions in the admin shell, and their disconnected datasets.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "product-analytics",
+    name: "Product Analytics",
+    category: "ANALYTICS",
+    description: "The five admin analytics pages: overview, voice calls, organisation usage, process movement, revenue and invoices.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "telephony",
+    name: "Telephony",
+    category: "TELEPHONY",
+    description: "Telephony, phone numbers and providers in the admin shell.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
+  },
+  {
+    id: "audit-logs",
+    name: "Audit Logs (Admin)",
+    category: "SECURITY & USERS",
+    description: "The platform-wide audit log.",
+    availableIn: { client: false, admin: true, companion: false, "ai-receptionist": false },
   },
 
   // ── Reference (shared across all four products) ──
