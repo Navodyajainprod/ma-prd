@@ -137,10 +137,10 @@ _(append one line per ambiguous choice)_
 | 4d | `content/admin/automations.md` | Automations (admin) | analysis 13 C.18 | done |
 | 4d | `content/admin/form-templates.md` | Forms (admin) | analysis 13 C.19 | done |
 | 4d | `content/admin/admin-knowledge-base.md` | Knowledge Base (admin) | analysis 13 C.20 | done |
-| 4e | `content/admin/workspace-billing.md` | Workspace Billing, Orders, Subscriptions | analysis 13 C.21 to C.23 | todo |
-| 4e | `content/admin/product-analytics.md` | Analytics: Overview, Voice Calls, Org Usage, Process Movement, Revenue | analysis 13 C.24 to C.28 | todo |
-| 4e | `content/admin/telephony.md` | Telephony | analysis 13 C.29 | todo |
-| 4e | `content/admin/audit-logs.md` | Audit Logs (admin) | analysis 13 C.30 | todo |
+| 4e | `content/admin/workspace-billing.md` | Workspace Billing, Orders, Subscriptions | analysis 13 C.21 to C.23 | done |
+| 4e | `content/admin/product-analytics.md` | Analytics: Overview, Voice Calls, Org Usage, Process Movement, Revenue | analysis 13 C.24 to C.28 | done |
+| 4e | `content/admin/telephony.md` | Telephony | analysis 13 C.29 | done |
+| 4e | `content/admin/audit-logs.md` | Audit Logs (admin) | analysis 13 C.30 | done |
 
 After the files exist, add their entries to `src/lib/modulesConfig.ts` (tabs `booking`, `detail-drawer`, `numbers`, `notifications`; new client modules `auth`, `account`, `help`; companion module `access`; admin modules `products-services`, `admin-workflows`, `automations`, `form-templates`, `admin-knowledge-base`, `workspace-billing`, `product-analytics`, `telephony`, `audit-logs`). The admin ids are distinct from client/companion ids (`workflows`, `forms`, `knowledge-base`, `billing` already exist) so sidebar names stay correct. The analysis row C.31 (admin shell, cross-cutting) has no page of its own; it is covered by the Reference page Roles and access and by section 4 of each admin page.
 
