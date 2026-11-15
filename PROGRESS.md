@@ -126,12 +126,12 @@ _(append one line per ambiguous choice)_
 | 4a | `content/client/settings/numbers.md` | settings / numbers | analysis 10 D.9 | done |
 | 4a | `content/client/settings/notifications.md` | settings / notifications | analysis 10 D.10 | done |
 | 4a | `content/companion/access.md` | companion / access | analysis 12 D0 | done |
-| 4b | `content/client/auth/access.md` | auth / access | analysis 14 D1 | todo |
-| 4b | `content/client/auth/onboarding.md` | auth / onboarding | analysis 14 D2 | todo |
-| 4b | `content/client/auth/pricing-payment.md` | auth / pricing-payment | analysis 14 D3 | todo |
-| 4b | `content/client/account/profile.md` | account / profile | analysis 14 D4 | todo |
-| 4b | `content/client/account/refer-and-earn.md` | account / refer-and-earn | analysis 14 D5 | todo |
-| 4b | `content/client/help/guide.md` | help / guide | analysis 14 D6 | todo |
+| 4b | `content/client/auth/access.md` | auth / access | analysis 14 D1 | done |
+| 4b | `content/client/auth/onboarding.md` | auth / onboarding | analysis 14 D2 | done |
+| 4b | `content/client/auth/pricing-payment.md` | auth / pricing-payment | analysis 14 D3 | done |
+| 4b | `content/client/account/profile.md` | account / profile | analysis 14 D4 | done |
+| 4b | `content/client/account/refer-and-earn.md` | account / refer-and-earn | analysis 14 D5 | done |
+| 4b | `content/client/help/guide.md` | help / guide | analysis 14 D6 | done |
 | 4d | `content/admin/products-services.md` | Product / Services | analysis 13 C.16 | done |
 | 4d | `content/admin/admin-workflows.md` | Workflows (admin) | analysis 13 C.17 | done |
 | 4d | `content/admin/automations.md` | Automations (admin) | analysis 13 C.18 | done |
