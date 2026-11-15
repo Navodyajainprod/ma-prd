@@ -3,172 +3,259 @@ title: "Billing Lookup & Invoice Ledger"
 product: "ai-receptionist"
 module: "billing"
 channel: "invoices"
+route: "/reception/billing"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-12"
-last_updated: "2026-11-12"
+last_updated: "2026-11-14"
 ---
 
-| Product | AI Receptionist |
-| :--- | :--- |
-| Module | Billing & Payments - Billing Lookup & Invoice Ledger (`/reception/billing`) |
+| Product | AI RECEPTIONIST |
+| Module | BILLING AND PAYMENTS: BILLING LOOKUP AND INVOICE LEDGER (`/reception/billing`) |
+| Route | `/reception/billing` |
 | Status | In Review |
+| Build status | Partly simulated |
 | Created | 2026-11-12 |
-| Last updated | 2026-11-12 |
+| Last updated | 2026-11-14 |
+
+## At a glance
+
+| | |
+| :--- | :--- |
+| **What it is** | A kiosk screen where a visitor enters a phone number and a code, sees a Patient Account banner and a list of invoice cards, and can start a QR payment or open a receipt. |
+| **Who uses it** | Patient (a patient or a relative at the lobby kiosk). Front-desk Staff (create the invoices the kiosk lists). No role is checked: the kiosk has no sign-in. |
+| **Where you start it** | The **Billing** tile on the kiosk home screen, **Billing** on the dock, or saying "Pay my bill". The address `/reception/billing` opens the phone keypad in Billing mode. |
+| **Where the result goes** | The kiosk only reads invoices. Payment itself happens on the QR Pay page. |
+| **How real is it** | 1 feature works, 3 are partly simulated, 0 are not built. See the legend below. |
+
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client | Live Invoice & Ledger Sync | Invoices created or updated by clinic billing staff appear immediately on the lobby kiosk invoice ledger (`Sync with MA`). | [View in Client](/client/invoices) |
-| Client | Insurance Claims Separation | Insurance claims processing stays isolated in Client Claims, keeping the kiosk ledger simple and focused on patient balances due. | [View in Client](/client/claims) |
-| Client | Clinic Services Pricing | Itemized service labels shown inside each kiosk invoice row originate from the clinic Services catalog. | [View in Client](/client/services) |
-| Client | Patient Profile Phone Lookup | Mobile numbers and family household profiles managed in Client CRM unlock patient statements after OTP verification. | [View in Client](/client/clients) |
-| Client | Billing Configuration | Practice billing setup governs invoice formatting and currency rules reflected in kiosk statements. | [View in Client](/client/settings/billing) |
-| Companion | Patient Billing View | Patients see identical pending invoices, partial credits, and settled receipts inside their mobile Companion Billing tab. | [View in Companion](/companion/billing) |
-| Admin | Document & Invoice Templates | Platform invoice structure standards ensure consistent line items across staff and patient views. | [View in Admin](/admin/document-templates) |
+| Client (Invoices) | Ledger read | The kiosk reads every invoice the Invoices page holds. It matches by client id, exact name or part of a phone number. With no match it lists every unpaid invoice in the system. Void invoices with a balance count as unpaid. | [View Invoices](/client/invoices) |
+| Client (Appointments) | Invoice from a booking | An invoice made for an appointment may carry a placeholder client id that no kiosk patient has. It then shows only through the all-unpaid fallback. | [View Appointments](/client/appointments/list) |
+| Client (Claims) | Insurance claims | Not connected. The kiosk shows patient balances only and no claim data. | [View Claims](/client/claims) |
+| Client (Services) | Service names on cards | Each card lists the invoice's line descriptions. When none exist it says "Clinical Consultation & Reception Services". | [View Services](/client/services) |
+| Client (Clients) | Phone lookup | The visitor's phone is matched to clients, including partial matches once 7 digits are typed. | [View Clients](/client/clients) |
+| Client (Billing settings) | Invoice format | Not connected. Kiosk cards use a fixed dollar sign and no setting. | [View Billing Settings](/client/settings/billing) |
+| Companion | Patient Bill | Companion lists the same invoices with the same wider matching and an invented-invoice fallback. | [View Companion Billing](/companion/billing) |
+| Admin | Invoice templates | Not connected. Kiosk cards do not use an admin template. | [View Document Templates](/admin/document-templates) |
 
 ## 1. Module Summary
-- The **Billing Lookup & Invoice Ledger** enables clinic patients and caregivers to look up, review, and verify open consultation charges, itemized service bills, and past paid receipts directly at the lobby kiosk (`/reception/billing`).
-- Protecting financial privacy on public screens, opening Billing routes strictly through **Phone & 4-Digit OTP verification** (plus Household Member Selection when multiple profiles share a phone number) before displaying any patient balances, partial deposits, or payment actions.
+
+### The story in one minute
+
+Sarah Johnson taps **Billing** on the kiosk. A phone keypad opens. She types her number and a four-digit code. Any number accepts 1234 or 0000. She sees a short loader, "Synchronizing invoices with MantraAssist...". Then the **Patient Account** banner shows her name, patient ID, full phone number and "1 Outstanding". Below it is the consultation invoice with services, issued and due dates, and a **Pay via QR** button. Daniel Brooks may not have posted a bill for her yet. If Sarah has no invoice at all, the kiosk does not say so. It shows every unpaid invoice in the clinic, with other patients' names and amounts. Meera Iyer at the front desk never sees it, because nothing is logged.
+
+### What is real and what is not
+
+- **Real in the prototype:** the phone gate, the zero-match message, the household picker, the loader, invoice cards with balance math, status badges, Pay via QR and View Receipt, All Bills Clear!, Sync with MA and Done.
+- **Simulated:** the code check (any number accepts 1234 or 0000), the lookup scope (other patients' unpaid invoices leak) and the failure state (a load error looks like All Bills Clear!).
+- **Not built:** masking of the phone number and ID on the public banner, and a load-error message that differs from All Bills Clear!.
+
+### Journey position
+
+```
+Billing tile ─▶ Phone + code ─▶ Household picker ─▶ Invoice ledger ─▶ Pay via QR (see QR Pay page)
+```
 
 ## 2. Feature Requests
 
-### F-1: Secure Phone/OTP Billing Gate & Family Account Selection
+### F-1: Phone gate and household picker
+
 #### 1. What it does
-Whether a visitor taps **Billing** on the lobby home screen, selects **Billing** from the Floating Right Dock, or speaks *"Pay my bill"*, the kiosk launches **Phone Number Check-in** in Billing mode rather than running passive facial unlock:
-- **Zero Matches:** If no patient or billing profile matches the verified phone number, the kiosk displays `"No billing records found for this phone number."`, Aria apologizes gently and advises checking with the front desk, and the visitor remains safely on Phone check-in (never erroneously dropped into walk-in clinical registration).
-- **Single Profile:** Loads the patient's invoices straight away and opens the Billing ledger while Aria speaks the number of pending bills.
-- **Multiple Household Profiles:** Opens **Select Patient Profile** asking *"Whose bill would you like to view?"* so parents or spouses select the right family member before statements display.
+Sarah opens Billing and the kiosk shows the phone keypad in Billing mode. She types a number and the code. If no client matches, she sees "No billing records found for this phone number." and stays on the keypad. One match opens the ledger. Several matches open **Select Patient Profile** with "Whose bill would you like to view?". A face match can also open billing.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: Billing Verification Gate | Privacy Rule | Enforces Phone + 4-digit OTP entry before showing any financial amounts | Protects waiting-room financial confidentiality |
-| F-1.2: Safe Non-Match Guard | Error Handling | Keeps unrecognized billing numbers on the phone retry screen cleanly | Never triggers walk-in intake forms from Billing |
-| F-1.3: Family Member Picker | Multi-Match Flow | Prompts household payers to choose whose statement to view | Supports shared family mobile numbers |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: Phone and code gate | Rule | No amount is shown until a phone number and a four-digit code are entered | ◐ Simulated | The code 1234 or 0000 works for any number, and nothing is sent (G11-E-03). Decision needed: D-46 |
+| F-1.2: Phone lookup | Rule | Matches the number to clients, including part of a number once 7 digits are typed | ◐ Simulated | A few digits of another patient's number can return that patient (G11-E-04) |
+| F-1.3: Zero-match message | State | Shows "No billing records found for this phone number." and stays on the keypad | ● Works | G11-I-100 |
+| F-1.4: Household picker | Screen | Asks whose bill to view when several profiles share the number | ● Works | G11-I-101 |
+| F-1.5: Face unlock | Rule | A face match can also open Billing | ◐ Simulated | The old PRD said phone only (G11-I-99). The match is a mock (G11-E-01). Decision needed: D-40 |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Visitor taps Billing to pay spouse's consultation balance | Enters mobile number, verifies 4-digit OTP, selects spouse's profile | **Loads spouse's Patient Account header and invoice ledger cleanly** |
-| 2 | Visitor enters an unlinked phone number in Billing | Verifies OTP | **Displays "No billing records found for this phone number." and stays ready to retry phone number** |
+| 1 | Sarah taps Billing | Types her number and the code 1234 | **The ledger opens for her profile** |
+| 2 | A visitor types a number no client has | Types any code | **"No billing records found for this phone number." and the keypad stays** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Patient / Caregiver | When checking medical bills on a public lobby screen, I want phone OTP verification and household selection so no one else sees my financial balances. |
+| F-1-J1 | Patient | When I check a bill on a public screen, I want a phone check and a family picker, so that no one else sees my balance. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Given a visitor selects **Billing**, then financial invoice rows MUST NOT appear until Phone & OTP verification succeeds. |
-| F-1-2 | Given verified phone lookup returns zero matching profiles in Billing mode, then `"No billing records found for this phone number."` MUST display and stay on **Phone Number Check-in**. |
+| F-1-1 | **Given** Billing is chosen, **when** any number and the code 1234 or 0000 are entered, **then** invoices are shown. |
+| F-1-2 | **Given** no client matches the number, **then** the zero-match message shows and the keypad stays. |
+| F-1-3 | **Given** several clients share the number, **then** the household picker opens before any invoice. |
 
----
+### F-2: Ledger and Patient Account banner
 
-### F-2: Live Ledger Hydration & **Patient Account** Header
 #### 1. What it does
-Upon verification, the kiosk shows `"Synchronizing invoices with MantraAssist..."` while fetching live patient bills created by front-desk staff or consultations. Once ready, the top **Patient Account** banner displays the patient's verified Name, Patient ID, Phone Number, and an amber **Pending Invoices** counter badge (e.g., `2 Outstanding`). Each invoice card below clearly lists the **Invoice Number** (`INV-...`), itemized service descriptions (e.g., *Clinical Consultation • Lab Panel*, falling back cleanly to *Clinical Consultation & Reception Services* when unitemized), plus **Issued** and **Due** dates.
+After the check, the kiosk loads invoices and shows the **Patient Account** banner, then one card per invoice. Each card shows the invoice number, the service lines, the issued and due dates, the balance due and a status. If the lookup finds nothing for the patient, it returns every unpaid invoice in the system.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: Live Practice Ledger Sync | Real-Time Fetch | Pulls up-to-date open and settled invoices synchronized with MantraAssist billing | Reflects desk edits immediately |
-| F-2.2: **Patient Account** Banner | Header Summary | Displays verified patient name, ID, phone, and live `{X} Outstanding` badge | Confirms payer is viewing the right account |
-| F-2.3: Service Breakdown Text | Line Clarity | Lists itemized service names separated clearly on each invoice card | Helps patients verify charges before paying |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Loader | State | Shows "Synchronizing invoices with MantraAssist..." while loading | ● Works | G11-I-103 |
+| F-2.2: Invoice lookup scope | Rule | Matches by client id, exact name or partial phone | ◐ Simulated | With no match it returns every unpaid invoice in the system with names and amounts (G11-E-05). Decision needed: D-39 |
+| F-2.3: Patient Account banner | Header | Shows name, patient ID, full phone number and "N Outstanding" | ◐ Simulated | Phone and ID are not masked on a public screen (G11-E-34). Decision needed: D-39 |
+| F-2.4: Invoice cards | Card | Invoice number (the invoice id), service descriptions, issued and due dates | ● Works | G11-I-105 |
+| F-2.5: Void invoices | Rule | A void invoice with a balance is listed as unpaid and can be paid | ◐ Simulated | XM-06. Decision needed: D-63 |
+| F-2.6: Load failure | State | A failed load shows an empty list | ◐ Simulated | It reads as **All Bills Clear!** and Aria says there are no outstanding bills (G11-E-19) |
+| F-2.7: Outstanding count | Metric | Counts invoices whose status is not paid | ● Works | |
+| F-2.8: Masked phone and patient ID | Rule | Described nowhere in the old PRD | ○ Not built | Decision needed: D-39 |
+| F-2.9: Separate load-error message | State | A message that tells a failed load from an empty ledger | ○ Not built | See F-2.6 |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Front desk creates a consultation bill while patient walks over to kiosk | Patient completes Phone/OTP in Billing | **Ledger shows "Synchronizing invoices with MantraAssist...", then displays updated Invoice `#INV`, service lines, and `1 Outstanding` pill** |
+| 1 | Sarah has one open invoice | Finishes the phone check | **The banner reads "1 Outstanding" and the invoice card shows its services and dates** |
+| 2 | A patient has no invoice | Finishes the phone check | **The ledger lists every unpaid invoice in the clinic, with other patients' names** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Clinic Patient | Before scanning to pay at a kiosk, I want to verify the invoice number, service breakdown, and total outstanding count against my name. |
+| F-2-J1 | Patient | Before I pay, I want to check the invoice number, services and count against my name, so that I pay the right bill. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Given invoices exist for the verified patient, then the **Patient Account** header MUST display accurate open invoice count in **`{N} Outstanding`** and show itemized descriptions per card. |
+| F-2-1 | **Given** invoices match the patient, **then** the banner shows the full phone and ID and the cards show the matching invoices. |
+| F-2-2 | **Given** no invoice matches the patient, **then** every unpaid invoice in the system is listed. |
+| F-2-3 | **Given** an invoice load fails, **then** the screen shows All Bills Clear!. |
 
----
+### F-3: Balance, status and row actions
 
-### F-3: Partial Payment Arithmetic (`$`), **Pay via QR**, & **View Receipt** Actions
 #### 1. What it does
-Clinics frequently record partial booking deposits or prior copays against an invoice (`Total $200.00`, `Paid $50.00`, remaining **`Balance Due: $150.00`**). Every kiosk invoice card calculates the true remaining USD balance cleanly and tailors its status pill and action CTA automatically:
-- **Open or Partial Balance (`Balance Due > $0.00`):** Displays an amber **Pending Payment** badge, bold blue `$` Balance Due, an explicit credit subline (`Paid: $50.00 / $200.00`) whenever partial payments exist, and the primary **`Pay via QR`** button.
-- **Settled Bill (`$0.00` due / Paid):** Displays an emerald green **Paid & Settled** badge, muted settled total, and the **`View Receipt`** button to open the digital settled confirmation card anytime.
+Each card works out the balance as the total minus what was paid, never below zero. An unpaid or partly paid card shows an amber **Pending Payment** badge, the balance and **Pay via QR**. A paid card shows **Paid & Settled** and **View Receipt**. Saying "pay" or "checkout" opens the first unpaid invoice.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Partial Deposit Math (`$`) | Balance Calculator | Displays exact remaining USD balance due plus `Paid: $X / $Y` credit breakdown | Prevents double-charging prior deposits |
-| F-3.2: **Pending Payment** vs **Paid & Settled** | Status Badges | Separates active dues from settled historical invoices clearly | Updates immediately after payment |
-| F-3.3: **Pay via QR** vs **View Receipt** | Action Buttons | Launches instant QR settlement for unpaid rows or digital receipt view for paid rows | Single consistent checkout card |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Balance math | Metric | Balance due is total minus paid, with a Paid / Total line when part is paid | ● Works | G11-I-106. The dollar sign is fixed. Decision needed: D-62 |
+| F-3.2: Status badges | Badge | **Pending Payment** or **Paid & Settled** | ● Works | |
+| F-3.3: Pay via QR and View Receipt | Buttons | Opens the QR card for unpaid rows or the settled card for paid rows | ● Works | |
+| F-3.4: Voice pay | Voice | "Pay", "QR" or "checkout" opens the first unpaid invoice | ● Works | G11-I-111. Not in the old PRD |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient paid a `$50.00` online booking deposit toward a `$200.00` invoice | Opens invoice card in kiosk ledger | **Shows `Balance Due: $150.00`, subline `Paid: $50.00 / $200.00`, badge `Pending Payment`, and `Pay via QR` CTA** |
-| 2 | Patient inspects last week's completed bill | Views lower card in ledger | **Shows green `Paid & Settled` pill and secondary `View Receipt` button** |
+| 1 | A 200 invoice has 50 paid | Looks at the card | **Balance Due 150, a Paid 50 / 200 line, Pending Payment and Pay via QR** |
+| 2 | Last week's invoice is paid | Looks at its card | **Paid & Settled and View Receipt** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Patient with Booking Deposit | I want to see what I already paid credited clearly and pay only my remaining `$` balance via QR. |
+| F-3-J1 | Patient | When I paid a deposit, I want to see it credited and pay only what remains, so that I am not charged twice. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given an unpaid invoice of `$200.00` with `$50.00` already paid, then the card MUST display **`Balance Due: $150.00`**, **`Paid: $50.00 / $200.00`**, and **`Pay via QR`**. |
-| F-3-2 | Given a fully paid invoice, then the card MUST display **`Paid & Settled`** and **`View Receipt`** instead of **`Pay via QR`**. |
+| F-3-1 | **Given** an invoice of 200 with 50 paid, **then** the card shows Balance Due 150, Paid 50 / 200 and Pay via QR. |
+| F-3-2 | **Given** a fully paid invoice, **then** the card shows Paid & Settled and View Receipt, not Pay via QR. |
 
----
+### F-4: All Bills Clear!, Sync with MA and footer actions
 
-### F-4: **All Bills Clear!** Empty State & Ledger Action Footer (`Sync with MA`, `Different Patient`)
 #### 1. What it does
-Even when a verified patient has zero pending or past invoices, the screen presents a warm emerald check icon card reading **All Bills Clear!** (*"No pending invoices found for this patient. All clinic visits and consultations are settled."*). Across the bottom of the ledger sits a flexible 3-button action bar:
-- **Sync with MA:** Re-fetches live invoices on demand from MantraAssist and shows a confirmation toast (`"Invoices refreshed from MantraAssist"`), handy if front-desk billing just posted a new lab charge while the patient stood at the kiosk.
-- **Done / Return Home:** Closes and wipes the billing session cleanly back to the lobby home screen.
-- **Different Patient:** Clears the current patient selection and returns straight to **Phone Number Check-in** so a companion or caregiver can quickly look up another family member's phone number.
+When the list is empty, a card says **All Bills Clear!**. The footer has **Sync with MA**, **Done / Return Home** and **Different Patient**. Different Patient returns to the phone keypad.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-4.1: **All Bills Clear!** Card | Empty State | Confirms cleanly when no outstanding bills exist | Reassures patients before leaving clinic |
-| F-4.2: **Sync with MA** Refresh | Live Re-Fetch | Pulls fresh desk invoice updates immediately without restarting OTP | Confirms refresh with toast banner |
-| F-4.3: **Done / Return Home** & **Different Patient** | Footer Actions | Either wipes session cleanly to Home or switches smoothly to verify another mobile number | Streamlines multi-patient caregivers |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-4.1: All Bills Clear! | State | Shows when no invoices are listed | ● Works | Also shown after a load failure (F-2.6) |
+| F-4.2: Sync with MA | Button | Reloads the invoices and shows "Invoices refreshed from MantraAssist" | ● Works | The toast shows at once, before the reload ends (G11-I-109) |
+| F-4.3: Done / Return Home | Button | Clears the billing session and returns home | ● Works | |
+| F-4.4: Different Patient | Button | Clears the patient and returns to the keypad | ◐ Simulated | The previous phone, code and invoice list stay in memory and the number still shows on the keypad (G11-E-11) |
+| F-4.5: Session wipe | Rule | The 60-second reset should clear invoices, the selected invoice and the QR | ◐ Simulated | It does not clear all of them (G11-E-10) |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Front desk posts a brand-new diagnostic invoice while patient is already logged into kiosk Billing | Taps **Sync with MA** | **Toast confirms refresh and the newly posted invoice renders right in the list** |
-| 2 | Daughter paid her father's bill and wants to pay her own bill under a separate phone number | Taps **Different Patient** | **Clears father's account cleanly and opens Phone Number Check-in ready for her number** |
+| 1 | Daniel posts a new invoice while Sarah is at the kiosk | Sarah taps **Sync with MA** | **A toast shows and the new invoice appears** |
+| 2 | Sarah's daughter wants to check her own bill | Taps **Different Patient** | **The keypad opens, but the earlier number is still on it** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-4-J1 | Caregiver / Escort | After checking one relative's bills, I want to either refresh newly added charges on demand or switch directly to check another phone number cleanly. |
+| F-4-J1 | Patient | After I check one relative's bills, I want to refresh or switch to another number cleanly, so that the next person does not see mine. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-4-1 | Given **Sync with MA** is tapped, then invoices MUST refresh from live billing records and confirm via toast notification. |
-| F-4-2 | Given **Different Patient** is tapped, then the current patient profile MUST clear and transition back to **Phone Number Check-in**. |
+| F-4-1 | **Given** Sync with MA is pressed, **then** invoices reload and the toast shows. |
+| F-4-2 | **Given** Different Patient is pressed, **then** the keypad opens with the previous number still entered. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Billing Verification Gate & Household Picker | F-1.1 to F-1.3 | Protects financial balances behind Phone/OTP and selects family members safely. |
-| F-2 | Patient Account Header & Live Ledger | F-2.1 to F-2.3 | Displays itemized charges, dates, and live outstanding invoice counts from MantraAssist. |
-| F-3 | Partial Balance Math (`$`) & Row Actions | F-3.1 to F-3.3 | Credits prior deposits accurately and shows **Pay via QR** vs **View Receipt**. |
-| F-4 | **All Bills Clear!** & Footer Actions | F-4.1 to F-4.3 | Provides settled confirmation, **Sync with MA** manual refresh, Home exit, and **Different Patient** switch. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | Phone gate and household picker | F-1.1 – F-1.5 | ◐ / ● | Gate is a demo: any number takes the code; partial phone matches. |
+| F-2 | Ledger and Patient Account banner | F-2.1 – F-2.9 | ● / ◐ / ○ | Cards work; lookup leaks others' invoices; failure looks like all clear. |
+| F-3 | Balance, status and row actions | F-3.1 – F-3.4 | ● Works | Balance math and buttons work. |
+| F-4 | All Bills Clear!, Sync and footer | F-4.1 – F-4.5 | ● / ◐ | Sync and Done work; Different Patient keeps data. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | Clinic Patient | Verify identity securely, understand itemized charges and partial credits in USD (`$`), and launch QR payment or inspect receipts. | F-1, F-2, F-3 |
-| 2 | Family Caregiver | Refresh live desk-created invoices on demand or switch seamlessly to pay another relative's account. | F-4 |
+| 1 | Patient | Keep my balance private on a public screen | F-1 |
+| 2 | Patient | Check the invoice before I pay | F-2 |
+| 3 | Patient | Pay only what remains after a deposit | F-3 |
+| 4 | Patient | Refresh or switch patient cleanly | F-4 |
+
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Any visitor at the kiosk | Enter any number with the code 1234 or 0000, see invoices, start a payment | Nothing. The kiosk routes sit outside sign-in |
+| Front-desk Staff (Meera), Billing Specialist (Daniel) | Create the invoices the kiosk lists, on the Invoices page | Nothing is checked |
+
+The old PRD said the screen opens only after verified phone and code and shows the verified patient's invoices. Decision needed: D-46.
+
+## 5. Metrics and definitions
+
+| Metric | Where | Formula as built |
+| :--- | :--- | :--- |
+| Balance due | Invoice card | Invoice total minus amount paid, never below zero |
+| Outstanding count | Patient Account banner | Count of invoices whose status is not paid |
+| Paid / Total line | Invoice card | Amount paid over invoice total, shown when part is paid |
+
+## 6. Cross-module journeys this module appears in
+
+| Journey | Step | What happens as built |
+| :--- | :--- | :--- |
+| Kiosk check-in → Appointment → **Billing** | Visitor opens Billing, phone gate passed | Matches by client id, exact name or partial phone. With no match it lists every unpaid invoice. Void invoices count as unpaid. A face match can also open Billing. |
+| | Appointment created an invoice | The invoice may carry a placeholder client id that no kiosk patient has, so it shows only through the all-unpaid fallback. |
+| Patient portal ↔ Appointments / **Invoices** | Staff cancels a prepaid appointment | The invoice is voided even when paid. The kiosk still lists a void invoice with a balance as payable. |
+
+Full journey: see Journeys page.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-46 | What is the visitor authentication model: real code delivery, limits and lockout? | F-1.1, Section 4 |
+| D-39 | Which details may appear on screen or be spoken in a public lobby, and who may see which invoices? | F-2.2, F-2.3 |
+| D-40 | May a face match unlock Billing? | F-1.5 |
+| D-62 | Which currency and payment rails apply on the kiosk? | F-3.1 |
+| D-63 | Are void invoices excluded from payment, and what counts as Paid? | F-2.5 |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-12 | First version (generated stub). |

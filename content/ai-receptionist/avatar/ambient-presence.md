@@ -3,203 +3,266 @@ title: "Ambient Presence & Wake Flow"
 product: "ai-receptionist"
 module: "avatar"
 channel: "ambient-presence"
+route: "/reception"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-12"
-last_updated: "2026-11-12"
+last_updated: "2026-11-14"
 ---
 
-| Product | AI Receptionist |
-| :--- | :--- |
-| Module | Avatar & Voice Experience - Ambient Presence & Wake (`/reception`) |
+| Product | AI RECEPTIONIST |
+| Module | AVATAR: AMBIENT PRESENCE AND WAKE |
+| Route | `/reception` |
 | Status | In Review |
+| Build status | Partly simulated |
 | Created | 2026-11-12 |
-| Last updated | 2026-11-12 |
+| Last updated | 2026-11-14 |
+
+## At a glance
+
+| | |
+| :--- | :--- |
+| **What it is** | The standing lobby home of the kiosk. Aria waits with four quick-action tiles and a **Start** button, and wakes when someone stands close to the screen. |
+| **Who uses it** | Patient (the walk-up visitor). Practice Admin or an installer uses the `?debug=1` strip. No sign-in and no role is checked. |
+| **Where you start it** | Open `/reception`, `/reception/landing` or `/reception/avatar`. Standing close to the screen, tapping **Start** or tapping a tile wakes it. |
+| **Where the result goes** | Into the flow the visitor chooses: appointment check-in, billing, feedback or directions. Nothing is stored. |
+| **How real is it** | 2 features work, 3 are partly simulated, 0 are not built. See the legend below. |
+
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client | Reception Facility Context | Kiosk configuration and clinic rooms managed in Client Reception Settings drive what visitors can act on right after waking Aria. | [View in Client](/client/settings/reception) |
-| Client | Clinic AI Voice Configuration | Organization voice channel settings define Aria's active reception voice persona used during welcome greetings. | [View in Client](/client/settings/voices) |
-| Client | Scheduled Visits Entry | Tapping Appointment on the home screen opens check-in connected directly to today's clinic appointment calendar. | [View in Client](/client/appointments/calendar) |
-| Client | Billing & Invoice Access | Tapping Billing on the home screen launches phone-verified invoice lookup backed by Client Billing. | [View in Client](/client/invoices) |
-| Companion | Mobile Alternative | Visitors who prefer checking in or tracking queues on their own smartphone can continue seamlessly inside the Companion portal. | [View in Companion](/companion/today) |
+| Client (Reception settings) | Clinic name, colour, greeting phrase, flags | The home screen takes the clinic name and colour, a custom greeting phrase and the billing flag from Reception Settings. The Billing tile follows the payments flag. | [View Reception Settings](/client/settings/reception) |
+| Client (Voices) | Greeting voice | Aria speaks the greeting in the active kiosk language. Whether the Voices settings choose her voice is not traced. | [View Voices](/client/settings/voices) |
+| Client (Appointments) | Appointment tile | The tile opens check-in. The check-in looks up the visitor's appointment, but does not update the clinic's appointment record. | [View Appointments](/client/appointments/calendar) |
+| Client (Invoices) | Billing tile | The tile opens the phone-verified invoice lookup. | [View Invoices](/client/invoices) |
+| Companion | Check in on a phone | Not connected. No link from the home screen to the patient portal exists. | [View Companion Today](/companion/today) |
 
 ## 1. Module Summary
-- The **Ambient Presence & Wake Flow** defines the standing lobby home screen of Aria (`/reception`), designed as a calm, approachable clinic greeter ready for walk-up visitors.
-- Combining gentle **close-proximity presence sensing** with large **one-tap Quick Action cards** (`Appointment`, `Billing`, `Feedback`, `Directions`) and a manual **Start** button, Aria welcomes patients who stop in front of the terminal while ignoring passersby across the waiting room.
-- Every visit begins on a clean, private home screen with any prior patient details completely cleared between visitors.
+
+### The story in one minute
+
+Sarah Johnson walks into the lobby with her husband. The kiosk shows Aria at rest with four tiles around her. A few people walk past in the background and nothing happens. Sarah stops in front of the screen. After two close readings in a row, Aria wakes. She pauses for a moment and greets Sarah aloud, with captions under her. Sarah does not want to talk, so she taps **Appointment** while the greeting plays. The greeting stops and check-in opens. A small camera icon in the top corner says the camera is for greeting only. On a tablet with no camera permission the same screen works by touch alone.
+
+### What is real and what is not
+
+- **Real in the prototype:** the home screen and its aliases, the distance and dwell wake rule, the camera icon with its tooltip, the 5-phase welcome, the four tiles and **Start** button, the camera-free touch fallback, and the `?debug=1` strip.
+- **Simulated:** the visitor wipe on return to home. It clears most details but not invoices, next-step data or face samples.
+- **Not built:** the `/reception/idle` route (it shows Not Found) and a persistent text pill that reads "Camera active for greeting only".
+
+### Journey position
+
+```
+Home (Aria at rest) ─▶ Wake (approach or Start) ─▶ Greeting ─▶ Tile or voice ─┬▶ Appointment ─▶ Billing ─▶ Directions
+```
 
 ## 2. Feature Requests
 
-### F-1: Canonical Lobby Home & Privacy-Clean Session Reset
+### F-1: Home route and visitor reset
+
 #### 1. What it does
-Whether a kiosk opens `/reception`, `/reception/landing`, or `/reception/idle`, it normalizes cleanly to the canonical home screen and presents Aria's welcoming lobby presence. Whenever the kiosk returns home from an appointment, check-in, visit tracker, or billing screen, all prior patient names, phone numbers, verification codes, and invoice views clear immediately so no waiting-room visitor can ever see the previous person's information.
+The kiosk home is the first screen. `/reception`, `/reception/landing` and `/reception/avatar` all open it. Each time the kiosk returns home, the details of the last visitor should disappear. Most do. Some do not.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: Normalized Home Route | Navigation | Opens the unified standing lobby experience consistently across legacy or canonical entry paths | Prevents stale history back-navigation |
-| F-1.2: Instant Visitor Session Wipe | Privacy Safeguard | Clears prior patient selection, entered phone/OTP digits, onboarding drafts, and bills on return | Guarantees clean privacy slate per visitor |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: Canonical home | Route | `/reception` and `/reception/landing` open the home screen | ● Works | |
+| F-1.2: `/reception/idle` | Route | The earlier PRD expects it to open home | ○ Not built | The route is not registered and the app shows Not Found (G11-E-30) |
+| F-1.3: Visitor wipe on return | Rule | Clears the entered phone, code, matched patient, visit summary and form on return to home | ◐ Simulated | Invoices, the selected invoice, the QR image, next-step data and captured face samples are not cleared (G11-E-10) |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Previous patient finishes checking out and taps Home | Returns to `/reception` lobby screen | **Previous patient's invoice and name disappear instantly; next visitor sees fresh home stage** |
+| 1 | The last patient taps **Home** on a bill screen | Returns to the lobby screen | **The name and phone are gone and the home stage shows. The invoice data stays in kiosk memory** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Clinic Privacy Lead | When one visitor steps away and the next walks up, I want all previous visitor details erased immediately, so that private health or billing info never leaks. |
+| F-1-J1 | Patient | When the person before me steps away, I want all of their details gone from the screen, so that my own visit starts clean and theirs stays private. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Given a visitor finishes any flow and returns Home, then all previous patient, appointment, and invoice details MUST be cleared before displaying the ambient screen. |
+| F-1-1 | **Given** a visitor returns home, **then** the entered phone, code, matched patient and visit summary are cleared. Invoice data is not cleared. |
+| F-1-2 | **Given** a browser opens `/reception/idle`, **then** the Not Found page shows. |
 
----
+### F-2: Close-proximity greeting and camera notice
 
-### F-2: Passive Close-Proximity Greeting & Privacy Disclosure
 #### 1. What it does
-While waiting in the lobby, the kiosk samples camera presence gently (`5 times per second`) solely to notice when someone steps up closely and pauses intentionally in front of the screen:
-- **Distant Lobby Movement Ignored:** Staff and patients walking across the waiting area (`under 14%` frame size) or passing briefly without pausing never trigger false audio interruptions.
-- **Intentional Approach Wake:** Only when someone stands close (`at least 30%` height ratio) for **two consecutive checks** does Aria wake up and greet them warmly.
-- **Zero Passive Identification & Clear Notice:** Ambient camera presence measures distance only — it **never runs face recognition or saves images**. A clear persistent top-right green status badge reads **"Camera active for greeting only"**.
-- **Camera-Free Degrade:** If a clinic tablet disables camera permissions or runs on unsupported hardware, the kiosk stays 100% operational via the manual **Start** button and Quick Action tiles.
+While the home screen waits, the browser's face detector, when the browser has one and the camera is allowed, measures only how big a face looks in the frame, about 5 times a second. People far away are ignored. When one face is close for two checks in a row, Aria wakes. Nothing is matched and no image is stored. A small camera icon with a tooltip tells the visitor the camera is for greeting only.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: Distance & Dwell Filter | Approach Logic | Distinguishes close stationary visitors (`>= 30%` height for 2 ticks) from passing background foot traffic | Stops annoying repeated lobby greetings |
-| F-2.2: Non-Identifying Camera Promise | Privacy Control | Evaluates distance ephemerally in memory with zero biometric matching or photo storage | Preserves lobby visitor anonymity |
-| F-2.3: `"Camera active for greeting only"` Pill | Transparency Badge | Displays a constant visible status notice near the camera indicator | Builds visitor trust at a glance |
-| F-2.4: Touch-First Fallback | Hardware Resilience | Operates seamlessly via touch buttons if camera permission is denied | Never blocks kiosk check-in |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Distance and dwell filter | Rule | A face under 14% of frame height is ignored. At 30% or more for 2 checks in a row, the welcome starts. Checks run every 200 ms | ● Works | |
+| F-2.2: No identification | Privacy rule | Only face size is read. No matching runs and no image is stored | ● Works | |
+| F-2.3: Camera icon and tooltip | Badge | A small camera icon with a green dot appears while the camera is on. The tooltip reads "Camera active for greeting only" on hover or long press | ● Works | A weaker notice than the earlier PRD. Decision needed: D-35 |
+| F-2.4: Persistent text pill | Badge | The earlier PRD asked for a constant green pill reading "Camera active for greeting only" | ○ Not built | Decision needed: D-35 |
+| F-2.5: Touch-first fallback | State | With the camera denied or no face detector, the home screen works by tap and **Start** | ● Works | With no detector, wake is silently manual and no message says so |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Receptionist walks behind waiting chairs | Passes through distant background view (`9%` ratio) | **Kiosk stays calm and silent with zero unwanted greeting** |
-| 2 | Patient steps directly up to the standee and pauses | Stands within close greeting zone for ~0.4 seconds | **Aria shifts smoothly into attentive greeting without identifying them yet** |
-| 3 | Tablet has camera permission turned off | Approaching visitor taps **Start** or **Appointment** | **Full voice and touch reception workflows launch immediately** |
+| 1 | Meera walks behind the chairs | Passes in the background | **The kiosk stays calm and silent** |
+| 2 | Sarah stands in front of the screen | Stays close for two checks | **Aria wakes and greets her. Nobody is identified** |
+| 3 | The tablet camera is blocked | Sarah taps **Start** | **The welcome and every flow work by touch** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Approaching Visitor | When I walk up and stand in front of the kiosk, I want Aria to greet me naturally without bothering people sitting behind me. |
-| F-2-J2 | Privacy Compliance Officer | When the home camera is active for greetings, I want visitors clearly informed that it is for greeting only and does not scan or identify them passively. |
+| F-2-J1 | Patient | When I stand in front of the kiosk, I want Aria to greet me without greeting everyone who walks past, so that the lobby stays calm. |
+| F-2-J2 | Patient | When the home camera is on, I want to be told it is only for greeting, so that I know it does not scan or identify me. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Given background lobby motion below the close-proximity dwell threshold, then Aria MUST remain resting and MUST NOT play welcome audio. |
-| F-2-2 | Given ambient mode is active, then facial matching MUST NOT execute and **"Camera active for greeting only"** MUST communicate camera purpose clearly. |
+| F-2-1 | **Given** a face below the close threshold, **then** Aria stays at rest and plays no welcome. |
+| F-2-2 | **Given** home mode is active, **then** no face matching runs and no image is stored. |
+| F-2-3 | **Given** the camera is on, **then** a camera icon shows with the tooltip "Camera active for greeting only". No persistent text pill shows. |
+| F-2-4 | **Given** the camera is denied or unsupported, **then** the tiles and **Start** still open every flow. |
 
----
+### F-3: Five-phase welcome
 
-### F-3: 5-Phase Natural Welcome Sequence
 #### 1. What it does
-Whether triggered automatically by a close approach or manually by tapping the bottom-left **Start** (`शुरू करें` in Hindi) button, Aria executes a natural **5-phase conversational welcome**:
-1. **Dormant:** Calm resting posture waiting in the lobby.
-2. **Engaged (`0.3s` pause):** Brief attentive posture shift signaling she noticed the visitor.
-3. **Greeting:** Speaks the warm clinic welcome in the active language (`"Welcome to MantraCare! How can I help you today?"` or localized Hindi equivalent `"नमस्ते, MantraCare में आपका स्वागत है! मैं आज आपकी क्या सहायता कर सकती हूँ?"`).
-4. **Listening (`0.2s` echo buffer):** Waits briefly after finishing her sentence so her own speaker output clears, then opens the microphone with live caption feedback.
-5. **Routing:** Shows a brief thinking/understanding confirmation (`"One moment, directing your visit..."`) while transitioning smoothly to the visitor's requested workflow.
+The welcome starts from a close approach or the **Start** button (**शुरू करें** in Hindi). Aria rests, pauses about 0.3 seconds, greets aloud in the active language (or the clinic's custom phrase), waits about 0.2 seconds so her speaker clears, then listens. After a request she shows a thinking message and moves to the flow.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Attentive Lead-In (`0.3s`) | Conversational Cue | Smoothly bridges silent rest into spoken greeting without abrupt audio cuts | Prevents duplicate trigger overlaps |
-| F-3.2: Bilingual Greeting | Voice Prompt | Welcomes visitors clearly in English or Hindi matching selected kiosk language | Synchronized with bottom live captions |
-| F-3.3: Post-Speech Listening Handoff | Mic Timing | Adds a brief `0.2s` pause before listening so Aria does not hear her own voice | Ensures clean first-word capture |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Attentive lead-in | Cue | Dormant, then Engaged after a 0.3 second pause | ● Works | |
+| F-3.2: Spoken greeting | Voice | Speaks in the active language. A custom clinic greeting phrase replaces the default | ● Works | The phrase comes from Reception Settings |
+| F-3.3: Listening hand-off | Timing | A 0.2 second buffer, then the microphone opens with live captions | ● Works | |
+| F-3.4: Routing | Phase | Shows a thinking message such as "One moment, directing your visit..." and opens the matching flow | ● Works | |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Visitor taps **Start** on a quiet morning | Taps **Start** in bottom-left corner | **Aria pauses briefly, greets visitor aloud with synced captions, opens mic, and listens for their request** |
+| 1 | A quiet morning | Sarah taps **Start** | **Aria pauses, greets aloud with captions, then opens the microphone** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Lobby Visitor | When waking the kiosk by approach or tap, I want natural turn-taking pacing, so that Aria finishes speaking cleanly before expecting me to talk. |
+| F-3-J1 | Patient | When I wake the kiosk by walking up or tapping, I want Aria to finish speaking before she expects me to talk, so that my first words are heard. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given **Start** is tapped or close dwell triggers, then Aria MUST play the greeting before opening active voice listening with a brief post-speech buffer. |
+| F-3-1 | **Given** **Start** is tapped or the close rule fires, **then** the greeting plays before the microphone opens, with a short buffer after the speech. |
 
----
+### F-4: Quick actions and the Start button
 
-### F-4: Responsive Flanking Quick Actions & Bottom **Start** Bar
 #### 1. What it does
-For visitors who prefer quiet touchscreen navigation over speaking out loud, the `AMBIENT` home screen surrounds Aria with four primary shortcuts translated dynamically between English and Hindi:
-- **Appointment** (`अपॉइंटमेंट`) -> opens unified Face/Phone Check-In
-- **Billing** (`बिलिंग`) -> opens Phone/OTP Billing Lookup
-- **Feedback** (`प्रतिक्रिया`) -> opens Patient Feedback preview
-- **Directions** (`दिशा-निर्देश`) -> opens Clinic Department & Room Wayfinding
-
-On large lobby kiosks (`>= 1280px` wide), these tiles sit symmetrically two to the left and two to the right of Aria; on compact portrait tablets, they wrap cleanly into a neat bottom grid above the footer containing **Start** and the live voice caption bar. Tapping any Quick Action interrupts ongoing greeting audio immediately and jumps straight to that task.
+Four tiles surround Aria: **Appointment**, **Billing**, **Feedback** and **Directions**, in English or Hindi. On a wide screen (1280 pixels or more) two sit on each side. On a narrow tablet they wrap into a grid at the bottom. A **Start** button sits at the bottom left. Tapping any tile stops the greeting and opens that flow. The **Billing** tile follows the clinic's payments setting.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-4.1: Desktop Symmetrical Columns | Responsive Layout | Places `Appointment` & `Billing` left and `Feedback` & `Directions` right of Aria on wide screens | Balanced lobby kiosk geometry |
-| F-4.2: Compact Grid Reflow | Mobile/Tablet Layout | Wraps all 4 Quick Action cards cleanly below Aria on smaller viewports | Zero clipping or horizontal scrolling |
-| F-4.3: Direct Touch Bypass | Fast Action | Interrupts greeting TTS and jumps straight into the selected workflow | Works even while microphone is muted or silent |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-4.1: Wide layout | Layout | Two tiles on each side of Aria on wide screens | ● Works | |
+| F-4.2: Compact layout | Layout | Tiles wrap into a bottom grid on small screens | ● Works | |
+| F-4.3: Tile bypass | Action | A tap stops the greeting and opens the flow | ● Works | Works even when muted |
+| F-4.4: Billing tile flag | Rule | The tile is hidden when the clinic turns payments off | ● Works | Not in the earlier PRD |
+| F-4.5: Feedback tile | Action | Opens `/reception/feedback` | ○ Not built | The route shows Not Found (G11-E-30) |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Quiet patient wants directions without talking aloud | Taps **Directions** right away while greeting plays | **Greeting stops cleanly and Clinic Department Directory opens immediately** |
+| 1 | The greeting is playing | Sarah taps **Directions** | **The greeting stops and the departments open** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-4-J1 | Silent / Shy Visitor | When standing in a crowded waiting room, I want large one-tap shortcuts for my top clinic tasks, so that I don't have to speak aloud if I prefer privacy. |
+| F-4-J1 | Patient | When I do not want to speak in a crowded room, I want large one-tap shortcuts, so that I can finish without talking. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-4-1 | Given any of the four Quick Action buttons (`Appointment`, `Billing`, `Feedback`, `Directions`) is tapped on the home screen, then the kiosk MUST stop ambient greeting audio and open the matching screen immediately. |
+| F-4-1 | **Given** a tile is tapped, **then** the greeting audio stops and the matching screen opens. For **Feedback** that screen is the Not Found page. |
+| F-4-2 | **Given** the clinic turned payments off, **then** the Billing tile does not show. |
 
----
+### F-5: Installer diagnostic strip
 
-### F-5: Field Installer Diagnostic Mode (`?debug=1`)
 #### 1. What it does
-During physical standee installation or lighting calibration inside a clinic lobby, field technicians can load `/reception?debug=1` (or `?debug=true`) to view an unobtrusive top diagnostic status strip displaying the current wake phase, active screen, and camera status (`[DEBUG] Phase | Screen`). Standard clinic kiosk URLs omit this parameter so patients never see diagnostic overlays.
+A technician opens `/reception?debug=1` and sees a thin strip with the wake phase, the screen and the camera state (Active, Denied or Off). Normal URLs show nothing.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-5.1: Query Flag Toggle | Installer Tool | Activates live phase/screen calibration badge strictly when `?debug=1` or `?debug=true` is appended | Hidden completely in normal production URLs |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-5.1: `?debug=1` strip | Installer tool | Shows `[DEBUG] Phase` and `Screen` and the camera state | ● Works | `?debug=true` works too |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Technician tests standee angle in bright sunlight | Opens `/reception?debug=1` and steps into range | **Live HUD confirms switch from `dormant` to `engaged` -> `greeting` -> `listening`** |
+| 1 | An installer tests the standee angle | Opens `/reception?debug=1` and steps close | **The strip moves from dormant to engaged, greeting and listening** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-5-J1 | Kiosk Installer | When calibrating standee tilt and distance in a lobby, I want an optional debug status strip, so that I can verify approach triggers without opening browser tools. |
+| F-5-J1 | Practice Admin | When I set up the standee, I want a status strip, so that I can check the wake rule without browser tools. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-5-1 | Given `?debug=1` is omitted from the kiosk URL, then zero diagnostic status badges MUST appear on screen. |
+| F-5-1 | **Given** `?debug=1` is missing from the URL, **then** no diagnostic strip shows. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Canonical Home & Session Reset | F-1.1 to F-1.2 | Normalizes lobby URLs and erases prior visitor data completely between sessions. |
-| F-2 | Close-Proximity Greeting & Privacy | F-2.1 to F-2.4 | Greets visitors who pause nearby without matching biometrics or reacting to background traffic. |
-| F-3 | 5-Phase Natural Welcome | F-3.1 to F-3.3 | Coordinates attentive pause, bilingual greeting, echo buffer, listening, and routing seamlessly. |
-| F-4 | Responsive Quick Actions & Start Bar | F-4.1 to F-4.3 | Displays bilingual `Appointment`, `Billing`, `Feedback`, and `Directions` tiles across kiosk & tablet sizes. |
-| F-5 | Field Calibration Mode | F-5.1 | Provides optional `?debug=1` telemetry overlay during physical lobby setup. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | Home route and visitor reset | F-1.1 – F-1.3 | ● / ◐ / ○ | Home works; wipe is partial; the idle route is Not Found. |
+| F-2 | Close-proximity greeting and camera notice | F-2.1 – F-2.5 | ● / ○ | Wake rule works; notice is an icon, not a pill. |
+| F-3 | Five-phase welcome | F-3.1 – F-3.4 | ● Works | Greeting, buffer, listening, routing. |
+| F-4 | Quick actions and Start | F-4.1 – F-4.5 | ● / ○ | Tiles work; Feedback opens Not Found. |
+| F-5 | Installer diagnostic strip | F-5.1 | ● Works | `?debug=1` shows phase, screen and camera. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | Lobby Visitor | Be greeted naturally on approach or launch any top reception task quietly with one tap. | F-2, F-3, F-4 |
-| 2 | Privacy Lead & Installer | Keep camera presence strictly anonymous between sessions while simplifying lobby calibration. | F-1, F-2, F-5 |
+| 1 | Patient | Start with the last visitor's details gone | F-1 |
+| 2 | Patient | Be greeted only when I walk up | F-2 |
+| 3 | Patient | Know the camera is for greeting only | F-2 |
+| 4 | Patient | Be heard after the greeting finishes | F-3 |
+| 5 | Patient | Use one-tap shortcuts without speaking | F-4 |
+| 6 | Practice Admin | Check the wake rule at installation | F-5 |
+
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Any visitor with the kiosk URL | Wake the kiosk, tap any tile, use `?debug=1` | Nothing. No sign-in is needed |
+
+The earlier PRD names no role. Decision needed: D-35 for the camera notice, D-41 for what a verified visit may do.
+
+## 5. Metrics and definitions
+
+No metric is shown. The wake rule reads face height as a share of frame height: 14% noticed, 30% close, 2 checks in a row.
+
+## 6. Cross-module journeys this module appears in
+
+| Journey | Step | What happens as built |
+| :--- | :--- | :--- |
+| Kiosk check-in → Appointment → Billing | Start of the journey | Home, wake and tile choice. No identity is read here. |
+
+Full journey: see Journeys page.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-35 | Is a persistent camera notice pill required, and how is biometric consent handled? | F-2.3, F-2.4 |
+| D-41 | What may a successful verification authorise, and for how long? | Section 4 |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-12 | First version (generated stub). |

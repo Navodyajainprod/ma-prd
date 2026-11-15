@@ -3,137 +3,223 @@ title: "Touchless UPI QR Checkout & Reconciliation"
 product: "ai-receptionist"
 module: "billing"
 channel: "qr-pay"
+route: "/reception/billing"
 status: "In Review"
+build_status: "Partly simulated"
 created_date: "2026-11-12"
-last_updated: "2026-11-12"
+last_updated: "2026-11-14"
 ---
 
-| Product | AI Receptionist |
-| :--- | :--- |
-| Module | Billing & Payments - Touchless QR Checkout (`/reception/billing`) |
+| Product | AI RECEPTIONIST |
+| Module | BILLING AND PAYMENTS: TOUCHLESS QR CHECKOUT (`/reception/billing`) |
+| Route | `/reception/billing` |
 | Status | In Review |
+| Build status | Partly simulated |
 | Created | 2026-11-12 |
-| Last updated | 2026-11-12 |
+| Last updated | 2026-11-14 |
+
+## At a glance
+
+| | |
+| :--- | :--- |
+| **What it is** | A kiosk checkout card with a payment QR, supported wallet badges, a Copy Payment Link button and an **I Have Paid** button that records the payment on the invoice. |
+| **Who uses it** | Patient (at the lobby kiosk). Billing Specialist (sees the payment on the Invoices page). No identity check and no role is applied. |
+| **Where you start it** | **Pay via QR** or **View Receipt** on an invoice card in the kiosk ledger, or saying "pay" or "checkout". |
+| **Where the result goes** | The invoice and its payment record on the Invoices page, the kiosk ledger, and the patient's Companion Bill screen. Nothing reaches Claims. |
+| **How real is it** | 0 features work, 3 are partly simulated, 0 are not built. See the legend below. |
+
+**Build-status legend used on every row of this PRD**
+
+| Mark | Meaning |
+| :--- | :--- |
+| ● Works | Behaves as described in the prototype. |
+| ◐ Simulated | Looks live on screen but uses preset or placeholder data, or only shows a confirmation. |
+| ○ Not built | Described so the intent is not lost. Nothing happens in the prototype. |
 
 ## Cross-product Summary
 
 | Related product | Feature / change | How it shows up in this product | Link |
 | :--- | :--- | :--- | :--- |
-| Client | Real-Time Payment Reconciliation | Settling via kiosk QR records the payment immediately in Client Invoices marked as QR Code payment (`Paid via AI Receptionist QR Kiosk`), flipping front-desk ledgers to Paid automatically. | [View in Client](/client/invoices) |
-| Client | Billing Merchant & Receipt Settings | Clinic payee identity and invoice numbering rules from Client Billing Settings shape every generated QR payment link. | [View in Client](/client/settings/billing) |
-| Client | Reception Deployment Link | Associates lobby kiosk payment activity cleanly alongside Reception kiosk hardware configuration. | [View in Client](/client/settings/reception) |
-| Client | Client Account Financial Timeline | Updates the patient's balance and settled invoice history inside their Client profile. | [View in Client](/client/clients) |
-| Companion | Instant Paid Receipt Sync | Invoices paid via kiosk QR immediately appear as settled inside the patient's mobile Companion Billing view. | [View in Companion](/companion/billing) |
-| Companion | Visit & Appointment Continuity | Keeps consultation charges and paid visit receipts aligned with the patient's Companion Appointments view. | [View in Companion](/companion/appointments) |
+| Client (Invoices) | Payment lands on the invoice | **I Have Paid** records the full balance with method QR Code and the note "Paid via AI Receptionist QR Kiosk". The invoice shows Paid. Nothing checks that money moved. An invoice id the service cannot find creates a new paid invoice for client CL-001. A void invoice with a balance can be paid. | [View Invoices](/client/invoices) |
+| Client (Billing settings) | Payee and numbering | Not connected. The QR uses a fixed payee address and USD amounts. Billing settings do not feed it. | [View Billing Settings](/client/settings/billing) |
+| Client (Reception Settings) | Kiosk setup | The kiosk is deployed from Reception Settings, which holds no payment rules. | [View Reception Settings](/client/settings/reception) |
+| Client (Clients) | Account balance | The client's Invoices tab shows the payment after it is recorded. Kiosk payment does not move the client's stage (the portal does). | [View Clients](/client/clients) |
+| Companion | Paid receipt on the phone | The patient's Bill screen reads the same invoices, so a kiosk payment shows as paid there. | [View Companion Billing](/companion/billing) |
+| Companion (Appointments) | Visit receipts | Not connected from this screen. | [View Companion Appointments](/companion/appointments) |
 
 ## 1. Module Summary
-- The **Touchless UPI QR Checkout & Reconciliation** channel turns the lobby kiosk into a contactless mobile payment counter whenever a patient selects **Pay via QR** (or **View Receipt**) from the invoice ledger.
-- Opening directly inside the **Touchless QR Settlement** card, the kiosk generates a scannable payment QR pre-filled with clinic merchant details, invoice reference, and exact remaining USD (`$`) balance, highlights supported payment apps, enables 1-tap payment link copying, reconciles payment straight into MantraAssist's live billing engine, and celebrates completion visually and aloud.
+
+### The story in one minute
+
+Sarah Johnson taps **Pay via QR** on her consultation invoice. A card opens showing **Touchless QR Settlement**, a **Payment Pending** pill, the invoice number, the due date and the balance in dollars. A QR code sits beside a strip of wallet badges. She can tap **Copy Payment Link** if scanning is awkward. She pays on her phone, then taps **I Have Paid • Settle Invoice Now**. The kiosk does not check any bank or gateway. It records the payment, throws confetti, turns Aria green and speaks a thank-you. The card flips to **Paid & Reconciled**. Daniel Brooks later sees a QR Code payment on the invoice. The payment QR cannot be paid in a real UPI app, because it is an INR-only link with a dollar amount.
+
+### What is real and what is not
+
+- **Real in the prototype:** the QR card layout, the pending and paid header, the Settled & Paid overlay, the wallet badges, the copy button, the saving lock, the confetti and spoken thank-you, and the return buttons.
+- **Simulated:** the payment itself. Tapping **I Have Paid** records the full balance with no proof (G11-E-16). The QR carries a fixed payee address and USD (G11-E-18). The receipt number is made up (G11-E-40).
+- **Not built:** reconciliation against a real UPI or gateway confirmation, and the standalone Confirm & Record Payment dialog, which exists in code but is not mounted.
+
+### Journey position
+
+```
+Pay via QR ─▶ QR card ─▶ I Have Paid (no proof) ─▶ Invoice Paid ─┬▶ Kiosk ledger
+                                                                 ├▶ Invoices page
+                                                                 └▶ Companion Bill
+```
 
 ## 2. Feature Requests
 
-### F-1: Dynamic **Touchless QR Settlement** Card & Settled Receipt Overlay
+### F-1: QR settlement card and Settled overlay
+
 #### 1. What it does
-Selecting **Pay via QR** on any unpaid invoice (or **View Receipt** on a paid bill) opens the focused **Touchless QR Settlement** checkout card showing:
-- **Status & Invoice Header:** Displays **Touchless QR Settlement** badge paired with live status pill (**Payment Pending** in amber vs **Paid & Reconciled** in emerald), Invoice Number, Patient Name, Due Date, and right-aligned **Balance Due** / **Total Settled** in **`$`** USD (alongside paid vs total amounts whenever prior deposits exist).
-- **Scannable Contactless QR Code:** Generates a sharp high-contrast QR matrix encoding the clinic merchant payee (`MantraCare Health`), exact remaining USD balance due, and invoice reference number so any smartphone payment app pre-fills everything cleanly on scan.
-- **Digital Receipt Lock Overlay:** When viewing an already-paid bill (or right after checkout completes), an emerald **Settled & Paid • MantraAssist Synced** stamp covers the QR code so nobody can accidentally pay the same invoice twice.
+Sarah taps **Pay via QR** and the **Touchless QR Settlement** card opens. It shows a status pill, the invoice number, the patient name, the due date and the balance. The QR encodes a payee, the balance, a currency and the invoice number. On a paid invoice, **View Receipt** shows **Paid & Reconciled** and an overlay **Settled & Paid • MantraAssist Synced** covers the QR.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-1.1: Pre-Filled QR Matrix | Payment Generator | Encodes clinic payee, exact remaining `$` balance, `USD` currency, and invoice `#ID` into QR | Eliminates manual amount entry errors |
-| F-1.2: Pending vs Reconciled Header | Summary Strip | Highlights Invoice `#`, Patient Name, Due Date, and remaining Balance Due / Total Settled | Clear at standing reading distance |
-| F-1.3: **Settled & Paid** Overlay Stamp | Double-Pay Prevention | Masks the QR image with **Settled & Paid / MantraAssist Synced** once settled | Doubles cleanly as **View Receipt** confirmation |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1.1: Payment QR | Generator | Encodes a UPI link with a fixed payee address, the balance, USD and the invoice number | ◐ Simulated | UPI apps accept INR only, so a real scan would not complete (G11-E-18). Decision needed: D-62 |
+| F-1.2: Header | Strip | Shows **Payment Pending** or **Paid & Reconciled**, invoice number, patient, due date and balance | ● Works | G11-I-113 |
+| F-1.3: Settled & Paid overlay | Overlay | Covers the QR once the invoice is paid | ● Works | Hides the QR so the same invoice is not paid twice from this card |
+| F-1.4: Void invoice | Rule | A void invoice with a balance opens the card and can be paid | ◐ Simulated | XM-06. Decision needed: D-63 |
+| F-1.5: Payee and currency from Billing settings | Rule | Described in the earlier PRD | ○ Not built | The payee is fixed in code. Decision needed: D-62 |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient taps **Pay via QR** on `#INV-2041` with `$150.00` remaining | Opens Touchless QR Settlement card | **Displays `#INV-2041`, `Payment Pending`, `$150.00` Balance Due, and scannable QR pre-filled for `$150.00`** |
-| 2 | Patient opens an old paid invoice via **View Receipt** | Clicks View Receipt row action | **Displays `Paid & Reconciled`, `Total Settled`, and overlays `Settled & Paid • MantraAssist Synced` over QR** |
+| 1 | An invoice has a balance of 150 | Taps **Pay via QR** | **The card shows Payment Pending, the balance and a QR with a fixed payee, in USD** |
+| 2 | An invoice is already paid | Taps **View Receipt** | **Paid & Reconciled with the Settled & Paid overlay on the QR** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-1-J1 | Patient at Kiosk | When paying my clinic balance by phone, I want a scannable QR code that pre-fills the exact amount and invoice number automatically, so that I make zero typos. |
+| F-1-J1 | Patient | When I pay by phone at the kiosk, I want a QR that carries the exact amount and invoice, so that I make no typing mistakes. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-1-1 | Given an unpaid invoice with remaining balance `$150.00`, then **Touchless QR Settlement** MUST display `$150.00` Balance Due and generate a QR encoding that exact `$150.00` amount and invoice number. |
-| F-1-2 | Given an invoice is already paid or just settled, then **Paid & Reconciled** and the **Settled & Paid / MantraAssist Synced** overlay MUST cover the QR square. |
+| F-1-1 | **Given** an unpaid invoice, **when** Pay via QR is tapped, **then** the card shows Payment Pending, the balance and a QR with a fixed payee address and USD. |
+| F-1-2 | **Given** a paid invoice, **when** View Receipt is tapped, **then** Paid & Reconciled and the overlay show. |
+| F-1-3 | **Given** a void invoice with a balance, **then** the card opens and can be paid. |
 
----
+### F-2: Wallet badges and Copy Payment Link
 
-### F-2: Accepted Wallet Badges & One-Tap **Copy Payment Link**
 #### 1. What it does
-Inside the **Instant Mobile Checkout** panel right beside the QR frame, visitors immediately see supported payment app badges — **GPay**, **PhonePe**, **Paytm**, **BHIM UPI**, **Apple Pay**, and **Banking Apps** — reassuring them their preferred app works. For companions paying from another device or staff-assisted tablet checkouts where pointing a camera at glass isn't convenient, a **Copy Payment Link** button copies the full payment link to the clipboard, temporarily flipping its label to **URI Copied** alongside a confirmation toast (`"Payment URI copied to clipboard"`). (Standalone checkout dialogs similarly provide **Copy UPI Link** / **Copied**.)
+Beside the QR, the **Instant Mobile Checkout** panel shows badges for GPay, PhonePe, Paytm, BHIM UPI, Apple Pay and Banking Apps. **Copy Payment Link** copies the payment link and the label changes to **URI Copied**.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-2.1: Supported Wallet Strip | Compatibility Chips | Displays **GPay**, **PhonePe**, **Paytm**, **BHIM UPI**, **Apple Pay**, and **Banking Apps** | Builds confidence prior to scanning |
-| F-2.2: **Copy Payment Link** Action | Clipboard Helper | Copies generated UPI link directly and toggles confirmation state (**URI Copied**) | Useful for remote family payers or tablet demos |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-2.1: Wallet badges | Chips | Shows the six app names | ● Works | G11-I-115. Display only, no app is called |
+| F-2.2: Copy Payment Link | Button | Copies the link and shows **URI Copied** and a toast | ● Works | The copied link is the fixed-payee link from F-1.1 |
+| F-2.3: Standalone Copy UPI Link dialog | Dialog | Described in the earlier PRD | ○ Not built | The dialog exists in code but is never mounted (G11-E-39) |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Caregiver paying remotely needs link sent over message | Taps **Copy Payment Link** | **Clipboard stores payment URI, button changes to `URI Copied`, and toast confirms copy** |
+| 1 | Sarah's phone cannot scan the screen | Taps **Copy Payment Link** | **The label changes to URI Copied and a toast confirms** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-2-J1 | Patient / Caregiver | I want to verify at a glance that my mobile payment app is accepted, or copy the exact payment link cleanly if scanning is awkward. |
+| F-2-J1 | Patient | When scanning is awkward, I want to copy the payment link, so that I can pay from another device. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-2-1 | Given **Instant Mobile Checkout** renders, then **GPay**, **PhonePe**, **Paytm**, **BHIM UPI**, **Apple Pay**, **Banking Apps**, and **Copy Payment Link** MUST be visible. |
+| F-2-1 | **Given** the QR card, **then** the six wallet badges and Copy Payment Link are visible. |
+| F-2-2 | **Given** Copy Payment Link is tapped, **then** the label shows URI Copied. |
 
----
+### F-3: I Have Paid and ledger update
 
-### F-3: Instant Ledger Settlement, Celebration & Navigation Back to Bills
 #### 1. What it does
-Confirming settlement via **I Have Paid • Settle Invoice Now** (or **Confirm & Record Payment ($...)** in the standalone modal) completes the transaction atomically across clinic records:
-1. Prevents duplicate submissions while settlement saves, recording method **QR Code** with standardized accounting memo **`"Paid via AI Receptionist QR Kiosk"`**.
-2. Fires a celebratory multi-color confetti burst while Aria's halo turns **Verified Green** and she speaks thank-you confirmation (`"Thank you! Your payment of $X.XX has been recorded and synchronized with MantraAssist."`).
-3. Updates the card immediately to **Paid & Reconciled** / `$0.00` due and refreshes the underlying billing ledger automatically.
-4. Offers bottom controls **Back to All Bills** (returning to the refreshed invoice list) and **Return Home** (wiping session cleanly to the ambient lobby screen).
+After paying, Sarah taps **I Have Paid • Settle Invoice Now**. The button locks while the save runs. The kiosk records a payment of the full balance with method QR Code and the note "Paid via AI Receptionist QR Kiosk". Confetti bursts, Aria turns green and speaks a thank-you, and the card shows **Paid & Reconciled**. **Back to All Bills** and **Return Home** follow. The kiosk does not check that any money moved.
 
 #### 2. What it includes
-| Item | Type | What it does | Notes |
-| :--- | :--- | :--- | :--- |
-| F-3.1: Atomic Ledger Sync | Accounting Write | Credits payment as `QR Code` with note `"Paid via AI Receptionist QR Kiosk"` | Immediately visible on Client Billing desk |
-| F-3.2: Submitting Lock | Duplicate Protection | Disables settlement button during save to block accidental double-recording | Prevents duplicate receipt entries |
-| F-3.3: Confetti & Spoken Receipt Cue | Multimodal Confirmation | Launches celebratory visual burst, green Aria state, and toast confirmation | Clear reassurance without paper printers |
-| F-3.4: **Back to All Bills** & **Return Home** | Exit Actions | Lets payer settle another bill cleanly or end their session securely | Standalone modal also offers Cancel |
+| Item | Type | What it does (as built) | Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| F-3.1: Record payment | Write | Records the full balance as QR Code with the kiosk note, and the invoice becomes Paid | ◐ Simulated | The visitor's tap is the only proof (G11-E-16). Decision needed: D-63 |
+| F-3.2: Unknown invoice id | Rule | An id the service cannot find creates a new paid invoice for client CL-001 named "Patient" | ◐ Simulated | G11-E-17 |
+| F-3.3: Saving lock | Rule | The button is disabled while the save runs | ● Works | G11-I-119 |
+| F-3.4: Confetti, green Aria and thank-you | Feedback | Visual burst, green state and a spoken confirmation | ● Works | G11-I-120 |
+| F-3.5: Receipt number | Display | A receipt number shown on confirmation | ◐ Simulated | Made up from invoice digits, default 1001 (G11-E-40) |
+| F-3.6: Failure handling | State | A failed save shows an error toast | ◐ Simulated | The error is then rethrown and goes unhandled (G11-E-40) |
+| F-3.7: Back to All Bills, Return Home | Buttons | Returns to the refreshed ledger or to Home | ● Works | G11-I-121 |
+| F-3.8: Gateway reconciliation | Rule | Described in the earlier PRD: reconcile against a real payment confirmation | ○ Not built | Nothing checks that money arrived (G11-I-118). Decision needed: D-62 |
+| F-3.9: Standalone Confirm & Record Payment | Dialog | Described in the earlier PRD | ○ Not built | Never mounted (G11-E-39) |
 
 #### 3. Worked example
 | # | Situation | What the user does | Result |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient pays `#INV-2041` (`$150.00`) via mobile wallet | Taps **I Have Paid • Settle Invoice Now** | **Confetti bursts, card flips to `Paid & Reconciled`, Aria speaks thank-you confirmation, and tapping `Back to All Bills` shows `Paid & Settled`** |
+| 1 | Sarah has paid on her phone | Taps **I Have Paid • Settle Invoice Now** | **Confetti, a spoken thank-you and Paid & Reconciled. Back to All Bills shows Paid & Settled** |
+| 2 | A visitor taps it without paying | Taps **I Have Paid • Settle Invoice Now** | **The invoice is recorded as paid all the same** |
 
 #### 4. Jobs to be done
 | # | User | Job to be done |
 | :--- | :--- | :--- |
-| F-3-J1 | Clinic Accountant & Patient | When a patient pays by QR at the lobby kiosk, I want the invoice marked Paid immediately across desk and mobile views with clear confirmation and zero paper bottleneck. |
+| F-3-J1 | Patient | When I pay at the kiosk, I want the invoice shown as paid at once, so that I can leave without paper. |
+| F-3-J2 | Billing Specialist | When a patient pays at the kiosk, I want the payment to appear on the invoice and to be real, so that the ledger can be trusted. |
 
 #### 5. Acceptance criteria
 | # | Criteria |
 | :--- | :--- |
-| F-3-1 | Given **I Have Paid • Settle Invoice Now** is confirmed, then the invoice balance MUST drop to `$0.00`, payment method MUST record as QR Code (`"Paid via AI Receptionist QR Kiosk"`), celebratory confirmation MUST appear, and **Back to All Bills** MUST display the updated **Paid & Settled** state. |
+| F-3-1 | **Given** I Have Paid is tapped, **then** the full balance is recorded as QR Code with the note "Paid via AI Receptionist QR Kiosk" and the invoice shows Paid, with no check that money arrived. |
+| F-3-2 | **Given** the invoice id is not found, **then** a new paid invoice is created for client CL-001. |
+| F-3-3 | **Given** the save fails, **then** an error toast shows and the error is rethrown. |
 
 ## 3. Comprehensive Summary
 
 ### 3.1 Feature Request Summary
-| ID | Feature | Sub-features | One-line summary |
-| :--- | :--- | :--- | :--- |
-| F-1 | Dynamic QR Settlement & Receipt Stamp | F-1.1 to F-1.3 | Builds USD QR codes for exact unpaid balance and locks paid items with a Settled overlay. |
-| F-2 | Wallet Compatibility & Copy Link | F-2.1 to F-2.2 | Shows 6 supported mobile payment badges and copies UPI checkout links in one tap. |
-| F-3 | Atomic Reconciliation & Celebration | F-3.1 to F-3.4 | Syncs QR settlements straight to MantraAssist billing with confetti, spoken confirmation, and ledger return. |
+| ID | Feature | Sub-features | Build status | One-line summary |
+| :--- | :--- | :--- | :--- | :--- |
+| F-1 | QR settlement card | F-1.1 – F-1.5 | ◐ / ● / ○ | Card works; QR is fixed-payee, USD and not payable in a UPI app. |
+| F-2 | Wallet badges and Copy link | F-2.1 – F-2.3 | ● / ○ | Badges and copy work; standalone dialog unmounted. |
+| F-3 | I Have Paid and ledger update | F-3.1 – F-3.9 | ◐ / ● / ○ | Records paid on a tap with no proof; unknown ids create an invoice. |
 
 ### 3.2 Jobs to be Done
 | # | User | Job to be done | Feature(s) |
 | :--- | :--- | :--- | :--- |
-| 1 | Patient Paying Balance | Scan a pre-filled QR code with my preferred app, confirm settlement immediately, and leave knowing desk records are updated. | F-1, F-2, F-3 |
-| 2 | Billing Desk Team | Reconcile self-service lobby QR payments effortlessly inside the central clinic invoice ledger. | F-3 |
+| 1 | Patient | Pay with a QR that carries the exact amount | F-1 |
+| 2 | Patient | Copy the payment link when scanning is awkward | F-2 |
+| 3 | Patient | See the invoice paid at once | F-3 |
+| 4 | Billing Specialist | Trust that kiosk payments are real | F-3 |
+
+## 4. Roles and access (as built)
+
+| Who | Can do | Is blocked from |
+| :--- | :--- | :--- |
+| Any visitor at the kiosk | Open any invoice card, copy the link, mark an invoice paid | Nothing. No proof of payment is asked |
+| Billing Specialist (Daniel) | See the QR Code payment on the Invoices page | Nothing is checked |
+
+The old PRD said the invoice flips to Paid after the kiosk reconciles the payment. Decision needed: D-63.
+
+## 5. Metrics and definitions
+
+| Metric | Where | Formula as built |
+| :--- | :--- | :--- |
+| Balance due | QR card header | Invoice total minus amount paid, never below zero |
+| Amount recorded | I Have Paid | The full balance at the moment of the tap |
+| Receipt number | Confirmation | Built from invoice digits, default 1001. **Hardcoded, formula undefined** |
+
+## 6. Cross-module journeys this module appears in
+
+| Journey | Step | What happens as built |
+| :--- | :--- | :--- |
+| Kiosk check-in → Appointment → **Billing** | I Have Paid | Records the full balance on a tap. An unknown invoice id creates a paid invoice for client CL-001. |
+| | QR link | A fixed-payee INR link with USD amounts. No proof of money. Kiosk payment does not move the client's stage. |
+| Patient portal ↔ Appointments / **Invoices** | Staff cancels a prepaid appointment | The invoice is voided even when paid, and the kiosk can still take payment on it. |
+
+Full journey: see Journeys page.
+
+## 7. Open decisions
+
+| ID | Decision | Affects |
+| :--- | :--- | :--- |
+| D-63 | May the kiosk mark an invoice Paid on a tap, and are void invoices excluded? | F-1.4, F-3.1, Section 4 |
+| D-62 | Which gateway, currency and payee does the kiosk QR use, and is payment reconciled? | F-1.1, F-1.5, F-3.8 |
+
+## 8. Change log
+
+| Date | Change |
+| :--- | :--- |
+| 2026-11-14 | Rewritten to describe the prototype as built. Added status marks, roles, metrics, journeys and decisions. |
+| 2026-11-12 | First version (generated stub). |

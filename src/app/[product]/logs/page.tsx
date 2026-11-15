@@ -4,6 +4,7 @@ import PrdLayoutClient from "@/components/PrdLayoutClient";
 import { Clock, History, Calendar, FileEdit, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { ProductId, getProductLink } from "@/lib/modulesConfig";
+import { loadChangeLogs } from "@/lib/prdLoader";
 
 interface PageProps {
   params: {
@@ -286,7 +287,9 @@ export default function LogsPage({ params }: PageProps) {
     notFound();
   }
 
-  const data = LOG_ENTRIES[product] || { dates: [], edits: [] };
+  const base = LOG_ENTRIES[product] || { dates: [], edits: [] };
+  // Rows from each PRD file's "Change log" come first; the fixed entries below remain until every file has a change log.
+  const data = { dates: base.dates, edits: [...loadChangeLogs(product), ...base.edits] };
   const returnHref = getProductLink(product);
 
   return (

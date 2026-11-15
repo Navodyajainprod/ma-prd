@@ -13,6 +13,9 @@ export default function TableOfContents({ prd }: TableOfContentsProps) {
   useEffect(() => {
     // Collect all element IDs to observe
     const ids: string[] = [];
+    if (prd.atAGlanceRaw) {
+      ids.push("at-a-glance");
+    }
     if (prd.crossProductSummaryRaw) {
       ids.push("cross-product-summary");
     }
@@ -69,6 +72,20 @@ export default function TableOfContents({ prd }: TableOfContentsProps) {
       </p>
 
       <div className="space-y-3 text-xs">
+        {prd.atAGlanceRaw && (
+          <button
+            type="button"
+            onClick={() => scrollToElement("at-a-glance")}
+            className={`w-full text-left py-1 px-2 rounded-md transition-colors truncate block ${
+              activeId === "at-a-glance"
+                ? "text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-950/30"
+                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200"
+            }`}
+          >
+            At a glance
+          </button>
+        )}
+
         {prd.crossProductSummaryRaw && (
           <button
             type="button"

@@ -14,7 +14,7 @@ _Sources:_ PRD files `content/client/chat/chat.md`, `sms.md`, `whatsapp.md`, `we
 | C — Companion channel (`companion.md`) | 9 | 3 | 2 | 0 | 3 | 4 | 75.0% |
 | **Totals** | **35** | **15** | **12** | **6** | **24** | **27** | **62.5%** |
 
-Overall coverage: 62.5% · PRD-backed coverage: 62.5% (every sub-module has a PRD file; the Email channel is excluded because it belongs to another group). The defect column counts C-table rows. Some rows share one E entry, so section E lists 24 unique defects.
+Overall coverage: 62.5% · PRD-backed coverage: 62.5% (every sub-module has a PRD file; the Email channel is excluded because it belongs to another group). The defect column counts C-table rows. Some rows share one E entry, so section E lists 23 unique defects (IDs run E-01 to E-24 with E-02 intentionally unused).
 
 ## Route map
 
